@@ -1,6 +1,9 @@
 package app
 
-import "github.com/teambition/gear"
+import (
+	"github.com/seccom/kpass/server/api"
+	"github.com/teambition/gear"
+)
 
 // Router middleware mounts the service routers
 var Router = gear.NewRouter()
@@ -20,7 +23,7 @@ func init() {
 	})
 
 	// Create a new user
-	Router.Post("/join", noop)
+	Router.Post("/join", api.Join)
 	// login
 	Router.Post("/login", noop)
 
