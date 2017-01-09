@@ -13,8 +13,8 @@ import (
 // Logger middleware ...
 var Logger = logging.New(os.Stdout)
 
-// InitForProduction ...
-func InitForProduction(w io.Writer) {
+// InitLogger ...
+func InitLogger(w io.Writer) {
 	Logger.Out = w
 	Logger.SetLevel(logging.InfoLevel)
 

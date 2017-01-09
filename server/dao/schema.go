@@ -49,9 +49,19 @@ type User struct {
 	ID        string      `json:"id"`
 	Pass      string      `json:"pass"` // encrypt
 	IsBlocked bool        `json:"isBlocked"`
+	Attempt   int         `json:"at"` // login attempts
 	Entries   []uuid.UUID `json:"entries"`
 	Created   time.Time   `json:"created"`
 	Updated   time.Time   `json:"updated"`
+}
+
+// UserFrom parse JSON string and returns a User intance.
+func UserFrom(str string) (*User, error) {
+	user := new(User)
+	if err := json.Unmarshal([]byte(str), user); err != nil {
+		return nil, err
+	}
+	return user, nil
 }
 
 // String returns JSON string with full user info
@@ -92,6 +102,15 @@ type Team struct {
 	Entries   []uuid.UUID `json:"entries"`
 	Created   time.Time   `json:"created"`
 	Updated   time.Time   `json:"updated"`
+}
+
+// TeamFrom parse JSON string and returns a Team intance.
+func TeamFrom(str string) (*Team, error) {
+	team := new(Team)
+	if err := json.Unmarshal([]byte(str), team); err != nil {
+		return nil, err
+	}
+	return team, nil
 }
 
 // String returns JSON string with full team info
@@ -139,6 +158,15 @@ type Entry struct {
 	IsDeleted bool        `json:"isDeleted"`
 	Created   time.Time   `json:"created"`
 	Updated   time.Time   `json:"updated"`
+}
+
+// EntryFrom parse JSON string and returns a Entry intance.
+func EntryFrom(str string) (*Entry, error) {
+	entry := new(Entry)
+	if err := json.Unmarshal([]byte(str), entry); err != nil {
+		return nil, err
+	}
+	return entry, nil
 }
 
 // String returns JSON string with full entry info
@@ -193,6 +221,15 @@ type Secret struct {
 	Updated time.Time `json:"updated"`
 }
 
+// SecretFrom parse JSON string and returns a Secret intance.
+func SecretFrom(str string) (*Secret, error) {
+	secret := new(Secret)
+	if err := json.Unmarshal([]byte(str), secret); err != nil {
+		return nil, err
+	}
+	return secret, nil
+}
+
 // String returns JSON string with full secret info
 func (s *Secret) String() string {
 	return jsonMarshal(s)
@@ -208,6 +245,15 @@ type Share struct {
 	Expire  time.Time `json:"expire"`
 	Created time.Time `json:"created"`
 	Updated time.Time `json:"updated"`
+}
+
+// ShareFrom parse JSON string and returns a Share intance.
+func ShareFrom(str string) (*Share, error) {
+	share := new(Share)
+	if err := json.Unmarshal([]byte(str), share); err != nil {
+		return nil, err
+	}
+	return share, nil
 }
 
 // String returns JSON string with full share info

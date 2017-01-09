@@ -34,6 +34,15 @@ func SHA256Sum(str string) string {
 	return hex.EncodeToString(buf[:])
 }
 
+// IsHashString ...
+func IsHashString(str string) bool {
+	res, err := hex.DecodeString(str)
+	if err != nil {
+		return false
+	}
+	return len(res) == 32
+}
+
 // Crypto ...
 type Crypto struct {
 	salt []byte
@@ -62,9 +71,6 @@ func (c *Crypto) EncryptUserPass(userID, userPass string) string {
 
 // ValidateUserPass ...
 func (c *Crypto) ValidateUserPass(userID, userPass, dbUserPass string) bool {
-	if len(userPass) != 64 { // should be sha256 sum hex string
-		return false
-	}
 	return c.EncryptUserPass(userID, userPass) == dbUserPass
 }
 

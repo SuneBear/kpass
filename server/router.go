@@ -23,9 +23,9 @@ func init() {
 	})
 
 	// Create a new user
-	Router.Post("/join", api.Join)
+	Router.Post("/join", api.UserJoin)
 	// login
-	Router.Post("/login", noop)
+	Router.Post("/login", api.UserLogin)
 
 	// Return current user info
 	Router.Get("/user", noop)
