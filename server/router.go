@@ -12,14 +12,9 @@ func noop(ctx *gear.Context) error {
 	return ctx.ErrorStatus(404)
 }
 
-func init() {
-	serviceInfo := map[string]string{
-		"name":    "KPass",
-		"version": Version,
-	}
-
+func initRouter() {
 	Router.Get("/", func(ctx *gear.Context) error {
-		return ctx.JSON(200, serviceInfo)
+		return ctx.HTML(200, string(MustAsset("web/index.html")))
 	})
 
 	// Create a new user

@@ -40,6 +40,7 @@ func RandPass(length int, count ...int) string {
 	}
 
 	password := make([]byte, 0, len(buf))
+	// shuffle
 	for len(buf) > 1 {
 		i := rand.Intn(len(buf))
 		switch i {

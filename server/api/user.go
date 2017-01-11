@@ -1,11 +1,9 @@
 package api
 
 import (
-	"time"
-
-	"github.com/seccom/kpass/server"
 	"github.com/seccom/kpass/server/crypto"
 	"github.com/seccom/kpass/server/dao"
+	"github.com/seccom/kpass/server/util"
 	"github.com/teambition/gear"
 )
 
@@ -73,12 +71,12 @@ func UserLogin(ctx *gear.Context) (err error) {
 		return
 	}
 
-	key := crypto.Global().AESKey(body.ID, body.Pass)
+	key := crypto.Global().AESKey(user.ID, user.Pass)
 	// encrypt key
-	if key, err = crypto.Global().EncryptData(body.ID, key); err != nil {
+	if key, err = crypto.Global().EncryptData(user.ID, key); err != nil {
 		return
 	}
-	if key, err = app.Jwt.Sign(map[string]interface{}{"id": body.ID, "key": key}); err != nil {
+	if key, err = util.Jwt.Sign(map[string]interface{}{"id": user.ID, "key": key}); err != nil {
 		return
 	}
 
@@ -87,6 +85,6 @@ func UserLogin(ctx *gear.Context) (err error) {
 	return ctx.JSON(200, map[string]interface{}{
 		"access_token": key,
 		"token_type":   "Bearer",
-		"expires_in":   app.Jwt.GetExpiration() / time.Second,
+		"expires_in":   util.Jwt.GetExpiresIn().Seconds(),
 	})
 }
