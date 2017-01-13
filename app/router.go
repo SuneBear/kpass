@@ -64,6 +64,8 @@ func initRouter() {
 
 	// Create a team
 	Router.Post("/teams", noop)
+	// Validate team token
+	Router.Post("/teams/:teamId", noop)
 	// Return the team info
 	Router.Get("/teams/:teamId", noop)
 	// Return the team's entries list

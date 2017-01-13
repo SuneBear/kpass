@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/seccom/kpass/app/crypto"
 	"github.com/seccom/kpass/app/dao"
+	"github.com/seccom/kpass/app/pkg"
 	"github.com/teambition/gear"
 	"github.com/tidwall/buntdb"
 )
@@ -45,7 +45,7 @@ func CheckLogin(id, pass string) (user *dao.User, err error) {
 		if user.IsBlocked || user.Attempt > 5 {
 			return &gear.Error{Code: 403, Msg: "too many login attempts"}
 		}
-		if !crypto.Global().ValidateUserPass(id, pass, user.Pass) {
+		if !pkg.Crypto.ValidateUserPass(id, pass, user.Pass) {
 			user.Attempt++
 			tx.Set(userKey, user.String(), nil)
 			return &gear.Error{Code: 400, Msg: "user id or password error"}

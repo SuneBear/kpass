@@ -1,6 +1,8 @@
 package userAPI
 
 import (
+	"fmt"
+
 	"github.com/seccom/kpass/app/crypto"
 	"github.com/seccom/kpass/app/dao"
 	"github.com/seccom/kpass/app/dao/user"
@@ -11,21 +13,6 @@ import (
 type tplJoin struct {
 	ID   string `json:"id"`
 	Pass string `json:"pass"` // should encrypt
-}
-
-// InitDemo creates demo user
-func InitDemo() {
-	if err := userDao.CheckID("demo"); err != nil {
-		return
-	}
-	// client should make double sha256 hash.
-	pass := crypto.SHA256Sum(crypto.SHA256Sum("demo"))
-	pass = crypto.Global().EncryptUserPass("demo", pass)
-	if user, err := userDao.Create("demo", pass); err != nil {
-		pkg.Logger.Fatal(err)
-	} else {
-		pkg.Logger.Info(user.Result())
-	}
 }
 
 func (t *tplJoin) Validate() error {
@@ -47,7 +34,7 @@ func Join(ctx *gear.Context) (err error) {
 		}
 
 		var user *dao.User
-		pass := crypto.Global().EncryptUserPass(body.ID, body.Pass)
+		pass := pkg.Crypto.EncryptUserPass(body.ID, body.Pass)
 		if user, err = userDao.Create(body.ID, pass); err == nil {
 			return ctx.JSON(200, user.Result())
 		}
@@ -87,20 +74,36 @@ func Login(ctx *gear.Context) (err error) {
 		return
 	}
 
-	key := crypto.Global().AESKey(user.ID, user.Pass)
-	// encrypt key
-	if key, err = crypto.Global().EncryptData(user.ID, key); err != nil {
-		return
+	token, err := pkg.Crypto.NewToken(user.ID, user.Pass)
+	if err != nil {
+		return ctx.Error(err)
 	}
-	if key, err = pkg.Jwt.Sign(map[string]interface{}{"id": user.ID, "key": key}); err != nil {
-		return
-	}
-
 	ctx.Set(gear.HeaderPragma, "no-cache")
 	ctx.Set(gear.HeaderCacheControl, "no-store")
 	return ctx.JSON(200, map[string]interface{}{
-		"access_token": key,
+		"access_token": token,
 		"token_type":   "Bearer",
 		"expires_in":   pkg.Jwt.GetExpiresIn().Seconds(),
 	})
+}
+
+// InitDemo creates demo user
+func InitDemo() {
+	if err := userDao.CheckID("demo"); err != nil {
+		return
+	}
+	// client should make double sha256 hash.
+	pass := crypto.SHA256Sum(crypto.SHA256Sum("demo"))
+	pass = pkg.Crypto.EncryptUserPass("demo", pass)
+	if user, err := userDao.Create("demo", pass); err != nil {
+		pkg.Logger.Fatal(err)
+	} else {
+		fmt.Println(user)
+		pkg.Logger.Println(`User {id:"demo", pass:"demo"} created.`)
+		token, err := pkg.Crypto.NewToken(user.ID, pass)
+		if err != nil {
+			pkg.Logger.Fatal(err)
+		}
+		pkg.Logger.Printf("Demo user access_token: %s\n", token)
+	}
 }

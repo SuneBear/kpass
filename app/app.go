@@ -1,7 +1,10 @@
 package app
 
 import (
+	"crypto/rand"
 	"os"
+
+	"time"
 
 	"github.com/seccom/kpass/app/api/user"
 	"github.com/seccom/kpass/app/dao"
@@ -15,12 +18,17 @@ const Version = "0.0.1"
 
 // New returns a app instance
 func New() *gear.App {
+	pkg.InitLogger(os.Stdout)
+
 	if err := dao.Open(""); err != nil {
 		panic(err)
 	}
+	pkg.InitCrypto(dao.DBSalt)
 
-	pkg.InitJwt(3600, "new jwt key", "old jwt key")
-	pkg.InitLogger(os.Stdout)
+	// We use rand key
+	jwtKey := make([]byte, 64)
+	rand.Read(jwtKey)
+	pkg.InitJwt(10*time.Minute, jwtKey)
 
 	app := gear.New()
 	app.Use(favicon.NewWithIco(MustAsset("web/image/favicon.ico")))

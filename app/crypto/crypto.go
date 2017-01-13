@@ -6,6 +6,7 @@ import (
 	"crypto/hmac"
 	"crypto/rand"
 	"crypto/sha256"
+	"crypto/subtle"
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
@@ -15,33 +16,6 @@ import (
 
 	"golang.org/x/crypto/pbkdf2"
 )
-
-var globalCrypto = New([]byte("KPass"))
-
-// Global ...
-func Global() *Crypto {
-	return globalCrypto
-}
-
-// Reset ...
-func Reset(salt []byte) {
-	globalCrypto = New(salt)
-}
-
-// SHA256Sum ...
-func SHA256Sum(str string) string {
-	buf := sha256.Sum256([]byte(str))
-	return hex.EncodeToString(buf[:])
-}
-
-// IsHashString ...
-func IsHashString(str string) bool {
-	res, err := hex.DecodeString(str)
-	if err != nil {
-		return false
-	}
-	return len(res) == 32
-}
 
 // Crypto ...
 type Crypto struct {
@@ -58,7 +32,7 @@ func New(salt []byte) *Crypto {
 // AESKey ...
 func (c *Crypto) AESKey(key, pass string) string {
 	buf := c.hmacSum(fmt.Sprintf("%s.%s", key, pass))
-	return base64.StdEncoding.EncodeToString(buf)
+	return base64.RawURLEncoding.EncodeToString(buf)
 }
 
 // EncryptUserPass ...
@@ -66,12 +40,12 @@ func (c *Crypto) EncryptUserPass(userID, userPass string) string {
 	b := pbkdf2.Key([]byte(userPass), c.salt, 1024, 32, func() hash.Hash {
 		return hmac.New(sha256.New, []byte(userID))
 	})
-	return hex.EncodeToString(b)
+	return base64.RawURLEncoding.EncodeToString(b)
 }
 
 // ValidateUserPass ...
 func (c *Crypto) ValidateUserPass(userID, userPass, dbUserPass string) bool {
-	return c.EncryptUserPass(userID, userPass) == dbUserPass
+	return subtle.ConstantTimeCompare([]byte(c.EncryptUserPass(userID, userPass)), []byte(dbUserPass)) == 1
 }
 
 // EncryptData ...
@@ -90,12 +64,12 @@ func (c *Crypto) EncryptData(key, plainData string) (string, error) {
 
 	stream := cipher.NewCTR(block, iv)
 	stream.XORKeyStream(cipherData[blockSize:], []byte(plainData))
-	return base64.StdEncoding.EncodeToString(cipherData), nil
+	return base64.RawURLEncoding.EncodeToString(cipherData), nil
 }
 
 // DecryptData ...
 func (c *Crypto) DecryptData(key, cipherData string) (string, error) {
-	data, err := base64.StdEncoding.DecodeString(cipherData)
+	data, err := base64.RawURLEncoding.DecodeString(cipherData)
 	if err != nil {
 		return "", err
 	}
@@ -118,4 +92,19 @@ func (c *Crypto) hmacSum(str string) []byte {
 	c.hash.Reset()
 	c.hash.Write([]byte(str))
 	return c.hash.Sum(nil)
+}
+
+// SHA256Sum ...
+func SHA256Sum(str string) string {
+	buf := sha256.Sum256([]byte(str))
+	return hex.EncodeToString(buf[:])
+}
+
+// IsHashString ...
+func IsHashString(str string) bool {
+	res, err := hex.DecodeString(str)
+	if err != nil {
+		return false
+	}
+	return len(res) == 32
 }

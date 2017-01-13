@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/SermoDigital/jose/jwt"
-	"github.com/seccom/kpass/app/crypto"
 	"github.com/teambition/gear-auth"
 )
 
@@ -19,7 +18,7 @@ func InitJwt(expiresIn time.Duration, keys ...interface{}) {
 		Fn: func(c jwt.Claims) (err error) {
 			id := c.Get("id").(string)
 			key := c.Get("key").(string)
-			if key, err = crypto.Global().DecryptData(id, key); err == nil {
+			if key, err = Crypto.DecryptData(id, key); err == nil {
 				// decrypt key
 				c.Set("key", key)
 			}
