@@ -13,6 +13,21 @@ type tplJoin struct {
 	Pass string `json:"pass"` // should encrypt
 }
 
+// InitDemo creates demo user
+func InitDemo() {
+	if err := userDao.CheckID("demo"); err != nil {
+		return
+	}
+	// client should make double sha256 hash.
+	pass := crypto.SHA256Sum(crypto.SHA256Sum("demo"))
+	pass = crypto.Global().EncryptUserPass("demo", pass)
+	if user, err := userDao.Create("demo", pass); err != nil {
+		pkg.Logger.Fatal(err)
+	} else {
+		pkg.Logger.Info(user.Result())
+	}
+}
+
 func (t *tplJoin) Validate() error {
 	if len(t.ID) < 3 {
 		return &gear.Error{Code: 400, Msg: "invalid id, length of id should >= 3"}

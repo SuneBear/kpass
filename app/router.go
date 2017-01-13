@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/seccom/kpass/app/api/user"
+	"github.com/seccom/kpass/app/pkg"
 	"github.com/teambition/gear"
 )
 
@@ -13,6 +14,15 @@ func noop(ctx *gear.Context) error {
 }
 
 func initRouter() {
+
+	// Redirect to index site when user did not logined and not in login site.
+	Router.Use(func(ctx *gear.Context) error {
+		if _, err := ctx.Any(pkg.Jwt); err != nil && ctx.Path != "/" && ctx.Path != "/login" {
+			return ctx.Redirect("/")
+		}
+		return nil
+	})
+
 	Router.Get("/", func(ctx *gear.Context) error {
 		return ctx.HTML(200, string(MustAsset("web/index.html")))
 	})
@@ -27,9 +37,9 @@ func initRouter() {
 	// Update current user info
 	Router.Put("/user", noop)
 	// Return the user info, for admin
-	Router.Get("/users/:name", noop)
+	Router.Get("/users/:id", noop)
 	// Update the user, block or unblock, for admin
-	Router.Put("/users/:name", noop)
+	Router.Put("/users/:id", noop)
 
 	// Create a new entry
 	Router.Post("/entries", noop)

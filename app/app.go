@@ -3,6 +3,7 @@ package app
 import (
 	"os"
 
+	"github.com/seccom/kpass/app/api/user"
 	"github.com/seccom/kpass/app/dao"
 	"github.com/seccom/kpass/app/pkg"
 	"github.com/teambition/gear"
@@ -20,12 +21,13 @@ func New() *gear.App {
 
 	pkg.InitJwt(3600, "new jwt key", "old jwt key")
 	pkg.InitLogger(os.Stdout)
-	initRouter()
 
 	app := gear.New()
 	app.Use(favicon.NewWithIco(MustAsset("web/image/favicon.ico")))
 	app.UseHandler(pkg.Logger)
-	// app.UseHandler(util.Jwt)
+	initRouter()
 	app.UseHandler(Router)
+
+	userAPI.InitDemo()
 	return app
 }

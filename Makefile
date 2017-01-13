@@ -2,6 +2,7 @@ test:
 	go test --race ./app
 	go test --race ./app/crypto
 	go test --race ./app/dao
+	go test --race ./app/dao/user
 	go test --race ./app/pkg
 	go test --race ./app/api/user
 
