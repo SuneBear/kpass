@@ -1,18 +1,19 @@
 test:
-	go test --race ./server
-	go test --race ./server/api
-	go test --race ./server/crypto
-	go test --race ./server/dao
+	go test --race ./app
+	go test --race ./app/crypto
+	go test --race ./app/dao
+	go test --race ./app/pkg
+	go test --race ./app/api/user
 
 build:
-	go-bindata -ignore=\\.DS_Store -o ./server/bindata.go -pkg app web/...
+	go-bindata -ignore=\\.DS_Store -o ./app/bindata.go -pkg app web/...
 
 reset:
-	go-bindata -ignore=\\.* -o ./server/bindata.go -pkg app web/...
+	go-bindata -ignore=\\.* -o ./app/bindata.go -pkg app web/...
 
 cover:
 	rm -f *.coverprofile
-	go test -coverprofile=server.coverprofile ./server
+	go test -coverprofile=app.coverprofile ./app
 	gover
 	go tool cover -html=gover.coverprofile
 	rm -f *.coverprofile

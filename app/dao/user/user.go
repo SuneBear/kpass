@@ -1,4 +1,4 @@
-package dao
+package userDao
 
 import (
 	"encoding/json"
@@ -6,38 +6,39 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/seccom/kpass/server/crypto"
+	"github.com/seccom/kpass/app/crypto"
+	"github.com/seccom/kpass/app/dao"
 	"github.com/teambition/gear"
 	"github.com/tidwall/buntdb"
 )
 
-// InitUserIndex ...
-func InitUserIndex() {
-	db.CreateIndex("user_by_created", UserKey("*"), buntdb.IndexJSON("created"))
+// InitIndex ...
+func InitIndex() {
+	dao.DB.CreateIndex("user_by_created", dao.UserKey("*"), buntdb.IndexJSON("created"))
 }
 
-// CheckUserID ...
-func CheckUserID(id string) error {
+// CheckID ...
+func CheckID(id string) error {
 	if len(id) < 3 {
 		return &gear.Error{Code: 400, Msg: fmt.Sprintf(`invalid user id "%s"`, id)}
 	}
-	return db.View(func(tx *buntdb.Tx) error {
-		if _, e := tx.Get(UserKey(id)); e == nil {
+	return dao.DB.View(func(tx *buntdb.Tx) error {
+		if _, e := tx.Get(dao.UserKey(id)); e == nil {
 			return &gear.Error{Code: 409, Msg: fmt.Sprintf(`user "%s" exists`, id)}
 		}
 		return nil
 	})
 }
 
-// CheckUserLogin ...
-func CheckUserLogin(id, pass string) (user *User, err error) {
-	err = db.Update(func(tx *buntdb.Tx) error {
-		userKey := UserKey(id)
+// CheckLogin ...
+func CheckLogin(id, pass string) (user *dao.User, err error) {
+	err = dao.DB.Update(func(tx *buntdb.Tx) error {
+		userKey := dao.UserKey(id)
 		str, e := tx.Get(userKey)
 		if e != nil {
 			return &gear.Error{Code: 404, Msg: e.Error()}
 		}
-		user, e = UserFrom(str)
+		user, e = dao.UserFrom(str)
 		if e != nil {
 			return e
 		}
@@ -62,16 +63,16 @@ func CheckUserLogin(id, pass string) (user *User, err error) {
 	return
 }
 
-// NewUser ...
-func NewUser(id, pass string) (user *User, err error) {
-	err = db.Update(func(tx *buntdb.Tx) error {
-		userKey := UserKey(id)
+// Create ...
+func Create(id, pass string) (user *dao.User, err error) {
+	err = dao.DB.Update(func(tx *buntdb.Tx) error {
+		userKey := dao.UserKey(id)
 		_, e := tx.Get(userKey)
 		if e == nil {
 			return &gear.Error{Code: 409, Msg: fmt.Sprintf(`user "%s" exists`, id)}
 		}
 
-		user = &User{
+		user = &dao.User{
 			ID:        id,
 			Pass:      pass,
 			IsBlocked: false,
@@ -89,10 +90,10 @@ func NewUser(id, pass string) (user *User, err error) {
 	return
 }
 
-// FindUser ...
-func FindUser(id string) (user *User, err error) {
-	err = db.View(func(tx *buntdb.Tx) error {
-		res, e := tx.Get(UserKey(id))
+// Find ...
+func Find(id string) (user *dao.User, err error) {
+	err = dao.DB.View(func(tx *buntdb.Tx) error {
+		res, e := tx.Get(dao.UserKey(id))
 		if e == nil {
 			e = json.Unmarshal([]byte(res), user)
 		}
@@ -104,11 +105,11 @@ func FindUser(id string) (user *User, err error) {
 	return
 }
 
-// UpdateUser ...
-func UpdateUser(user *User) error {
-	return db.Update(func(tx *buntdb.Tx) error {
+// Update ...
+func Update(user *dao.User) error {
+	return dao.DB.Update(func(tx *buntdb.Tx) error {
 		user.Updated = time.Now()
-		_, _, e := tx.Set(UserKey(user.ID), user.String(), nil)
+		_, _, e := tx.Set(dao.UserKey(user.ID), user.String(), nil)
 		return e
 	})
 }

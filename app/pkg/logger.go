@@ -1,7 +1,6 @@
-package util
+package pkg
 
 import (
-	"encoding/json"
 	"io"
 	"os"
 	"time"
@@ -30,11 +29,11 @@ func InitLogger(w io.Writer) {
 		end := time.Now()
 		log["Time"] = end.Sub(log["Start"].(time.Time)) / 1e6
 		delete(log, "Start")
-		switch res, err := json.Marshal(log); err == nil {
-		case true:
-			Logger.Output(end, logging.InfoLevel, string(res))
-		default:
-			Logger.Output(end, logging.WarningLevel, err.Error())
+
+		if res, err := log.JSON(); err == nil {
+			Logger.Output(end, logging.InfoLevel, res)
+		} else {
+			Logger.Output(end, logging.WarningLevel, log.String())
 		}
 	})
 }

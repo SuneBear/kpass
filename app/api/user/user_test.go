@@ -1,12 +1,12 @@
-package api_test
+package userAPI_test
 
 import (
 	"testing"
 
 	"github.com/DavidCai1993/request"
-	"github.com/seccom/kpass/server"
-	"github.com/seccom/kpass/server/crypto"
-	"github.com/seccom/kpass/server/dao"
+	"github.com/seccom/kpass/app"
+	"github.com/seccom/kpass/app/crypto"
+	"github.com/seccom/kpass/app/dao"
 	"github.com/stretchr/testify/assert"
 	"github.com/teambition/gear"
 )

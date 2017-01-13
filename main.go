@@ -3,8 +3,8 @@ package main
 import (
 	"flag"
 
-	"github.com/seccom/kpass/server"
-	"github.com/seccom/kpass/server/util"
+	"github.com/seccom/kpass/app"
+	"github.com/seccom/kpass/app/pkg"
 )
 
 var (
@@ -14,6 +14,6 @@ var (
 func main() {
 	flag.Parse()
 	srv := app.New()
-	util.Logger.Info("Start KPass " + *port)
+	pkg.Logger.Info("Start KPass " + *port)
 	srv.Listen(*port)
 }

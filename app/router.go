@@ -1,7 +1,7 @@
 package app
 
 import (
-	"github.com/seccom/kpass/server/api"
+	"github.com/seccom/kpass/app/api/user"
 	"github.com/teambition/gear"
 )
 
@@ -18,9 +18,9 @@ func initRouter() {
 	})
 
 	// Create a new user
-	Router.Post("/join", api.UserJoin)
+	Router.Post("/join", userAPI.Join)
 	// login
-	Router.Post("/login", api.UserLogin)
+	Router.Post("/login", userAPI.Login)
 
 	// Return current user info
 	Router.Get("/user", noop)

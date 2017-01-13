@@ -8,18 +8,20 @@ import (
 	"github.com/tidwall/buntdb"
 )
 
-var db *buntdb.DB
-var DBSalt = make([]byte, 128)
+var (
+	DB     *buntdb.DB
+	DBSalt = make([]byte, 128)
+)
 
 // Open open db
 func Open(path string) (err error) {
 	if path == "" {
 		path = ":memory:"
 	}
-	if db, err = buntdb.Open(path); err != nil {
+	if DB, err = buntdb.Open(path); err != nil {
 		return
 	}
-	return db.Update(func(tx *buntdb.Tx) error {
+	return DB.Update(func(tx *buntdb.Tx) error {
 		salt, e := tx.Get(keyDBSalt)
 		if e != nil {
 			if _, e = rand.Read(DBSalt); e == nil {

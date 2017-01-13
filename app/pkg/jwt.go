@@ -1,10 +1,10 @@
-package util
+package pkg
 
 import (
 	"time"
 
 	"github.com/SermoDigital/jose/jwt"
-	"github.com/seccom/kpass/server/crypto"
+	"github.com/seccom/kpass/app/crypto"
 	"github.com/teambition/gear-auth"
 )
 

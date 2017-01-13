@@ -1,18 +1,19 @@
-package api
+package userAPI
 
 import (
-	"github.com/seccom/kpass/server/crypto"
-	"github.com/seccom/kpass/server/dao"
-	"github.com/seccom/kpass/server/util"
+	"github.com/seccom/kpass/app/crypto"
+	"github.com/seccom/kpass/app/dao"
+	"github.com/seccom/kpass/app/dao/user"
+	"github.com/seccom/kpass/app/pkg"
 	"github.com/teambition/gear"
 )
 
-type tplUserJoin struct {
+type tplJoin struct {
 	ID   string `json:"id"`
 	Pass string `json:"pass"` // should encrypt
 }
 
-func (t *tplUserJoin) Validate() error {
+func (t *tplJoin) Validate() error {
 	if len(t.ID) < 3 {
 		return &gear.Error{Code: 400, Msg: "invalid id, length of id should >= 3"}
 	}
@@ -22,17 +23,17 @@ func (t *tplUserJoin) Validate() error {
 	return nil
 }
 
-// UserJoin ...
-func UserJoin(ctx *gear.Context) (err error) {
-	body := new(tplUserJoin)
+// Join ...
+func Join(ctx *gear.Context) (err error) {
+	body := new(tplJoin)
 	if err = ctx.ParseBody(body); err == nil {
-		if err = dao.CheckUserID(body.ID); err != nil {
+		if err = userDao.CheckID(body.ID); err != nil {
 			return
 		}
 
 		var user *dao.User
 		pass := crypto.Global().EncryptUserPass(body.ID, body.Pass)
-		if user, err = dao.NewUser(body.ID, pass); err == nil {
+		if user, err = userDao.Create(body.ID, pass); err == nil {
 			return ctx.JSON(200, user.Result())
 		}
 	}
@@ -40,13 +41,13 @@ func UserJoin(ctx *gear.Context) (err error) {
 }
 
 // Resource Owner Password Credentials Grant https://tools.ietf.org/html/rfc6749#page-37
-type tplUserLogin struct {
+type tplLogin struct {
 	Type string `json:"grant_type"`
 	ID   string `json:"username"`
 	Pass string `json:"password"` // should encrypt
 }
 
-func (t *tplUserLogin) Validate() error {
+func (t *tplLogin) Validate() error {
 	if t.Type != "password" {
 		return &gear.Error{Code: 400, Msg: "invalid_grant"}
 	}
@@ -59,15 +60,15 @@ func (t *tplUserLogin) Validate() error {
 	return nil
 }
 
-// UserLogin ...
-func UserLogin(ctx *gear.Context) (err error) {
-	body := new(tplUserJoin)
+// Login ...
+func Login(ctx *gear.Context) (err error) {
+	body := new(tplJoin)
 	if err = ctx.ParseBody(body); err != nil {
 		return
 	}
 
 	var user *dao.User
-	if user, err = dao.CheckUserLogin(body.ID, body.Pass); err != nil {
+	if user, err = userDao.CheckLogin(body.ID, body.Pass); err != nil {
 		return
 	}
 
@@ -76,7 +77,7 @@ func UserLogin(ctx *gear.Context) (err error) {
 	if key, err = crypto.Global().EncryptData(user.ID, key); err != nil {
 		return
 	}
-	if key, err = util.Jwt.Sign(map[string]interface{}{"id": user.ID, "key": key}); err != nil {
+	if key, err = pkg.Jwt.Sign(map[string]interface{}{"id": user.ID, "key": key}); err != nil {
 		return
 	}
 
@@ -85,6 +86,6 @@ func UserLogin(ctx *gear.Context) (err error) {
 	return ctx.JSON(200, map[string]interface{}{
 		"access_token": key,
 		"token_type":   "Bearer",
-		"expires_in":   util.Jwt.GetExpiresIn().Seconds(),
+		"expires_in":   pkg.Jwt.GetExpiresIn().Seconds(),
 	})
 }
