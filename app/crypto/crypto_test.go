@@ -1,6 +1,7 @@
 package crypto
 
 import (
+	"encoding/base64"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -14,7 +15,8 @@ func TestCrypto(t *testing.T) {
 
 		pass := SHA256Sum("test pass")
 		k := c.AESKey("admin", pass)
-		assert.True(len(k) == 44)
+		b, _ := base64.RawURLEncoding.DecodeString(k)
+		assert.True(len(b) == 32)
 	})
 
 	t.Run("EncryptUserPass and ValidateUserPass", func(t *testing.T) {

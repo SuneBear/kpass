@@ -94,7 +94,7 @@ func (u *UserResult) String() string {
 type Team struct {
 	ID        uuid.UUID   `json:"uuid"`
 	Name      string      `json:"name"`
-	Token     string      `json:"token"`
+	Pass      string      `json:"pass"`
 	IsBlocked bool        `json:"isBlocked"`
 	IsDeleted bool        `json:"isDeleted"`
 	OwnerID   uuid.UUID   `json:"userId"`

@@ -20,15 +20,16 @@ func TestAPIUser(t *testing.T) {
 
 	t.Run("user Join", func(t *testing.T) {
 		assert := assert.New(t)
+		user := &dao.UserResult{}
 
-		res, err := request.Post(host+"/join").
+		_, err := request.Post(host+"/join").
 			Set(gear.HeaderContentType, gear.MIMEApplicationJSON).
 			Send(map[string]interface{}{"id": "admin", "pass": pass}).
-			JSON(&dao.UserResult{})
+			JSON(user)
 		assert.Nil(err)
 
-		assert.Equal("admin", res.(*dao.UserResult).ID)
-		assert.NotNil(res.(*dao.UserResult).Created)
-		assert.Equal(res.(*dao.UserResult).Created, res.(*dao.UserResult).Updated)
+		assert.Equal("admin", user.ID)
+		assert.NotNil(user.Created)
+		assert.Equal(user.Created, user.Updated)
 	})
 }

@@ -48,6 +48,7 @@ func CheckLogin(id, pass string) (user *dao.User, err error) {
 		if !pkg.Crypto.ValidateUserPass(id, pass, user.Pass) {
 			user.Attempt++
 			tx.Set(userKey, user.String(), nil)
+			tx.Commit()
 			return &gear.Error{Code: 400, Msg: "user id or password error"}
 		}
 		if user.Attempt > 0 {

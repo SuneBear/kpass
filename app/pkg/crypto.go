@@ -7,7 +7,7 @@ import (
 	"github.com/teambition/gear"
 )
 
-// Crypto middleware ...
+// Crypto ...
 var Crypto *cryptoJ
 
 // InitCrypto ...
@@ -19,9 +19,8 @@ type cryptoJ struct {
 	*crypto.Crypto
 }
 
-func (c *cryptoJ) NewToken(id, pass string) (token string, err error) {
-	token = c.AESKey(id, pass)
-	// encrypt key
+func (c *cryptoJ) NewToken(id, userPass, dbPass string) (token string, err error) {
+	token = c.AESKey(userPass, dbPass)
 	if token, err = c.EncryptData(id, token); err != nil {
 		return
 	}
@@ -31,21 +30,24 @@ func (c *cryptoJ) NewToken(id, pass string) (token string, err error) {
 	return
 }
 
-func (c *cryptoJ) AddTeamKey(claims jwt.Claims, id uuid.UUID, pass string) (token string, err error) {
-	strID := id.String()
-	token = c.AESKey(strID, pass)
-	if token, err = c.EncryptData(strID, token); err != nil {
-		return "", err
+func (c *cryptoJ) AddTeamKey(claims jwt.Claims, id uuid.UUID, userPass, dbPass string) (token string, err error) {
+	teamID := id.String()
+	token = c.AESKey(userPass, dbPass)
+	if token, err = c.EncryptData(teamID, token); err != nil {
+		return
 	}
-	claims.Set(strID, token)
+	claims.Set(teamID, token)
 	if token, err = Jwt.Sign(claims); err != nil {
-		return "", err
+		return
 	}
 	return
 }
 
 func (c *cryptoJ) UserKeyFromCtx(ctx *gear.Context) (key string, err error) {
-	claims, _ := Jwt.FromCtx(ctx) // It was validated by pre-middleware
+	var claims jwt.Claims
+	if claims, err = Jwt.FromCtx(ctx); err != nil {
+		return
+	}
 	id := claims.Get("id").(string)
 	key = claims.Get("key").(string)
 	// decrypt key
@@ -54,14 +56,17 @@ func (c *cryptoJ) UserKeyFromCtx(ctx *gear.Context) (key string, err error) {
 }
 
 func (c *cryptoJ) TeamKeyFromCtx(ctx *gear.Context, id uuid.UUID) (key string, err error) {
-	strID := id.String()
-	claims, _ := Jwt.FromCtx(ctx) // It was validated by pre-middleware
-	if k := claims.Get(strID); k != nil {
-		key, err = c.DecryptData(strID, k.(string))
+	var claims jwt.Claims
+	teamID := id.String()
+	if claims, err = Jwt.FromCtx(ctx); err != nil {
+		return
+	}
+	if k := claims.Get(teamID); k != nil {
+		key, err = c.DecryptData(teamID, k.(string))
 		return
 	}
 	return "", &gear.Error{
 		Code: 403,
-		Msg:  "invalid team id: " + strID,
+		Msg:  "forbidden: " + teamID,
 	}
 }

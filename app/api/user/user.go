@@ -74,7 +74,7 @@ func Login(ctx *gear.Context) (err error) {
 		return
 	}
 
-	token, err := pkg.Crypto.NewToken(user.ID, user.Pass)
+	token, err := pkg.Crypto.NewToken(user.ID, body.Pass, user.Pass)
 	if err != nil {
 		return ctx.Error(err)
 	}
@@ -100,7 +100,7 @@ func InitDemo() {
 	} else {
 		fmt.Println(user)
 		pkg.Logger.Println(`User {id:"demo", pass:"demo"} created.`)
-		token, err := pkg.Crypto.NewToken(user.ID, pass)
+		token, err := pkg.Crypto.NewToken(user.ID, pass, user.Pass)
 		if err != nil {
 			pkg.Logger.Fatal(err)
 		}

@@ -9,7 +9,6 @@ import (
 	"crypto/subtle"
 	"encoding/base64"
 	"encoding/hex"
-	"fmt"
 	"hash"
 	"io"
 	"sync"
@@ -30,22 +29,34 @@ func New(salt []byte) *Crypto {
 }
 
 // AESKey ...
-func (c *Crypto) AESKey(key, pass string) string {
-	buf := c.hmacSum(fmt.Sprintf("%s.%s", key, pass))
+func (c *Crypto) AESKey(userPass, dbPass string) string {
+	buf := c.hmacSum(userPass + dbPass)
 	return base64.RawURLEncoding.EncodeToString(buf)
 }
 
 // EncryptUserPass ...
 func (c *Crypto) EncryptUserPass(userID, userPass string) string {
-	b := pbkdf2.Key([]byte(userPass), c.salt, 1024, 32, func() hash.Hash {
-		return hmac.New(sha256.New, []byte(userID))
-	})
+	iv := make([]byte, 16)
+	rand.Read(iv)
+	b := c.encryptUserPass(iv, []byte(userPass+userID))
 	return base64.RawURLEncoding.EncodeToString(b)
 }
 
+func (c *Crypto) encryptUserPass(iv, pass []byte) []byte {
+	b := pbkdf2.Key(pass, c.salt, 1025, 32, func() hash.Hash {
+		return hmac.New(sha256.New, iv)
+	})
+	return append(b, iv...)
+}
+
 // ValidateUserPass ...
-func (c *Crypto) ValidateUserPass(userID, userPass, dbUserPass string) bool {
-	return subtle.ConstantTimeCompare([]byte(c.EncryptUserPass(userID, userPass)), []byte(dbUserPass)) == 1
+func (c *Crypto) ValidateUserPass(userID, userPass, dbPass string) bool {
+	a, err := base64.RawURLEncoding.DecodeString(dbPass)
+	if err != nil {
+		return false
+	}
+	b := c.encryptUserPass(a[32:], []byte(userPass+userID))
+	return subtle.ConstantTimeCompare(a, b) == 1
 }
 
 // EncryptData ...

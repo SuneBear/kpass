@@ -15,14 +15,6 @@ func noop(ctx *gear.Context) error {
 
 func initRouter() {
 
-	// Redirect to index site when user did not logined and not in login site.
-	Router.Use(func(ctx *gear.Context) error {
-		if _, err := ctx.Any(pkg.Jwt); err != nil && ctx.Path != "/" && ctx.Path != "/login" {
-			return ctx.Redirect("/")
-		}
-		return nil
-	})
-
 	Router.Get("/", func(ctx *gear.Context) error {
 		return ctx.HTML(200, string(MustAsset("web/index.html")))
 	})
@@ -33,48 +25,48 @@ func initRouter() {
 	Router.Post("/login", userAPI.Login)
 
 	// Return current user info
-	Router.Get("/user", noop)
+	Router.Get("/user", pkg.Jwt.Serve, noop)
 	// Update current user info
-	Router.Put("/user", noop)
+	Router.Put("/user", pkg.Jwt.Serve, noop)
 	// Return the user info, for admin
-	Router.Get("/users/:id", noop)
+	Router.Get("/users/:id", pkg.Jwt.Serve, noop)
 	// Update the user, block or unblock, for admin
-	Router.Put("/users/:id", noop)
+	Router.Put("/users/:id", pkg.Jwt.Serve, noop)
 
 	// Create a new entry
-	Router.Post("/entries", noop)
+	Router.Post("/entries", pkg.Jwt.Serve, noop)
 	// Return current user's entries list
-	Router.Get("/entries", noop)
+	Router.Get("/entries", pkg.Jwt.Serve, noop)
 	// Update the entry
-	Router.Put("/entries/:entryId", noop)
+	Router.Put("/entries/:entryId", pkg.Jwt.Serve, noop)
 	// Delete the entry
-	Router.Delete("/entries/:entryId", noop)
+	Router.Delete("/entries/:entryId", pkg.Jwt.Serve, noop)
 	// Add a secret to the entry
-	Router.Post("/entries/:entryId/secrets", noop)
+	Router.Post("/entries/:entryId/secrets", pkg.Jwt.Serve, noop)
 	// Update the secret
-	Router.Put("/entries/:entryId/secrets/:secretId", noop)
+	Router.Put("/entries/:entryId/secrets/:secretId", pkg.Jwt.Serve, noop)
 	// Delete the secret
-	Router.Delete("/entries/:entryId/secrets/:secretId", noop)
+	Router.Delete("/entries/:entryId/secrets/:secretId", pkg.Jwt.Serve, noop)
 	// Add a share to the entry
-	Router.Post("/entries/:entryId/shares", noop)
+	Router.Post("/entries/:entryId/shares", pkg.Jwt.Serve, noop)
 	// Update the share
-	Router.Put("/entries/:entryId/shares/:shareId", noop)
+	Router.Put("/entries/:entryId/shares/:shareId", pkg.Jwt.Serve, noop)
 	// Delete the share
-	Router.Delete("/entries/:entryId/shares/:shareId", noop)
+	Router.Delete("/entries/:entryId/shares/:shareId", pkg.Jwt.Serve, noop)
 
 	// Create a team
-	Router.Post("/teams", noop)
+	Router.Post("/teams", pkg.Jwt.Serve, noop)
 	// Validate team token
-	Router.Post("/teams/:teamId", noop)
+	Router.Post("/teams/:teamId", pkg.Jwt.Serve, noop)
 	// Return the team info
-	Router.Get("/teams/:teamId", noop)
+	Router.Get("/teams/:teamId", pkg.Jwt.Serve, noop)
 	// Return the team's entries list
-	Router.Get("/teams/:teamId/entries", noop)
+	Router.Get("/teams/:teamId/entries", pkg.Jwt.Serve, noop)
 	// Update the team
-	Router.Put("/teams/:teamId", noop)
+	Router.Put("/teams/:teamId", pkg.Jwt.Serve, noop)
 	// Delete the team
-	Router.Delete("/teams/:teamId", noop)
+	Router.Delete("/teams/:teamId", pkg.Jwt.Serve, noop)
 
 	// Return the shared entry
-	Router.Get("/shares/:shareId", noop)
+	// Router.Get("/shares/:shareId", pkg.Jwt.Serve, noop)
 }
