@@ -14,7 +14,7 @@ import (
 )
 
 // Version is app version
-const Version = "0.0.1"
+const Version = "0.1.0"
 
 // New returns a app instance
 func New() *gear.App {
@@ -23,6 +23,7 @@ func New() *gear.App {
 	if err := dao.Open(""); err != nil {
 		panic(err)
 	}
+	dao.InitIndex()
 	pkg.InitAuth(dao.DBSalt)
 	pkg.InitJwt(10 * time.Minute)
 

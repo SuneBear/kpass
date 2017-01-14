@@ -15,7 +15,6 @@ func noop(ctx *gear.Context) error {
 }
 
 func initRouter() {
-
 	Router.Get("/", func(ctx *gear.Context) error {
 		return ctx.HTML(200, string(MustAsset("web/index.html")))
 	})
@@ -38,12 +37,14 @@ func initRouter() {
 	Router.Post("/entries", pkg.Jwt.Serve, entryAPI.Create)
 	// Return current user's entries list
 	Router.Get("/entries", pkg.Jwt.Serve, entryAPI.FindByUser)
+	// Get the full entry
+	Router.Get("/entries/:entryId", pkg.Jwt.Serve, entryAPI.Find)
 	// Update the entry
-	Router.Put("/entries/:entryId", pkg.Jwt.Serve, entryAPI.Find)
+	Router.Put("/entries/:entryId", pkg.Jwt.Serve, noop)
 	// Delete the entry
 	Router.Delete("/entries/:entryId", pkg.Jwt.Serve, noop)
 	// Add a secret to the entry
-	Router.Post("/entries/:entryId/secrets", pkg.Jwt.Serve, entryAPI.CreateSecret)
+	Router.Post("/entries/:entryId/secrets", pkg.Jwt.Serve, entryAPI.AddSecret)
 	// Update the secret
 	Router.Put("/entries/:entryId/secrets/:secretId", pkg.Jwt.Serve, noop)
 	// Delete the secret

@@ -1,7 +1,6 @@
 package entryDao
 
 import (
-	"encoding/json"
 	"fmt"
 	"time"
 
@@ -39,10 +38,10 @@ func Update(entry *dao.Entry) error {
 
 // Find ...
 func Find(id string) (entry *dao.Entry, err error) {
-	err = dao.DB.View(func(tx *buntdb.Tx) error {
-		res, e := tx.Get(dao.EntryKey(id))
-		if e == nil {
-			e = json.Unmarshal([]byte(res), entry)
+	err = dao.DB.View(func(tx *buntdb.Tx) (e error) {
+		var res string
+		if res, e = tx.Get(dao.EntryKey(id)); e == nil {
+			entry, e = dao.EntryFrom(res)
 		}
 		return e
 	})
@@ -56,10 +55,13 @@ func Find(id string) (entry *dao.Entry, err error) {
 func FindByOwnerID(id string, IsDeleted bool) (entries []*dao.Entry, err error) {
 	cond := fmt.Sprintf(`{"ownerId":"%s"}`, id)
 	err = dao.DB.View(func(tx *buntdb.Tx) (e error) {
-		tx.AscendRange("entry_by_owner", cond, cond, func(key, value string) bool {
+		tx.AscendGreaterOrEqual("entry_by_owner", cond, func(key, value string) bool {
 			entry, e := dao.EntryFrom(value)
 			if e != nil {
 				e = fmt.Errorf("invalid entry: %s, %s", key, value)
+				return false
+			}
+			if entry.OwnerID != id {
 				return false
 			}
 			if entry.IsDeleted == IsDeleted {

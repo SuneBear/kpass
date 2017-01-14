@@ -64,7 +64,7 @@ func (t *tplLogin) Validate() error {
 
 // Login ...
 func Login(ctx *gear.Context) (err error) {
-	body := new(tplJoin)
+	body := new(tplLogin)
 	if err = ctx.ParseBody(body); err != nil {
 		return
 	}

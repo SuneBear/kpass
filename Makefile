@@ -5,6 +5,7 @@ test:
 	go test --race ./app/dao/user
 	go test --race ./app/pkg
 	go test --race ./app/api/user
+	go test --race ./app/api/entry
 
 build:
 	go-bindata -ignore=\\.DS_Store -o ./app/bindata.go -pkg app web/...

@@ -10,7 +10,7 @@ import (
 
 var (
 	DB     *buntdb.DB
-	DBSalt = make([]byte, 128)
+	DBSalt = make([]byte, 64)
 )
 
 // Open open db

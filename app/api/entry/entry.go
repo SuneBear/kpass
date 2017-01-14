@@ -57,7 +57,7 @@ func Find(ctx *gear.Context) error {
 		}
 	}
 
-	return ctx.JSON(200, entry.Result(secrets, []*dao.ShareResult{}))
+	return ctx.JSON(200, entry.Result(secrets, nil))
 }
 
 // FindByUser return entries for current user
@@ -89,8 +89,8 @@ func (t *tplSecretCreate) Validate() error {
 	return nil
 }
 
-// CreateSecret ...
-func CreateSecret(ctx *gear.Context) error {
+// AddSecret ...
+func AddSecret(ctx *gear.Context) error {
 	id := ctx.Param("entryId")
 	if !pkg.IsUUID(id) {
 		return ctx.ErrorStatus(400)
@@ -118,7 +118,7 @@ func CreateSecret(ctx *gear.Context) error {
 	if err != nil {
 		return ctx.Error(err)
 	}
-	entry.Shares = append(entry.Shares, secret.ID)
+	entry.Secrets = append(entry.Secrets, secret.ID)
 	if err = entryDao.Update(entry); err != nil {
 		return ctx.Error(err)
 	}

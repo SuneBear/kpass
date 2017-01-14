@@ -176,6 +176,12 @@ func (e *Entry) String() string {
 
 // Result returns EntryResult intance
 func (e *Entry) Result(secrets []*SecretResult, shares []*ShareResult) *EntryResult {
+	if secrets == nil {
+		secrets = []*SecretResult{}
+	}
+	if shares == nil {
+		shares = []*ShareResult{}
+	}
 	return &EntryResult{
 		ID:        e.ID,
 		OwnerID:   e.OwnerID,
