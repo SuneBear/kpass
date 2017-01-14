@@ -12,11 +12,6 @@ import (
 	"github.com/tidwall/buntdb"
 )
 
-// InitIndex ...
-func InitIndex() {
-	dao.DB.CreateIndex("user_by_created", dao.UserKey("*"), buntdb.IndexJSON("created"))
-}
-
 // CheckID ...
 func CheckID(id string) error {
 	if len(id) < 3 {
@@ -45,7 +40,7 @@ func CheckLogin(id, pass string) (user *dao.User, err error) {
 		if user.IsBlocked || user.Attempt > 5 {
 			return &gear.Error{Code: 403, Msg: "too many login attempts"}
 		}
-		if !pkg.Crypto.ValidateUserPass(id, pass, user.Pass) {
+		if !pkg.Auth.ValidateUserPass(id, pass, user.Pass) {
 			user.Attempt++
 			tx.Set(userKey, user.String(), nil)
 			tx.Commit()

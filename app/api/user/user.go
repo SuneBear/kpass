@@ -34,7 +34,7 @@ func Join(ctx *gear.Context) (err error) {
 		}
 
 		var user *dao.User
-		pass := pkg.Crypto.EncryptUserPass(body.ID, body.Pass)
+		pass := pkg.Auth.EncryptUserPass(body.ID, body.Pass)
 		if user, err = userDao.Create(body.ID, pass); err == nil {
 			return ctx.JSON(200, user.Result())
 		}
@@ -74,7 +74,7 @@ func Login(ctx *gear.Context) (err error) {
 		return
 	}
 
-	token, err := pkg.Crypto.NewToken(user.ID, body.Pass, user.Pass)
+	token, err := pkg.Auth.NewToken(user.ID, body.Pass, user.Pass)
 	if err != nil {
 		return ctx.Error(err)
 	}
@@ -87,20 +87,20 @@ func Login(ctx *gear.Context) (err error) {
 	})
 }
 
-// InitDemo creates demo user
-func InitDemo() {
+// InitDemoUser creates demo user
+func InitDemoUser() {
 	if err := userDao.CheckID("demo"); err != nil {
 		return
 	}
 	// client should make double sha256 hash.
 	pass := crypto.SHA256Sum(crypto.SHA256Sum("demo"))
-	pass = pkg.Crypto.EncryptUserPass("demo", pass)
+	pass = pkg.Auth.EncryptUserPass("demo", pass)
 	if user, err := userDao.Create("demo", pass); err != nil {
 		pkg.Logger.Fatal(err)
 	} else {
 		fmt.Println(user)
 		pkg.Logger.Println(`User {id:"demo", pass:"demo"} created.`)
-		token, err := pkg.Crypto.NewToken(user.ID, pass, user.Pass)
+		token, err := pkg.Auth.NewToken(user.ID, pass, user.Pass)
 		if err != nil {
 			pkg.Logger.Fatal(err)
 		}

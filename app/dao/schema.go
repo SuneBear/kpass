@@ -25,23 +25,23 @@ func UserKey(name string) string {
 }
 
 // TeamKey returns the team's db key
-func TeamKey(id uuid.UUID) string {
-	return keyPrefixTeam + id.String()
+func TeamKey(id string) string {
+	return keyPrefixTeam + id
 }
 
 // EntryKey returns the entry's db key
-func EntryKey(id uuid.UUID) string {
-	return keyPrefixEntry + id.String()
+func EntryKey(id string) string {
+	return keyPrefixEntry + id
 }
 
 // SecretKey returns the secret's db key
-func SecretKey(id uuid.UUID) string {
-	return keyPrefixSecret + id.String()
+func SecretKey(id string) string {
+	return keyPrefixSecret + id
 }
 
 // ShareKey returns the share's db key
-func ShareKey(id uuid.UUID) string {
-	return keyPrefixShare + id.String()
+func ShareKey(id string) string {
+	return keyPrefixShare + id
 }
 
 // User represents user info
@@ -175,7 +175,7 @@ func (e *Entry) String() string {
 }
 
 // Result returns EntryResult intance
-func (e *Entry) Result(secrets []Secret, shares []ShareResult) *EntryResult {
+func (e *Entry) Result(secrets []*SecretResult, shares []*ShareResult) *EntryResult {
 	return &EntryResult{
 		ID:        e.ID,
 		OwnerID:   e.OwnerID,
@@ -190,18 +190,30 @@ func (e *Entry) Result(secrets []Secret, shares []ShareResult) *EntryResult {
 	}
 }
 
+// Summary returns EntrySum intance
+func (e *Entry) Summary() *EntrySum {
+	return &EntrySum{
+		ID:       e.ID,
+		Name:     e.Name,
+		Category: e.Category,
+		Priority: e.Priority,
+		Created:  e.Created,
+		Updated:  e.Updated,
+	}
+}
+
 // EntryResult represents desensitized entry
 type EntryResult struct {
-	ID        uuid.UUID     `json:"uuid"`
-	OwnerID   string        `json:"ownerId"`
-	OwnerType string        `json:"ownerType"`
-	Name      string        `json:"name"`
-	Category  string        `json:"category"`
-	Priority  int           `json:"priority"`
-	Secrets   []Secret      `json:"secrets"`
-	Shares    []ShareResult `json:"shares"`
-	Created   time.Time     `json:"created"`
-	Updated   time.Time     `json:"updated"`
+	ID        uuid.UUID       `json:"uuid"`
+	OwnerID   string          `json:"ownerId"`
+	OwnerType string          `json:"ownerType"`
+	Name      string          `json:"name"`
+	Category  string          `json:"category"`
+	Priority  int             `json:"priority"`
+	Secrets   []*SecretResult `json:"secrets"`
+	Shares    []*ShareResult  `json:"shares"`
+	Created   time.Time       `json:"created"`
+	Updated   time.Time       `json:"updated"`
 }
 
 // String returns JSON string with desensitized entry info
@@ -209,14 +221,27 @@ func (e *EntryResult) String() string {
 	return jsonMarshal(e)
 }
 
+// EntrySum represents desensitized entry
+type EntrySum struct {
+	ID       uuid.UUID `json:"uuid"`
+	Name     string    `json:"name"`
+	Category string    `json:"category"`
+	Priority int       `json:"priority"`
+	Created  time.Time `json:"created"`
+	Updated  time.Time `json:"updated"`
+}
+
+// String returns JSON string with desensitized entry info
+func (e *EntrySum) String() string {
+	return jsonMarshal(e)
+}
+
 // Secret represents secret info
 type Secret struct {
-	ID      uuid.UUID `json:"uuid"`
 	Name    string    `json:"name"`
 	URL     string    `json:"url"`
-	Pass    string    `json:"password"` // encrypt
-	Note    string    `json:"note"`     // encrypt
-	RawData string    `json:"rawData"`  // encrypt
+	Pass    string    `json:"password"`
+	Note    string    `json:"note"`
 	Created time.Time `json:"created"`
 	Updated time.Time `json:"updated"`
 }
@@ -232,6 +257,35 @@ func SecretFrom(str string) (*Secret, error) {
 
 // String returns JSON string with full secret info
 func (s *Secret) String() string {
+	return jsonMarshal(s)
+}
+
+// Result returns EntryResult intance
+func (s *Secret) Result(id uuid.UUID) *SecretResult {
+	return &SecretResult{
+		ID:      id,
+		Name:    s.Name,
+		URL:     s.URL,
+		Pass:    s.Pass,
+		Note:    s.Note,
+		Created: s.Created,
+		Updated: s.Updated,
+	}
+}
+
+// SecretResult represents secret info
+type SecretResult struct {
+	ID      uuid.UUID `json:"uuid"`
+	Name    string    `json:"name"`
+	URL     string    `json:"url"`
+	Pass    string    `json:"password"`
+	Note    string    `json:"note"`
+	Created time.Time `json:"created"`
+	Updated time.Time `json:"updated"`
+}
+
+// String returns JSON string with full secret info
+func (s *SecretResult) String() string {
 	return jsonMarshal(s)
 }
 

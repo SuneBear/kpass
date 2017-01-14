@@ -36,8 +36,7 @@ func (c *Crypto) AESKey(userPass, dbPass string) string {
 
 // EncryptUserPass ...
 func (c *Crypto) EncryptUserPass(userID, userPass string) string {
-	iv := make([]byte, 16)
-	rand.Read(iv)
+	iv := RandBytes(16)
 	b := c.encryptUserPass(iv, []byte(userPass+userID))
 	return base64.RawURLEncoding.EncodeToString(b)
 }
@@ -109,6 +108,13 @@ func (c *Crypto) hmacSum(str string) []byte {
 func SHA256Sum(str string) string {
 	buf := sha256.Sum256([]byte(str))
 	return hex.EncodeToString(buf[:])
+}
+
+// RandBytes ...
+func RandBytes(size int) []byte {
+	b := make([]byte, size)
+	rand.Read(b)
+	return b
 }
 
 // IsHashString ...

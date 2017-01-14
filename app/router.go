@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/seccom/kpass/app/api/entry"
 	"github.com/seccom/kpass/app/api/user"
 	"github.com/seccom/kpass/app/pkg"
 	"github.com/teambition/gear"
@@ -34,15 +35,15 @@ func initRouter() {
 	Router.Put("/users/:id", pkg.Jwt.Serve, noop)
 
 	// Create a new entry
-	Router.Post("/entries", pkg.Jwt.Serve, noop)
+	Router.Post("/entries", pkg.Jwt.Serve, entryAPI.Create)
 	// Return current user's entries list
-	Router.Get("/entries", pkg.Jwt.Serve, noop)
+	Router.Get("/entries", pkg.Jwt.Serve, entryAPI.FindByUser)
 	// Update the entry
-	Router.Put("/entries/:entryId", pkg.Jwt.Serve, noop)
+	Router.Put("/entries/:entryId", pkg.Jwt.Serve, entryAPI.Find)
 	// Delete the entry
 	Router.Delete("/entries/:entryId", pkg.Jwt.Serve, noop)
 	// Add a secret to the entry
-	Router.Post("/entries/:entryId/secrets", pkg.Jwt.Serve, noop)
+	Router.Post("/entries/:entryId/secrets", pkg.Jwt.Serve, entryAPI.CreateSecret)
 	// Update the secret
 	Router.Put("/entries/:entryId/secrets/:secretId", pkg.Jwt.Serve, noop)
 	// Delete the secret
@@ -62,6 +63,8 @@ func initRouter() {
 	Router.Get("/teams/:teamId", pkg.Jwt.Serve, noop)
 	// Return the team's entries list
 	Router.Get("/teams/:teamId/entries", pkg.Jwt.Serve, noop)
+	// Create a new entry for team
+	Router.Post("/teams/:teamId/entries", pkg.Jwt.Serve, noop)
 	// Update the team
 	Router.Put("/teams/:teamId", pkg.Jwt.Serve, noop)
 	// Delete the team

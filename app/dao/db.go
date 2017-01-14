@@ -38,3 +38,9 @@ func Open(path string) (err error) {
 		return e
 	})
 }
+
+// InitIndex ...
+func InitIndex() {
+	DB.CreateIndex("user_by_created", UserKey("*"), buntdb.IndexJSON("created"))
+	DB.CreateIndex("entry_by_owner", EntryKey("*"), buntdb.IndexJSON("ownerId"))
+}

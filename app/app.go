@@ -1,7 +1,6 @@
 package app
 
 import (
-	"crypto/rand"
 	"os"
 
 	"time"
@@ -11,6 +10,7 @@ import (
 	"github.com/seccom/kpass/app/pkg"
 	"github.com/teambition/gear"
 	"github.com/teambition/gear/middleware/favicon"
+	"github.com/teambition/gear/middleware/secure"
 )
 
 // Version is app version
@@ -23,19 +23,16 @@ func New() *gear.App {
 	if err := dao.Open(""); err != nil {
 		panic(err)
 	}
-	pkg.InitCrypto(dao.DBSalt)
-
-	// We use rand key
-	jwtKey := make([]byte, 64)
-	rand.Read(jwtKey)
-	pkg.InitJwt(10*time.Minute, jwtKey)
+	pkg.InitAuth(dao.DBSalt)
+	pkg.InitJwt(10 * time.Minute)
 
 	app := gear.New()
 	app.Use(favicon.NewWithIco(MustAsset("web/image/favicon.ico")))
+	app.Use(secure.Default())
 	app.UseHandler(pkg.Logger)
 	initRouter()
 	app.UseHandler(Router)
 
-	userAPI.InitDemo()
+	userAPI.InitDemoUser()
 	return app
 }
