@@ -31,7 +31,7 @@ func Open(path string) (err error) {
 		}
 
 		if DBSalt, e = hex.DecodeString(salt); e == nil {
-			if len(DBSalt) != 128 {
+			if len(DBSalt) != 64 {
 				return errors.New("invalid DBSalt")
 			}
 		}

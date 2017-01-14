@@ -17,10 +17,10 @@ import (
 const Version = "0.1.0"
 
 // New returns a app instance
-func New() *gear.App {
+func New(dbPath string) *gear.App {
 	pkg.InitLogger(os.Stdout)
 
-	if err := dao.Open(""); err != nil {
+	if err := dao.Open(dbPath); err != nil {
 		panic(err)
 	}
 	dao.InitIndex()
