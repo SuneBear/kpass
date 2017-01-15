@@ -11,7 +11,7 @@ import (
 
 // Create ...
 func Create(key string, EntryID uuid.UUID, secret *dao.Secret) (res *dao.SecretResult, err error) {
-	SecretID := uuid.New()
+	SecretID := pkg.NewUUID(EntryID.String())
 	secret.Created = time.Now()
 	secret.Updated = secret.Created
 	secretID := SecretID.String()

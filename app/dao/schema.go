@@ -34,6 +34,16 @@ func EntryKey(id string) string {
 	return keyPrefixEntry + id
 }
 
+// EntryIDFromKey returns entry' ID from key
+func EntryIDFromKey(key string) uuid.UUID {
+	val := key[len(keyPrefixEntry):]
+	id, err := uuid.Parse(val)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // SecretKey returns the secret's db key
 func SecretKey(id string) string {
 	return keyPrefixSecret + id
@@ -145,7 +155,6 @@ func (t *TeamResult) String() string {
 
 // Entry represents entry info
 type Entry struct {
-	ID        uuid.UUID `json:"uuid"`
 	OwnerID   string    `json:"ownerId"`
 	OwnerType string    `json:"ownerType"`
 	Name      string    `json:"name"`
@@ -199,7 +208,7 @@ func (e *Entry) RemoveSecret(id string) bool {
 }
 
 // Result returns EntryResult intance
-func (e *Entry) Result(secrets []*SecretResult, shares []*ShareResult) *EntryResult {
+func (e *Entry) Result(ID uuid.UUID, secrets []*SecretResult, shares []*ShareResult) *EntryResult {
 	if secrets == nil {
 		secrets = []*SecretResult{}
 	}
@@ -207,7 +216,7 @@ func (e *Entry) Result(secrets []*SecretResult, shares []*ShareResult) *EntryRes
 		shares = []*ShareResult{}
 	}
 	return &EntryResult{
-		ID:        e.ID,
+		ID:        ID,
 		OwnerID:   e.OwnerID,
 		OwnerType: e.OwnerType,
 		Name:      e.Name,
@@ -221,9 +230,9 @@ func (e *Entry) Result(secrets []*SecretResult, shares []*ShareResult) *EntryRes
 }
 
 // Summary returns EntrySum intance
-func (e *Entry) Summary() *EntrySum {
+func (e *Entry) Summary(ID uuid.UUID) *EntrySum {
 	return &EntrySum{
-		ID:       e.ID,
+		ID:       ID,
 		Name:     e.Name,
 		Category: e.Category,
 		Priority: e.Priority,

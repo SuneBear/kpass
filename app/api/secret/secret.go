@@ -43,7 +43,7 @@ func Create(ctx *gear.Context) error {
 	if err != nil {
 		return ctx.Error(err)
 	}
-	secret, err := secretDao.Create(key, entry.ID, &dao.Secret{
+	secret, err := secretDao.Create(key, EntryID, &dao.Secret{
 		Name: body.Name,
 		URL:  body.URL,
 		Pass: body.Pass,

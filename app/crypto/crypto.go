@@ -113,7 +113,9 @@ func SHA256Sum(str string) string {
 // RandBytes ...
 func RandBytes(size int) []byte {
 	b := make([]byte, size)
-	rand.Read(b)
+	if _, err := rand.Read(b); err != nil {
+		panic(err)
+	}
 	return b
 }
 

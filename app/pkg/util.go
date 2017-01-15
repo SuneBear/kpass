@@ -1,6 +1,9 @@
 package pkg
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+	"github.com/seccom/kpass/app/crypto"
+)
 
 // IsUUID ...
 func IsUUID(id string) bool {
@@ -8,4 +11,13 @@ func IsUUID(id string) bool {
 		return true
 	}
 	return false
+}
+
+// NewUUID return a UUID with given space
+func NewUUID(space string) uuid.UUID {
+	id, err := uuid.Parse(space)
+	if err != nil {
+		id = uuid.NewSHA1(uuid.NameSpaceOID, []byte(space))
+	}
+	return uuid.NewSHA1(id, crypto.RandBytes(16))
 }

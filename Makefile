@@ -12,7 +12,7 @@ test: build-assets
 	go test --race ./app/dao/user
 	go test --race ./app/pkg
 
-cover:
+cover: build-assets
 	rm -f *.coverprofile
 	go test -coverprofile=app.coverprofile ./app
 	go test -coverprofile=api-entry.coverprofile ./app/api/entry

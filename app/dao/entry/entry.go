@@ -6,13 +6,14 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/seccom/kpass/app/dao"
+	"github.com/seccom/kpass/app/pkg"
 	"github.com/tidwall/buntdb"
 )
 
 // Create ...
-func Create(ownerID, ownerType, name, category string) (entry *dao.Entry, err error) {
-	entry = &dao.Entry{
-		ID:        uuid.New(),
+func Create(ownerID, ownerType, name, category string) (entrySum *dao.EntrySum, err error) {
+	EntryID := pkg.NewUUID(ownerID)
+	entry := &dao.Entry{
 		OwnerID:   ownerID,
 		OwnerType: ownerType,
 		Name:      name,
@@ -21,21 +22,30 @@ func Create(ownerID, ownerType, name, category string) (entry *dao.Entry, err er
 		Shares:    []string{},
 		Created:   time.Now(),
 	}
-	if err = Update(entry); err != nil {
-		entry = nil
+	entry.Updated = entry.Created
+	entrySum = entry.Summary(EntryID)
+	err = dao.DB.Update(func(tx *buntdb.Tx) error {
+		_, _, e := tx.Set(dao.EntryKey(EntryID.String()), entry.String(), nil)
+		return e
+	})
+	if err != nil {
+		entrySum = nil
 		err = dao.DBError(err)
 	}
 	return
 }
 
 // Update ...
-func Update(entry *dao.Entry) error {
-	err := dao.DB.Update(func(tx *buntdb.Tx) error {
+func Update(EntryID uuid.UUID, entry *dao.Entry) (entrySum *dao.EntrySum, err error) {
+	err = dao.DB.Update(func(tx *buntdb.Tx) error {
 		entry.Updated = time.Now()
-		_, _, e := tx.Set(dao.EntryKey(entry.ID.String()), entry.String(), nil)
+		_, _, e := tx.Set(dao.EntryKey(EntryID.String()), entry.String(), nil)
 		return e
 	})
-	return dao.DBError(err)
+	if err != nil {
+		return nil, dao.DBError(err)
+	}
+	return entry.Summary(EntryID), nil
 }
 
 // Find ...
@@ -59,7 +69,7 @@ func Find(EntryID uuid.UUID, IsDeleted bool) (entry *dao.Entry, err error) {
 }
 
 // FindByOwnerID ...
-func FindByOwnerID(ownerID string, IsDeleted bool) (entries []*dao.Entry, err error) {
+func FindByOwnerID(ownerID string, IsDeleted bool) (entries []*dao.EntrySum, err error) {
 	cond := fmt.Sprintf(`{"ownerId":"%s"}`, ownerID)
 	err = dao.DB.View(func(tx *buntdb.Tx) (e error) {
 		tx.AscendGreaterOrEqual("entry_by_owner", cond, func(key, value string) bool {
@@ -72,7 +82,8 @@ func FindByOwnerID(ownerID string, IsDeleted bool) (entries []*dao.Entry, err er
 				return false
 			}
 			if entry.IsDeleted == IsDeleted {
-				entries = append(entries, entry)
+				EntryID := dao.EntryIDFromKey(key)
+				entries = append(entries, entry.Summary(EntryID))
 			}
 			return true
 		})

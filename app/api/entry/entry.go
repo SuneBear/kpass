@@ -27,9 +27,9 @@ func Create(ctx *gear.Context) (err error) {
 	if err = ctx.ParseBody(body); err == nil {
 		claims, _ := pkg.Jwt.FromCtx(ctx)
 		id := claims.Get("id").(string)
-		var entry *dao.Entry
+		var entry *dao.EntrySum
 		if entry, err = entryDao.Create(id, "user", body.Name, body.Category); err == nil {
-			return ctx.JSON(200, entry.Summary())
+			return ctx.JSON(200, entry)
 		}
 	}
 	return
@@ -115,10 +115,12 @@ func Update(ctx *gear.Context) (err error) {
 	if !changed {
 		return ctx.End(204)
 	}
-	if err = entryDao.Update(entry); err != nil {
+
+	entrySum, err := entryDao.Update(EntryID, entry)
+	if err != nil {
 		return ctx.Error(err)
 	}
-	return ctx.JSON(200, entry.Summary())
+	return ctx.JSON(200, entrySum)
 }
 
 // Delete ...
@@ -138,7 +140,7 @@ func Delete(ctx *gear.Context) (err error) {
 	}
 
 	entry.IsDeleted = true
-	if err = entryDao.Update(entry); err != nil {
+	if _, err = entryDao.Update(EntryID, entry); err != nil {
 		return ctx.Error(err)
 	}
 	return ctx.End(204)
@@ -161,10 +163,11 @@ func Restore(ctx *gear.Context) (err error) {
 	}
 
 	entry.IsDeleted = false
-	if err = entryDao.Update(entry); err != nil {
+	entrySum, err := entryDao.Update(EntryID, entry)
+	if err != nil {
 		return ctx.Error(err)
 	}
-	return ctx.JSON(200, entry.Summary())
+	return ctx.JSON(200, entrySum)
 }
 
 // Find return the entry
@@ -190,7 +193,7 @@ func Find(ctx *gear.Context) error {
 		}
 	}
 
-	return ctx.JSON(200, entry.Result(secrets, nil))
+	return ctx.JSON(200, entry.Result(EntryID, secrets, nil))
 }
 
 // FindByUser return entries for current user
@@ -199,13 +202,9 @@ func FindByUser(ctx *gear.Context) (err error) {
 	if err != nil {
 		return ctx.Error(err)
 	}
-	var entries []*dao.Entry
-	if entries, err = entryDao.FindByOwnerID(userID, false); err == nil {
-		res := make([]*dao.EntrySum, 0, len(entries))
-		for _, entry := range entries {
-			res = append(res, entry.Summary())
-		}
-		return ctx.JSON(200, res)
+	entries, err := entryDao.FindByOwnerID(userID, false)
+	if err != nil {
+		return ctx.Error(err)
 	}
-	return
+	return ctx.JSON(200, entries)
 }
