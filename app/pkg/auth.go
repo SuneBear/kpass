@@ -70,3 +70,11 @@ func (a *authT) KeyFromCtx(ctx *gear.Context, ownerID string) (key string, err e
 		Msg:  "forbidden: " + ownerID,
 	}
 }
+
+func (a *authT) UserIDFromCtx(ctx *gear.Context) (userID string, err error) {
+	var claims jwt.Claims
+	if claims, err = Jwt.FromCtx(ctx); err != nil {
+		return
+	}
+	return claims.Get("id").(string), nil
+}

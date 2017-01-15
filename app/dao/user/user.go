@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/seccom/kpass/app/dao"
 	"github.com/seccom/kpass/app/pkg"
 	"github.com/teambition/gear"
@@ -17,12 +16,13 @@ func CheckID(id string) error {
 	if len(id) < 3 {
 		return &gear.Error{Code: 400, Msg: fmt.Sprintf(`invalid user id "%s"`, id)}
 	}
-	return dao.DB.View(func(tx *buntdb.Tx) error {
+	err := dao.DB.View(func(tx *buntdb.Tx) error {
 		if _, e := tx.Get(dao.UserKey(id)); e == nil {
 			return &gear.Error{Code: 409, Msg: fmt.Sprintf(`user "%s" exists`, id)}
 		}
 		return nil
 	})
+	return dao.DBError(err)
 }
 
 // CheckLogin ...
@@ -55,6 +55,7 @@ func CheckLogin(id, pass string) (user *dao.User, err error) {
 
 	if err != nil {
 		user = nil
+		err = dao.DBError(err)
 	}
 	return
 }
@@ -72,7 +73,6 @@ func Create(id, pass string) (user *dao.User, err error) {
 			ID:        id,
 			Pass:      pass,
 			IsBlocked: false,
-			Entries:   []uuid.UUID{},
 			Created:   time.Now(),
 		}
 		user.Updated = user.Created
@@ -82,6 +82,7 @@ func Create(id, pass string) (user *dao.User, err error) {
 
 	if err != nil {
 		user = nil
+		err = dao.DBError(err)
 	}
 	return
 }
@@ -97,15 +98,17 @@ func Find(id string) (user *dao.User, err error) {
 	})
 	if err != nil {
 		user = nil
+		err = dao.DBError(err)
 	}
 	return
 }
 
 // Update ...
 func Update(user *dao.User) error {
-	return dao.DB.Update(func(tx *buntdb.Tx) error {
+	err := dao.DB.Update(func(tx *buntdb.Tx) error {
 		user.Updated = time.Now()
 		_, _, e := tx.Set(dao.UserKey(user.ID), user.String(), nil)
 		return e
 	})
+	return dao.DBError(err)
 }

@@ -131,4 +131,62 @@ func TestEntryAPI(t *testing.T) {
 		assert.False(strings.Contains(entry.String(), "secrets"))
 		assert.False(strings.Contains(entry.String(), "shares"))
 	})
+
+	t.Run("Update a entry", func(t *testing.T) {
+		assert := assert.New(t)
+		res := new(dao.EntrySum)
+
+		_, err := request.Put(host+"/entries/"+entryID.String()).
+			Set(gear.HeaderAuthorization, accessToken).
+			Set(gear.HeaderContentType, gear.MIMEApplicationJSON).
+			Send(map[string]interface{}{"name": "test1", "category": "银行卡", "priority": 1}).
+			JSON(res)
+		assert.Nil(err)
+
+		assert.Equal(entryID, res.ID)
+		assert.Equal("test1", res.Name)
+		assert.Equal("银行卡", res.Category)
+		assert.Equal(1, res.Priority)
+		assert.True(res.Updated.After(res.Created))
+	})
+
+	t.Run("Delete a entry", func(t *testing.T) {
+		assert := assert.New(t)
+
+		res, err := request.Delete(host+"/entries/"+entryID.String()).
+			Set(gear.HeaderAuthorization, accessToken).End()
+		assert.Nil(err)
+		assert.Equal(204, res.StatusCode)
+
+		res, err = request.Get(host+"/entries/"+entryID.String()).
+			Set(gear.HeaderAuthorization, accessToken).End()
+		assert.Nil(err)
+		assert.Equal(404, res.StatusCode)
+	})
+
+	t.Run("Restore a entry", func(t *testing.T) {
+		assert := assert.New(t)
+		res := new(dao.EntrySum)
+
+		_, err := request.Put(host+"/entries/"+entryID.String()+"/restore").
+			Set(gear.HeaderAuthorization, accessToken).
+			JSON(res)
+		assert.Nil(err)
+
+		assert.Equal(entryID, res.ID)
+		assert.Equal("test1", res.Name)
+		assert.Equal("银行卡", res.Category)
+		assert.Equal(1, res.Priority)
+
+		res = new(dao.EntrySum)
+		_, err = request.Get(host+"/entries/"+entryID.String()).
+			Set(gear.HeaderAuthorization, accessToken).
+			JSON(res)
+		assert.Nil(err)
+
+		assert.Equal(entryID, res.ID)
+		assert.Equal("test1", res.Name)
+		assert.Equal("银行卡", res.Category)
+		assert.Equal(1, res.Priority)
+	})
 }

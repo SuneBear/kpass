@@ -1,6 +1,7 @@
 test: build-assets
 	go test --race ./app
 	go test --race ./app/api/entry
+	go test --race ./app/api/secret
 	go test --race ./app/api/user
 	go test --race ./app/crypto
 	go test --race ./app/dao
@@ -14,6 +15,17 @@ test: build-assets
 cover:
 	rm -f *.coverprofile
 	go test -coverprofile=app.coverprofile ./app
+	go test -coverprofile=api-entry.coverprofile ./app/api/entry
+	go test -coverprofile=api-secret.coverprofile ./app/api/secret
+	go test -coverprofile=api-user.coverprofile ./app/api/user
+	go test -coverprofile=crypto.coverprofile ./app/crypto
+	go test -coverprofile=dao.coverprofile ./app/dao
+	go test -coverprofile=dao-entry.coverprofile ./app/dao/entry
+	go test -coverprofile=dao-secret.coverprofile ./app/dao/secret
+	go test -coverprofile=dao-share.coverprofile ./app/dao/share
+	go test -coverprofile=dao-team.coverprofile ./app/dao/team
+	go test -coverprofile=dao-user.coverprofile ./app/dao/user
+	go test -coverprofile=pkg.coverprofile ./app/pkg
 	gover
 	go tool cover -html=gover.coverprofile
 	rm -f *.coverprofile

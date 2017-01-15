@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -16,7 +15,6 @@ func TestUser(t *testing.T) {
 		ID:        "test",
 		Pass:      "Pass",
 		IsBlocked: false,
-		Entries:   []uuid.UUID{uuid.New()},
 		Created:   time.Now(),
 		Updated:   time.Now(),
 	}
@@ -24,7 +22,6 @@ func TestUser(t *testing.T) {
 	assert.True(strings.Contains(str, `"id":"test"`))
 	assert.True(strings.Contains(str, `"pass":"Pass"`))
 	assert.True(strings.Contains(str, `"isBlocked":false`))
-	assert.True(strings.Contains(str, `"entries":["`))
 	assert.True(strings.Contains(str, `"created":"20`))
 	assert.True(strings.Contains(str, `"updated":"20`))
 
@@ -32,7 +29,6 @@ func TestUser(t *testing.T) {
 	assert.True(strings.Contains(str, `"id":"test"`))
 	assert.False(strings.Contains(str, `"pass":"Pass"`))
 	assert.False(strings.Contains(str, `"isBlocked":false`))
-	assert.False(strings.Contains(str, `"entries":["`))
 	assert.True(strings.Contains(str, `"created":"20`))
 	assert.True(strings.Contains(str, `"updated":"20`))
 }

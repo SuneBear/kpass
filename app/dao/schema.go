@@ -46,13 +46,12 @@ func ShareKey(id string) string {
 
 // User represents user info
 type User struct {
-	ID        string      `json:"id"`
-	Pass      string      `json:"pass"` // encrypt
-	IsBlocked bool        `json:"isBlocked"`
-	Attempt   int         `json:"attempt"` // login attempts
-	Entries   []uuid.UUID `json:"entries"`
-	Created   time.Time   `json:"created"`
-	Updated   time.Time   `json:"updated"`
+	ID        string    `json:"id"`
+	Pass      string    `json:"pass"` // encrypt
+	IsBlocked bool      `json:"isBlocked"`
+	Attempt   int       `json:"attempt"` // login attempts
+	Created   time.Time `json:"created"`
+	Updated   time.Time `json:"updated"`
 }
 
 // UserFrom parse JSON string and returns a User intance.
@@ -92,16 +91,15 @@ func (u *UserResult) String() string {
 
 // Team represents team info
 type Team struct {
-	ID        uuid.UUID   `json:"uuid"`
-	Name      string      `json:"name"`
-	Pass      string      `json:"pass"`
-	IsBlocked bool        `json:"isBlocked"`
-	IsDeleted bool        `json:"isDeleted"`
-	OwnerID   uuid.UUID   `json:"userId"`
-	Members   []string    `json:"members"`
-	Entries   []uuid.UUID `json:"entries"`
-	Created   time.Time   `json:"created"`
-	Updated   time.Time   `json:"updated"`
+	ID        uuid.UUID `json:"uuid"`
+	Name      string    `json:"name"`
+	Pass      string    `json:"pass"`
+	IsBlocked bool      `json:"isBlocked"`
+	IsDeleted bool      `json:"isDeleted"`
+	OwnerID   string    `json:"ownerID"`
+	Members   []string  `json:"members"`
+	Created   time.Time `json:"created"`
+	Updated   time.Time `json:"updated"`
 }
 
 // TeamFrom parse JSON string and returns a Team intance.
@@ -134,7 +132,7 @@ func (t *Team) Result() *TeamResult {
 type TeamResult struct {
 	ID      uuid.UUID `json:"uuid"`
 	Name    string    `json:"name"`
-	OwnerID uuid.UUID `json:"userId"`
+	OwnerID string    `json:"ownerID"`
 	Members []string  `json:"members"`
 	Created time.Time `json:"created"`
 	Updated time.Time `json:"updated"`
@@ -147,17 +145,17 @@ func (t *TeamResult) String() string {
 
 // Entry represents entry info
 type Entry struct {
-	ID        uuid.UUID   `json:"uuid"`
-	OwnerID   string      `json:"ownerId"`
-	OwnerType string      `json:"ownerType"`
-	Name      string      `json:"name"`
-	Category  string      `json:"category"`
-	Priority  int         `json:"priority"`
-	Secrets   []uuid.UUID `json:"secrets"`
-	Shares    []uuid.UUID `json:"shares"`
-	IsDeleted bool        `json:"isDeleted"`
-	Created   time.Time   `json:"created"`
-	Updated   time.Time   `json:"updated"`
+	ID        uuid.UUID `json:"uuid"`
+	OwnerID   string    `json:"ownerId"`
+	OwnerType string    `json:"ownerType"`
+	Name      string    `json:"name"`
+	Category  string    `json:"category"`
+	Priority  int       `json:"priority"`
+	Secrets   []string  `json:"secrets"`
+	Shares    []string  `json:"shares"`
+	IsDeleted bool      `json:"isDeleted"`
+	Created   time.Time `json:"created"`
+	Updated   time.Time `json:"updated"`
 }
 
 // EntryFrom parse JSON string and returns a Entry intance.
@@ -172,6 +170,32 @@ func EntryFrom(str string) (*Entry, error) {
 // String returns JSON string with full entry info
 func (e *Entry) String() string {
 	return jsonMarshal(e)
+}
+
+// HasSecret returns whether the secret is in the Entry.Secrets
+func (e *Entry) HasSecret(id string) bool {
+	for i := 0; i < len(e.Secrets); i++ {
+		if e.Secrets[i] == id {
+			return true
+		}
+	}
+	return false
+}
+
+// RemoveSecret remove the secret from the Entry.Secrets
+func (e *Entry) RemoveSecret(id string) bool {
+	offset := 0
+	for i := 0; i < len(e.Secrets); i++ {
+		if e.Secrets[i] != id {
+			e.Secrets[offset] = e.Secrets[i]
+			offset++
+		}
+	}
+	if offset < len(e.Secrets) {
+		e.Secrets = e.Secrets[0:offset]
+		return true
+	}
+	return false
 }
 
 // Result returns EntryResult intance

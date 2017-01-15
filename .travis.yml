@@ -8,5 +8,16 @@ before_install:
   - go get github.com/mattn/goveralls
 script:
   - go test -coverprofile=app.coverprofile ./app
+	- go test -coverprofile=api-entry.coverprofile ./app/api/entry
+	- go test -coverprofile=api-secret.coverprofile ./app/api/secret
+	- go test -coverprofile=api-user.coverprofile ./app/api/user
+	- go test -coverprofile=crypto.coverprofile ./app/crypto
+	- go test -coverprofile=dao.coverprofile ./app/dao
+	- go test -coverprofile=dao-entry.coverprofile ./app/dao/entry
+	- go test -coverprofile=dao-secret.coverprofile ./app/dao/secret
+	- go test -coverprofile=dao-share.coverprofile ./app/dao/share
+	- go test -coverprofile=dao-team.coverprofile ./app/dao/team
+	- go test -coverprofile=dao-user.coverprofile ./app/dao/user
+	- go test -coverprofile=pkg.coverprofile ./app/pkg
   - gover
   - goveralls -coverprofile=gover.coverprofile -service=travis-ci

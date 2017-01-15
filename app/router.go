@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/seccom/kpass/app/api/entry"
+	"github.com/seccom/kpass/app/api/secret"
 	"github.com/seccom/kpass/app/api/user"
 	"github.com/seccom/kpass/app/pkg"
 	"github.com/teambition/gear"
@@ -63,11 +64,13 @@ func initRouter() {
 	// Return current user's entries list with summary info.
 	Router.Get("/entries", pkg.Jwt.Serve, entryAPI.FindByUser)
 	// Get the full entry, with all secrets
-	Router.Get("/entries/:entryId", pkg.Jwt.Serve, entryAPI.Find)
+	Router.Get("/entries/:entryID", pkg.Jwt.Serve, entryAPI.Find)
 	// Update the entry
-	Router.Put("/entries/:entryId", pkg.Jwt.Serve, noOp)
+	Router.Put("/entries/:entryID", pkg.Jwt.Serve, entryAPI.Update)
 	// Delete the entry
-	Router.Delete("/entries/:entryId", pkg.Jwt.Serve, noOp)
+	Router.Delete("/entries/:entryID", pkg.Jwt.Serve, entryAPI.Delete)
+	// Restore the entry
+	Router.Put("/entries/:entryID/restore", pkg.Jwt.Serve, entryAPI.Restore)
 
 	// Add a secret to the entry
 	// Request body:
@@ -78,33 +81,33 @@ func initRouter() {
 	// 		"note":"other info",
 	//  }
 	// Return: secret info object
-	Router.Post("/entries/:entryId/secrets", pkg.Jwt.Serve, entryAPI.AddSecret)
+	Router.Post("/entries/:entryID/secrets", pkg.Jwt.Serve, secretAPI.Create)
 	// Update the secret
-	Router.Put("/entries/:entryId/secrets/:secretId", pkg.Jwt.Serve, noOp)
+	Router.Put("/entries/:entryID/secrets/:secretID", pkg.Jwt.Serve, secretAPI.Update)
 	// Delete the secret
-	Router.Delete("/entries/:entryId/secrets/:secretId", pkg.Jwt.Serve, noOp)
+	Router.Delete("/entries/:entryID/secrets/:secretID", pkg.Jwt.Serve, secretAPI.Delete)
 	// Add a share to the entry
-	Router.Post("/entries/:entryId/shares", pkg.Jwt.Serve, noOp)
+	Router.Post("/entries/:entryID/shares", pkg.Jwt.Serve, noOp)
 	// Update the share
-	Router.Put("/entries/:entryId/shares/:shareId", pkg.Jwt.Serve, noOp)
+	Router.Put("/entries/:entryID/shares/:shareID", pkg.Jwt.Serve, noOp)
 	// Delete the share
-	Router.Delete("/entries/:entryId/shares/:shareId", pkg.Jwt.Serve, noOp)
+	Router.Delete("/entries/:entryID/shares/:shareID", pkg.Jwt.Serve, noOp)
 
 	// Create a team
 	Router.Post("/teams", pkg.Jwt.Serve, noOp)
 	// Validate team token
-	Router.Post("/teams/:teamId", pkg.Jwt.Serve, noOp)
+	Router.Post("/teams/:teamID", pkg.Jwt.Serve, noOp)
 	// Return the team info
-	Router.Get("/teams/:teamId", pkg.Jwt.Serve, noOp)
+	Router.Get("/teams/:teamID", pkg.Jwt.Serve, noOp)
 	// Return the team's entries list
-	Router.Get("/teams/:teamId/entries", pkg.Jwt.Serve, noOp)
+	Router.Get("/teams/:teamID/entries", pkg.Jwt.Serve, noOp)
 	// Create a new entry for team
-	Router.Post("/teams/:teamId/entries", pkg.Jwt.Serve, noOp)
+	Router.Post("/teams/:teamID/entries", pkg.Jwt.Serve, noOp)
 	// Update the team
-	Router.Put("/teams/:teamId", pkg.Jwt.Serve, noOp)
+	Router.Put("/teams/:teamID", pkg.Jwt.Serve, noOp)
 	// Delete the team
-	Router.Delete("/teams/:teamId", pkg.Jwt.Serve, noOp)
+	Router.Delete("/teams/:teamID", pkg.Jwt.Serve, noOp)
 
 	// Return the shared entry
-	// Router.Get("/shares/:shareId", pkg.Jwt.Serve, noOp)
+	// Router.Get("/shares/:shareID", pkg.Jwt.Serve, noOp)
 }
