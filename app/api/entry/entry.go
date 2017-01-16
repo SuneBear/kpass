@@ -24,13 +24,30 @@ func (t *tplCreate) Validate() error {
 // Create ...
 func Create(ctx *gear.Context) (err error) {
 	body := new(tplCreate)
-	if err = ctx.ParseBody(body); err == nil {
-		claims, _ := pkg.Jwt.FromCtx(ctx)
-		id := claims.Get("id").(string)
-		var entry *dao.EntrySum
-		if entry, err = entryDao.Create(id, "user", body.Name, body.Category); err == nil {
-			return ctx.JSON(200, entry)
+	if err = ctx.ParseBody(body); err != nil {
+		return ctx.Error(err)
+	}
+	userID, err := pkg.Auth.UserIDFromCtx(ctx)
+	if err != nil {
+		return ctx.Error(err)
+	}
+
+	// POST /entries
+	ownerID := userID
+	ownerType := "user"
+	// POST /teams/:teamID/entries
+	if ctx.Param("teamID") != "" {
+		TeamID, err := uuid.Parse(ctx.Param("teamID"))
+		if err != nil {
+			return ctx.ErrorStatus(400)
 		}
+		ownerID = TeamID.String()
+		ownerType = "team"
+	}
+
+	var entry *dao.EntrySum
+	if entry, err = entryDao.Create(userID, ownerID, ownerType, body.Name, body.Category); err == nil {
+		return ctx.JSON(200, entry)
 	}
 	return
 }
@@ -196,13 +213,26 @@ func Find(ctx *gear.Context) error {
 	return ctx.JSON(200, entry.Result(EntryID, secrets, nil))
 }
 
-// FindByUser return entries for current user
-func FindByUser(ctx *gear.Context) (err error) {
+// FindByOwner return entries for current user
+func FindByOwner(ctx *gear.Context) (err error) {
 	userID, err := pkg.Auth.UserIDFromCtx(ctx)
 	if err != nil {
 		return ctx.Error(err)
 	}
-	entries, err := entryDao.FindByOwnerID(userID, false)
+	// GET /entries
+	ownerID := userID
+	ownerType := "user"
+	// GET /teams/:teamID/entries
+	if ctx.Param("teamID") != "" {
+		TeamID, err := uuid.Parse(ctx.Param("teamID"))
+		if err != nil {
+			return ctx.ErrorStatus(400)
+		}
+		ownerID = TeamID.String()
+		ownerType = "team"
+	}
+
+	entries, err := entryDao.FindByOwnerID(userID, ownerID, ownerType, false)
 	if err != nil {
 		return ctx.Error(err)
 	}

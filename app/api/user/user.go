@@ -32,8 +32,7 @@ func Join(ctx *gear.Context) (err error) {
 		}
 
 		var user *dao.User
-		pass := pkg.Auth.EncryptUserPass(body.ID, body.Pass)
-		if user, err = userDao.Create(body.ID, pass); err == nil {
+		if user, err = userDao.Create(body.ID, body.Pass); err == nil {
 			return ctx.JSON(200, user.Result())
 		}
 	}

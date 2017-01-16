@@ -46,6 +46,7 @@ func Open(path string) error {
 func InitIndex() {
 	DB.CreateIndex("user_by_created", UserKey("*"), buntdb.IndexJSON("created"))
 	DB.CreateIndex("entry_by_owner", EntryKey("*"), buntdb.IndexJSON("ownerId"))
+	DB.CreateIndex("team_by_owner", TeamKey("*"), buntdb.IndexJSON("ownerId"))
 }
 
 // DBError ...

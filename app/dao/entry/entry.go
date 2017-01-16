@@ -7,11 +7,12 @@ import (
 	"github.com/google/uuid"
 	"github.com/seccom/kpass/app/dao"
 	"github.com/seccom/kpass/app/pkg"
+	"github.com/teambition/gear"
 	"github.com/tidwall/buntdb"
 )
 
 // Create ...
-func Create(ownerID, ownerType, name, category string) (entrySum *dao.EntrySum, err error) {
+func Create(userID, ownerID, ownerType, name, category string) (entrySum *dao.EntrySum, err error) {
 	EntryID := pkg.NewUUID(ownerID)
 	entry := &dao.Entry{
 		OwnerID:   ownerID,
@@ -25,6 +26,23 @@ func Create(ownerID, ownerType, name, category string) (entrySum *dao.EntrySum, 
 	entry.Updated = entry.Created
 	entrySum = entry.Summary(EntryID)
 	err = dao.DB.Update(func(tx *buntdb.Tx) error {
+		// check right for team
+		if ownerType == "team" {
+			value, e := tx.Get(dao.TeamKey(ownerID))
+			if e != nil {
+				return e
+			}
+			team, e := dao.TeamFrom(value)
+			if e != nil {
+				return e
+			}
+			if team.IsDeleted {
+				return buntdb.ErrNotFound
+			}
+			if !team.HasMember(userID) {
+				return &gear.Error{Code: 403, Msg: "not team member"}
+			}
+		}
 		_, _, e := tx.Set(dao.EntryKey(EntryID.String()), entry.String(), nil)
 		return e
 	})
@@ -69,10 +87,28 @@ func Find(EntryID uuid.UUID, IsDeleted bool) (entry *dao.Entry, err error) {
 }
 
 // FindByOwnerID ...
-func FindByOwnerID(ownerID string, IsDeleted bool) (entries []*dao.EntrySum, err error) {
+func FindByOwnerID(userID, ownerID, ownerType string, IsDeleted bool) (entries []*dao.EntrySum, err error) {
 	entries = make([]*dao.EntrySum, 0)
 	cond := fmt.Sprintf(`{"ownerId":"%s"}`, ownerID)
 	err = dao.DB.View(func(tx *buntdb.Tx) (e error) {
+		// check right for team
+		if ownerType == "team" {
+			value, e := tx.Get(dao.TeamKey(ownerID))
+			if e != nil {
+				return e
+			}
+			team, e := dao.TeamFrom(value)
+			if e != nil {
+				return e
+			}
+			if team.IsDeleted {
+				return buntdb.ErrNotFound
+			}
+			if !team.HasMember(userID) {
+				return &gear.Error{Code: 403, Msg: "not team member"}
+			}
+		}
+
 		tx.AscendGreaterOrEqual("entry_by_owner", cond, func(key, value string) bool {
 			entry, e := dao.EntryFrom(value)
 			if e != nil {

@@ -71,7 +71,7 @@ func initDemo() {
 	pkg.Logger.Println(user)
 
 	// create a demo entry
-	entrySum, _ := entryDao.Create(user.ID, "user", "demo entry", "")
+	entrySum, _ := entryDao.Create(user.ID, user.ID, "user", "demo entry", "")
 	pkg.Logger.Println(`create a demo entry:`)
 	pkg.Logger.Println(entrySum)
 

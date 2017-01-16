@@ -17,17 +17,23 @@ func TestSecretAPI(t *testing.T) {
 	defer srv.Close()
 
 	host := "http://" + srv.Addr().String()
-	id := "demo"
-	pass := crypto.SHA256Sum(crypto.SHA256Sum("demo"))
+	id := "secret"
+	pass := crypto.SHA256Sum(crypto.SHA256Sum("password"))
+	_, err := request.Post(host+"/join").
+		Set(gear.HeaderContentType, gear.MIMEApplicationJSON).
+		Send(map[string]interface{}{"id": id, "pass": pass}).
+		End()
+	assert.Nil(t, err)
 
-	res, _ := request.Post(host+"/login").
+	res, err := request.Post(host+"/login").
 		Set(gear.HeaderContentType, gear.MIMEApplicationJSON).
 		Send(map[string]interface{}{"username": id, "password": pass, "grant_type": "password"}).
 		JSON()
+	assert.Nil(t, err)
 	accessToken := "Bearer " + (*res.(*map[string]interface{}))["access_token"].(string)
 
 	entry := new(dao.EntrySum)
-	_, err := request.Post(host+"/entries").
+	_, err = request.Post(host+"/entries").
 		Set(gear.HeaderAuthorization, accessToken).
 		Set(gear.HeaderContentType, gear.MIMEApplicationJSON).
 		Send(map[string]interface{}{"name": "test"}).

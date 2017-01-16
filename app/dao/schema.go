@@ -144,6 +144,25 @@ func (t *Team) String() string {
 	return jsonMarshal(t)
 }
 
+// HasMember returns whether the user is team's member
+func (t *Team) HasMember(userID string) bool {
+	return StringSlice(t.Members).Has(userID)
+}
+
+// AddMember adds the user to team's members
+func (t *Team) AddMember(userID string) bool {
+	ok := false
+	t.Members, ok = StringSlice(t.Members).Add(userID)
+	return ok
+}
+
+// RemoveMember removes the user from team's members
+func (t *Team) RemoveMember(userID string) bool {
+	ok := false
+	t.Members, ok = StringSlice(t.Members).Remove(userID)
+	return ok
+}
+
 // Result returns TeamResult intance
 func (t *Team) Result(ID uuid.UUID) *TeamResult {
 	return &TeamResult{
@@ -202,29 +221,15 @@ func (e *Entry) String() string {
 }
 
 // HasSecret returns whether the secret is in the Entry.Secrets
-func (e *Entry) HasSecret(id string) bool {
-	for i := 0; i < len(e.Secrets); i++ {
-		if e.Secrets[i] == id {
-			return true
-		}
-	}
-	return false
+func (e *Entry) HasSecret(secretID string) bool {
+	return StringSlice(e.Secrets).Has(secretID)
 }
 
 // RemoveSecret remove the secret from the Entry.Secrets
-func (e *Entry) RemoveSecret(id string) bool {
-	offset := 0
-	for i := 0; i < len(e.Secrets); i++ {
-		if e.Secrets[i] != id {
-			e.Secrets[offset] = e.Secrets[i]
-			offset++
-		}
-	}
-	if offset < len(e.Secrets) {
-		e.Secrets = e.Secrets[0:offset]
-		return true
-	}
-	return false
+func (e *Entry) RemoveSecret(secretID string) bool {
+	ok := false
+	e.Secrets, ok = StringSlice(e.Secrets).Remove(secretID)
+	return ok
 }
 
 // Result returns EntryResult intance
@@ -402,4 +407,40 @@ func jsonMarshal(v interface{}) (str string) {
 		str = string(res)
 	}
 	return
+}
+
+// StringSlice ...
+type StringSlice []string
+
+// Has returns whether the str is in the slice.
+func (s StringSlice) Has(str string) bool {
+	for i := 0; i < len(s); i++ {
+		if s[i] == str {
+			return true
+		}
+	}
+	return false
+}
+
+// Add adds the str to the slice.
+func (s StringSlice) Add(str string) ([]string, bool) {
+	if s.Has(str) {
+		return s, false
+	}
+	return append(s, str), true
+}
+
+// Remove remove the str from the slice.
+func (s StringSlice) Remove(str string) ([]string, bool) {
+	offset := 0
+	for i := 0; i < len(s); i++ {
+		if s[i] != str {
+			s[offset] = s[i]
+			offset++
+		}
+	}
+	if offset < len(s) {
+		return s[0:offset], true
+	}
+	return s, false
 }

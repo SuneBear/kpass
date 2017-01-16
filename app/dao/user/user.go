@@ -29,11 +29,11 @@ func CheckID(id string) error {
 func CheckLogin(id, pass string) (user *dao.User, err error) {
 	err = dao.DB.Update(func(tx *buntdb.Tx) error {
 		userKey := dao.UserKey(id)
-		str, e := tx.Get(userKey)
+		value, e := tx.Get(userKey)
 		if e != nil {
-			return &gear.Error{Code: 404, Msg: e.Error()}
+			return e
 		}
-		user, e = dao.UserFrom(str)
+		user, e = dao.UserFrom(value)
 		if e != nil {
 			return e
 		}
@@ -61,17 +61,17 @@ func CheckLogin(id, pass string) (user *dao.User, err error) {
 }
 
 // Create ...
-func Create(id, pass string) (user *dao.User, err error) {
+func Create(userID, pass string) (user *dao.User, err error) {
 	err = dao.DB.Update(func(tx *buntdb.Tx) error {
-		userKey := dao.UserKey(id)
+		userKey := dao.UserKey(userID)
 		_, e := tx.Get(userKey)
 		if e == nil {
-			return &gear.Error{Code: 409, Msg: fmt.Sprintf(`user "%s" exists`, id)}
+			return &gear.Error{Code: 409, Msg: fmt.Sprintf(`user "%s" exists`, userID)}
 		}
 
 		user = &dao.User{
-			ID:        id,
-			Pass:      pass,
+			ID:        userID,
+			Pass:      pkg.Auth.EncryptUserPass(userID, pass),
 			IsBlocked: false,
 			Created:   time.Now(),
 		}

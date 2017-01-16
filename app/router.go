@@ -3,6 +3,7 @@ package app
 import (
 	"github.com/seccom/kpass/app/api/entry"
 	"github.com/seccom/kpass/app/api/secret"
+	"github.com/seccom/kpass/app/api/team"
 	"github.com/seccom/kpass/app/api/user"
 	"github.com/seccom/kpass/app/pkg"
 	"github.com/teambition/gear"
@@ -62,7 +63,7 @@ func initRouter() {
 	// Return: entry info object
 	Router.Post("/entries", pkg.Jwt.Serve, entryAPI.Create)
 	// Return current user's entries list with summary info.
-	Router.Get("/entries", pkg.Jwt.Serve, entryAPI.FindByUser)
+	Router.Get("/entries", pkg.Jwt.Serve, entryAPI.FindByOwner)
 	// Get the full entry, with all secrets
 	Router.Get("/entries/:entryID", pkg.Jwt.Serve, entryAPI.Find)
 	// Update the entry
@@ -94,19 +95,21 @@ func initRouter() {
 	Router.Delete("/entries/:entryID/shares/:shareID", pkg.Jwt.Serve, noOp)
 
 	// Create a team
-	Router.Post("/teams", pkg.Jwt.Serve, noOp)
-	// Validate team token
-	Router.Post("/teams/:teamID", pkg.Jwt.Serve, noOp)
-	// Return the team info
-	Router.Get("/teams/:teamID", pkg.Jwt.Serve, noOp)
+	Router.Post("/teams", pkg.Jwt.Serve, teamAPI.Create)
+	// // Return current user's teams joined.
+	Router.Get("/teams", pkg.Jwt.Serve, teamAPI.FindByMember)
+	// Get team's token
+	Router.Post("/teams/:teamID/token", pkg.Jwt.Serve, teamAPI.Token)
 	// Return the team's entries list
-	Router.Get("/teams/:teamID/entries", pkg.Jwt.Serve, noOp)
+	Router.Get("/teams/:teamID/entries", pkg.Jwt.Serve, entryAPI.FindByOwner)
 	// Create a new entry for team
-	Router.Post("/teams/:teamID/entries", pkg.Jwt.Serve, noOp)
+	Router.Post("/teams/:teamID/entries", pkg.Jwt.Serve, entryAPI.Create)
 	// Update the team
-	Router.Put("/teams/:teamID", pkg.Jwt.Serve, noOp)
+	Router.Put("/teams/:teamID", pkg.Jwt.Serve, teamAPI.Update)
+	// change the team's members
+	Router.Put("/teams/:teamID/members", pkg.Jwt.Serve, teamAPI.Members)
 	// Delete the team
-	Router.Delete("/teams/:teamID", pkg.Jwt.Serve, noOp)
+	Router.Delete("/teams/:teamID", pkg.Jwt.Serve, teamAPI.Delete)
 
 	// Return the shared entry
 	// Router.Get("/shares/:shareID", pkg.Jwt.Serve, noOp)

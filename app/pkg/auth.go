@@ -19,20 +19,25 @@ func InitAuth(salt []byte) {
 	Auth = &authT{crypto.New(salt)}
 }
 
-func (a *authT) NewToken(id, userPass, dbPass string) (token string, err error) {
-	token = a.AESKey(userPass, dbPass)
-	if token, err = a.EncryptData(id, token); err != nil {
+func (a *authT) NewToken(userID, pass, dbPass string) (token string, err error) {
+	token = a.AESKey(pass, dbPass)
+	if token, err = a.EncryptData(userID, token); err != nil {
 		return
 	}
-	if token, err = Jwt.Sign(map[string]interface{}{"id": id, "key": token}); err != nil {
+	if token, err = Jwt.Sign(map[string]interface{}{"id": userID, "key": token}); err != nil {
 		return
 	}
 	return
 }
 
-func (a *authT) AddTeamKey(claims jwt.Claims, id uuid.UUID, userPass, dbPass string) (token string, err error) {
-	teamID := id.String()
-	token = a.AESKey(userPass, dbPass)
+// AddTeamKey ...
+func (a *authT) AddTeamKey(ctx *gear.Context, TeamID uuid.UUID, pass, dbPass string) (token string, err error) {
+	var claims jwt.Claims
+	if claims, err = Jwt.FromCtx(ctx); err != nil {
+		return
+	}
+	teamID := TeamID.String()
+	token = a.AESKey(pass, dbPass)
 	if token, err = a.EncryptData(teamID, token); err != nil {
 		return
 	}
