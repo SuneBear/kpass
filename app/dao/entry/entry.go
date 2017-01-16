@@ -70,6 +70,7 @@ func Find(EntryID uuid.UUID, IsDeleted bool) (entry *dao.Entry, err error) {
 
 // FindByOwnerID ...
 func FindByOwnerID(ownerID string, IsDeleted bool) (entries []*dao.EntrySum, err error) {
+	entries = make([]*dao.EntrySum, 0)
 	cond := fmt.Sprintf(`{"ownerId":"%s"}`, ownerID)
 	err = dao.DB.View(func(tx *buntdb.Tx) (e error) {
 		tx.AscendGreaterOrEqual("entry_by_owner", cond, func(key, value string) bool {

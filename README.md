@@ -27,8 +27,16 @@ It will run with default options, create a `kpass.kdb` file and open a browser.
 A demo user `{id:"demo", pass:"demo"}` will be created for a new database.
 
 ### Development
+
+Start a development mode with memory database:
 ```sh
 go run main.go -dev
 ```
 
-It will serve `./web` as static server.
+Start a development mode with local file database:
+```sh
+go run main.go -dev -dbpath=dev.kdb
+```
+It creates some demo data. You can find the encrypted secret in the `dev.kdb`.
+
+It will serve `./web` as static server too.

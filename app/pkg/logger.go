@@ -1,7 +1,6 @@
 package pkg
 
 import (
-	"io"
 	"os"
 	"time"
 
@@ -13,8 +12,7 @@ import (
 var Logger = logging.New(os.Stdout)
 
 // InitLogger ...
-func InitLogger(w io.Writer) {
-	Logger.Out = w
+func InitLogger() {
 	Logger.SetLevel(logging.InfoLevel)
 
 	Logger.SetLogInit(func(log logging.Log, ctx *gear.Context) {
