@@ -9,14 +9,13 @@ import (
 
 const (
 	// KeyPrefixUser ...
-	keyPrefixUser   string = "U:"
-	keyPrefixTeam   string = "T:"
-	keyPrefixEntry  string = "E:"
-	keyPrefixSecret string = "S:"
-	keyPrefixShare  string = "SH:"
+	keyPrefixUser   = "U:"
+	keyPrefixTeam   = "T:"
+	keyPrefixEntry  = "E:"
+	keyPrefixSecret = "S:"
+	keyPrefixShare  = "SH:"
 
-	keyDBSalt    string = "DB_SALT"
-	keyUserAdmin string = "ADMIN"
+	keyDBSalt = "DB_SALT"
 )
 
 // UserKey returns the user's db key
@@ -27,6 +26,16 @@ func UserKey(name string) string {
 // TeamKey returns the team's db key
 func TeamKey(id string) string {
 	return keyPrefixTeam + id
+}
+
+// TeamIDFromKey returns team' ID from key
+func TeamIDFromKey(key string) uuid.UUID {
+	val := key[len(keyPrefixTeam):]
+	id, err := uuid.Parse(val)
+	if err != nil {
+		panic(err)
+	}
+	return id
 }
 
 // EntryKey returns the entry's db key
@@ -52,6 +61,16 @@ func SecretKey(id string) string {
 // ShareKey returns the share's db key
 func ShareKey(id string) string {
 	return keyPrefixShare + id
+}
+
+// ShareIDFromKey returns share' ID from key
+func ShareIDFromKey(key string) uuid.UUID {
+	val := key[len(keyPrefixShare):]
+	id, err := uuid.Parse(val)
+	if err != nil {
+		panic(err)
+	}
+	return id
 }
 
 // User represents user info
@@ -101,10 +120,9 @@ func (u *UserResult) String() string {
 
 // Team represents team info
 type Team struct {
-	ID        uuid.UUID `json:"uuid"`
 	Name      string    `json:"name"`
 	Pass      string    `json:"pass"`
-	IsBlocked bool      `json:"isBlocked"`
+	IsFrozen  bool      `json:"isFrozen"`
 	IsDeleted bool      `json:"isDeleted"`
 	OwnerID   string    `json:"ownerID"`
 	Members   []string  `json:"members"`
@@ -127,25 +145,27 @@ func (t *Team) String() string {
 }
 
 // Result returns TeamResult intance
-func (t *Team) Result() *TeamResult {
+func (t *Team) Result(ID uuid.UUID) *TeamResult {
 	return &TeamResult{
-		ID:      t.ID,
-		Name:    t.Name,
-		OwnerID: t.OwnerID,
-		Members: t.Members,
-		Created: t.Created,
-		Updated: t.Updated,
+		ID:       ID,
+		Name:     t.Name,
+		IsFrozen: t.IsFrozen,
+		OwnerID:  t.OwnerID,
+		Members:  t.Members,
+		Created:  t.Created,
+		Updated:  t.Updated,
 	}
 }
 
 // TeamResult represents desensitized team
 type TeamResult struct {
-	ID      uuid.UUID `json:"uuid"`
-	Name    string    `json:"name"`
-	OwnerID string    `json:"ownerID"`
-	Members []string  `json:"members"`
-	Created time.Time `json:"created"`
-	Updated time.Time `json:"updated"`
+	ID       uuid.UUID `json:"uuid"`
+	Name     string    `json:"name"`
+	IsFrozen bool      `json:"isFrozen"`
+	OwnerID  string    `json:"ownerID"`
+	Members  []string  `json:"members"`
+	Created  time.Time `json:"created"`
+	Updated  time.Time `json:"updated"`
 }
 
 // String returns JSON string with desensitized team info
@@ -330,10 +350,9 @@ func (s *SecretResult) String() string {
 
 // Share represents share info
 type Share struct {
-	ID      uuid.UUID `json:"uuid"`
 	Name    string    `json:"name"`
 	Salt    string    `json:"salt"`
-	Members []string  `json:"members"`
+	ToUser  string    `json:"toUser"`
 	TTL     int       `json:"ttl"`
 	Expire  time.Time `json:"expire"`
 	Created time.Time `json:"created"`
@@ -355,11 +374,11 @@ func (s *Share) String() string {
 }
 
 // Result returns ShareResult intance
-func (s *Share) Result() *ShareResult {
+func (s *Share) Result(ID uuid.UUID) *ShareResult {
 	return &ShareResult{
-		ID:      s.ID,
+		ID:      ID,
 		Name:    s.Name,
-		Members: s.Members,
+		ToUser:  s.ToUser,
 		TTL:     s.TTL,
 		Expire:  s.Expire,
 		Created: s.Created,
@@ -371,7 +390,7 @@ func (s *Share) Result() *ShareResult {
 type ShareResult struct {
 	ID      uuid.UUID `json:"uuid"`
 	Name    string    `json:"name"`
-	Members []string  `json:"members"`
+	ToUser  string    `json:"toUser"`
 	TTL     int       `json:"ttl"`
 	Expire  time.Time `json:"expire"`
 	Created time.Time `json:"created"`

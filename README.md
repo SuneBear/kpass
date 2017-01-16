@@ -9,6 +9,9 @@ KPass is a web application to manage password safe.
 ## Build
 
 ```sh
+go get -t github.com/seccom/kpass
+go get -u github.com/jteeuwen/go-bindata/...
+cd $GOPATH/src/github.com/seccom/kpass
 make build
 ```
 It will build three executable files for OSX, windows and linux version in "./dist" directory.
@@ -22,3 +25,10 @@ cd ./dist
 It will run with default options, create a `kpass.kdb` file and open a browser.
 
 A demo user `{id:"demo", pass:"demo"}` will be created for a new database.
+
+### Development
+```sh
+go run main.go -dev
+```
+
+It will serve `./web` as static server.

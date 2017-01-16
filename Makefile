@@ -29,6 +29,7 @@ cover: build-assets
 	gover
 	go tool cover -html=gover.coverprofile
 	rm -f *.coverprofile
+	make clean
 
 doc:
 	godoc -http=:6060

@@ -22,4 +22,4 @@ script:
   - go test -coverprofile=dao-user.coverprofile ./app/dao/user
   - go test -coverprofile=pkg.coverprofile ./app/pkg
   - gover
-  - goveralls -coverprofile=gover.coverprofile -service=travis-ci
+  # - goveralls -coverprofile=gover.coverprofile -service=travis-ci

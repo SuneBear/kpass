@@ -13,7 +13,7 @@ import (
 )
 
 func TestSecretAPI(t *testing.T) {
-	srv := app.New("").Start()
+	srv := app.New("", false).Start()
 	defer srv.Close()
 
 	host := "http://" + srv.Addr().String()
