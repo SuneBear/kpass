@@ -13,7 +13,7 @@ import (
 )
 
 // Create ...
-func Create(ownerID, name, pass string) (res *dao.TeamResult, err error) {
+func Create(ownerID, name, pass string) (teamResult *dao.TeamResult, err error) {
 	TeamID := pkg.NewUUID(ownerID)
 	team := &dao.Team{
 		Name:    name,
@@ -23,20 +23,19 @@ func Create(ownerID, name, pass string) (res *dao.TeamResult, err error) {
 		Created: time.Now(),
 	}
 	team.Updated = team.Created
-	res = team.Result(TeamID)
+	teamResult = team.Result(TeamID)
 	err = dao.DB.Update(func(tx *buntdb.Tx) error {
 		_, _, e := tx.Set(dao.TeamKey(TeamID.String()), team.String(), nil)
 		return e
 	})
 	if err != nil {
-		res = nil
-		err = dao.DBError(err)
+		return nil, dao.DBError(err)
 	}
 	return
 }
 
 // Update ...
-func Update(TeamID uuid.UUID, team *dao.Team) (res *dao.TeamResult, err error) {
+func Update(TeamID uuid.UUID, team *dao.Team) (teamResult *dao.TeamResult, err error) {
 	err = dao.DB.Update(func(tx *buntdb.Tx) error {
 		team.Updated = time.Now()
 		_, _, e := tx.Set(dao.TeamKey(TeamID.String()), team.String(), nil)
@@ -49,7 +48,8 @@ func Update(TeamID uuid.UUID, team *dao.Team) (res *dao.TeamResult, err error) {
 }
 
 // UpdateMembers ...
-func UpdateMembers(userID string, TeamID uuid.UUID, pull, push []string) (res *dao.TeamResult, err error) {
+func UpdateMembers(userID string, TeamID uuid.UUID, pull, push []string) (
+	teamResult *dao.TeamResult, err error) {
 	err = dao.DB.Update(func(tx *buntdb.Tx) error {
 		teamID := TeamID.String()
 		value, e := tx.Get(dao.TeamKey(teamID))
@@ -61,10 +61,10 @@ func UpdateMembers(userID string, TeamID uuid.UUID, pull, push []string) (res *d
 			return e
 		}
 		if team.IsDeleted {
-			return buntdb.ErrNotFound
+			return &gear.Error{Code: 404, Msg: "team not found"}
 		}
-		if !team.HasMember(userID) {
-			return &gear.Error{Code: 403, Msg: "not team member"}
+		if team.OwnerID != userID {
+			return &gear.Error{Code: 403, Msg: "not team owner"}
 		}
 		for _, user := range pull {
 			if !team.RemoveMember(user) {
@@ -78,13 +78,12 @@ func UpdateMembers(userID string, TeamID uuid.UUID, pull, push []string) (res *d
 			}
 			team.AddMember(user)
 		}
-		res = team.Result(TeamID)
+		teamResult = team.Result(TeamID)
 		_, _, e = tx.Set(dao.TeamKey(teamID), team.String(), nil)
 		return e
 	})
 	if err != nil {
-		res = nil
-		err = dao.DBError(err)
+		return nil, dao.DBError(err)
 	}
 	return
 }
@@ -103,8 +102,7 @@ func Find(TeamID uuid.UUID, IsDeleted bool) (team *dao.Team, err error) {
 		return e
 	})
 	if err != nil {
-		team = nil
-		err = dao.DBError(err)
+		return nil, dao.DBError(err)
 	}
 	return
 }
@@ -133,8 +131,7 @@ func FindByOwnerID(ownerID string, IsDeleted bool) (teams []*dao.TeamResult, err
 		return nil
 	})
 	if err != nil {
-		teams = nil
-		err = dao.DBError(err)
+		return nil, dao.DBError(err)
 	}
 	return
 }
@@ -161,8 +158,7 @@ func FindByMemberID(memberID string) (teams []*dao.TeamResult, err error) {
 		return nil
 	})
 	if err != nil {
-		teams = nil
-		err = dao.DBError(err)
+		return nil, dao.DBError(err)
 	}
 	return
 }
@@ -210,8 +206,7 @@ func CheckToken(teamID, userID, pass string) (team *dao.Team, err error) {
 	})
 
 	if err != nil {
-		team = nil
-		err = dao.DBError(err)
+		return nil, dao.DBError(err)
 	}
 	return
 }

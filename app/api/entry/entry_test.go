@@ -1,6 +1,7 @@
 package entryAPI_test
 
 import (
+	"encoding/hex"
 	"testing"
 
 	"strings"
@@ -15,24 +16,32 @@ import (
 )
 
 func TestEntryAPI(t *testing.T) {
-	srv := app.New("", false).Start()
+	srv := app.New("", "test").Start()
 	defer srv.Close()
 
 	host := "http://" + srv.Addr().String()
-	id := "entry"
-	pass := crypto.SHA256Sum(crypto.SHA256Sum("password"))
-	_, err := request.Post(host+"/join").
-		Set(gear.HeaderContentType, gear.MIMEApplicationJSON).
-		Send(map[string]interface{}{"id": id, "pass": pass}).
-		End()
-	assert.Nil(t, err)
+	_, _, accessToken := func() (id, pass, accessToken string) {
+		id = "test" + hex.EncodeToString(crypto.RandBytes(8))
+		pass = crypto.SHA256Sum(crypto.SHA256Sum(crypto.RandPass(8, 2, 2)))
+		_, err := request.Post(host+"/join").
+			Set(gear.HeaderContentType, gear.MIMEApplicationJSON).
+			Send(map[string]interface{}{"id": id, "pass": pass}).
+			End()
 
-	res, err := request.Post(host+"/login").
-		Set(gear.HeaderContentType, gear.MIMEApplicationJSON).
-		Send(map[string]interface{}{"username": id, "password": pass, "grant_type": "password"}).
-		JSON()
-	assert.Nil(t, err)
-	accessToken := "Bearer " + (*res.(*map[string]interface{}))["access_token"].(string)
+		if err != nil {
+			panic(err)
+		}
+
+		res, err := request.Post(host+"/login").
+			Set(gear.HeaderContentType, gear.MIMEApplicationJSON).
+			Send(map[string]interface{}{"username": id, "password": pass, "grant_type": "password"}).
+			JSON()
+		if err != nil {
+			panic(err)
+		}
+		accessToken = "Bearer " + (*res.(*map[string]interface{}))["access_token"].(string)
+		return
+	}()
 
 	t.Run("Find with no content", func(t *testing.T) {
 		assert := assert.New(t)

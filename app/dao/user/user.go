@@ -54,8 +54,7 @@ func CheckLogin(id, pass string) (user *dao.User, err error) {
 	})
 
 	if err != nil {
-		user = nil
-		err = dao.DBError(err)
+		return nil, dao.DBError(err)
 	}
 	return
 }
@@ -81,8 +80,7 @@ func Create(userID, pass string) (user *dao.User, err error) {
 	})
 
 	if err != nil {
-		user = nil
-		err = dao.DBError(err)
+		return nil, dao.DBError(err)
 	}
 	return
 }

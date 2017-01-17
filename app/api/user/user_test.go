@@ -13,7 +13,7 @@ import (
 )
 
 func TestUserAPI(t *testing.T) {
-	srv := app.New("", false).Start()
+	srv := app.New("", "test").Start()
 	defer srv.Close()
 
 	host := "http://" + srv.Addr().String()

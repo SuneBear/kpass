@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"os"
+
 	"github.com/seccom/kpass/app"
 	"github.com/seccom/kpass/app/pkg"
 )
@@ -23,11 +25,20 @@ func main() {
 		panic(`Invalid dbpath, must have ".kdb" as extension.`)
 	}
 
-	srv := app.New(*dbPath, *devMode)
+	if os.Getenv("APP_ENV") == "" {
+		if *devMode {
+			os.Setenv("APP_ENV", "development")
+		} else {
+			os.Setenv("APP_ENV", "production")
+		}
+	}
+
+	env := os.Getenv("APP_ENV")
+	srv := app.New(*dbPath, env)
 	s := srv.Start(*address)
 	go func() {
 		host := "http://" + s.Addr().String()
-		if *devMode {
+		if env == "development" {
 			host += "/dev"
 		}
 		pkg.Logger.Info("Start KPass: " + host)

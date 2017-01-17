@@ -39,11 +39,15 @@ func Create(ctx *gear.Context) error {
 	if err != nil {
 		return ctx.Error(err)
 	}
+	userID, err := pkg.Auth.UserIDFromCtx(ctx)
+	if err != nil {
+		return ctx.Error(err)
+	}
 	key, err := pkg.Auth.KeyFromCtx(ctx, entry.OwnerID)
 	if err != nil {
 		return ctx.Error(err)
 	}
-	secret, err := secretDao.Create(key, EntryID, &dao.Secret{
+	secret, err := secretDao.Create(userID, key, EntryID, &dao.Secret{
 		Name: body.Name,
 		URL:  body.URL,
 		Pass: body.Pass,
@@ -102,47 +106,17 @@ func Update(ctx *gear.Context) error {
 	if !entry.HasSecret(SecretID.String()) {
 		return ctx.ErrorStatus(404)
 	}
-	// ensure current user has right.
+	userID, err := pkg.Auth.UserIDFromCtx(ctx)
+	if err != nil {
+		return ctx.Error(err)
+	}
+	// ensure current user (owner or team member) has right.
 	key, err := pkg.Auth.KeyFromCtx(ctx, entry.OwnerID)
 	if err != nil {
 		return ctx.Error(err)
 	}
 
-	secret, err := secretDao.Find(key, SecretID)
-	if err != nil {
-		return ctx.Error(err)
-	}
-
-	changed := false
-	for key, val := range *body {
-		switch key {
-		case "name":
-			if name := val.(string); name != secret.Name {
-				changed = true
-				secret.Name = name
-			}
-		case "url":
-			if url := val.(string); url != secret.URL {
-				changed = true
-				secret.URL = url
-			}
-		case "password":
-			if pass := val.(string); pass != secret.Pass {
-				changed = true
-				secret.Pass = pass
-			}
-		case "note":
-			if note := val.(string); note != secret.Note {
-				changed = true
-				secret.Note = note
-			}
-		}
-	}
-
-	if !changed {
-		return ctx.End(204)
-	}
-	res, err := secretDao.Update(key, SecretID, secret)
+	res, err := secretDao.Update(userID, key, EntryID, SecretID, *body)
 	if err != nil {
 		return ctx.Error(err)
 	}
@@ -159,20 +133,12 @@ func Delete(ctx *gear.Context) error {
 	if err != nil {
 		return ctx.ErrorStatus(400)
 	}
-
-	entry, err := entryDao.Find(EntryID, false)
-	if err != nil {
-		return ctx.Error(err)
-	}
 	userID, err := pkg.Auth.UserIDFromCtx(ctx)
 	if err != nil {
 		return ctx.Error(err)
 	}
-	if userID != entry.OwnerID {
-		return ctx.ErrorStatus(403)
-	}
 
-	if err := secretDao.Delete(EntryID, SecretID); err != nil {
+	if err := secretDao.Delete(userID, EntryID, SecretID); err != nil {
 		return ctx.Error(err)
 	}
 	return ctx.End(204)

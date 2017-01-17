@@ -16,14 +16,11 @@ import (
 )
 
 // Version is app version
-const Version = "0.1.0"
+const Version = "0.2.0"
 
 // New returns a app instance
-func New(dbPath string, devMode bool) *gear.App {
-	if devMode && dbPath == "./kpass.kdb" {
-		dbPath = ""
-	}
-	if !devMode {
+func New(dbPath string, env string) *gear.App {
+	if env == "production" {
 		pkg.InitLogger()
 	}
 
@@ -37,21 +34,19 @@ func New(dbPath string, devMode bool) *gear.App {
 	app := gear.New()
 	app.Use(favicon.NewWithIco(MustAsset("web/image/favicon.ico")))
 	app.Use(secure.Default())
-	if devMode {
-		app.Set("AppEnv", "development")
+
+	if env == "development" {
 		app.Use(static.New(static.Options{
 			Root:        "./web",
 			Prefix:      "/dev",
 			StripPrefix: true,
 		}))
-	} else {
-		app.Set("AppEnv", "production")
 	}
 	app.UseHandler(pkg.Logger)
 	initRouter()
 	app.UseHandler(Router)
 
-	if devMode {
+	if env != "production" {
 		initDemo()
 	}
 	return app
@@ -88,7 +83,7 @@ func initDemo() {
 		Note: "Hello world!",
 	}
 
-	secretResult, _ := secretDao.Create(key, entrySum.ID, secret)
+	secretResult, _ := secretDao.Create(user.ID, key, entrySum.ID, secret)
 	pkg.Logger.Println(`Add a secret to demo entry:`)
 	pkg.Logger.Println(secretResult)
 

@@ -100,40 +100,7 @@ func Update(ctx *gear.Context) (err error) {
 		return ctx.Error(err)
 	}
 
-	entry, err := entryDao.Find(EntryID, false)
-	if err != nil {
-		return ctx.Error(err)
-	}
-	if entry.OwnerID != userID {
-		return ctx.ErrorStatus(403)
-	}
-
-	changed := false
-	for key, val := range *body {
-		switch key {
-		case "name":
-			if name := val.(string); name != entry.Name {
-				changed = true
-				entry.Name = name
-			}
-		case "category":
-			if category := val.(string); category != entry.Category {
-				changed = true
-				entry.Category = category
-			}
-		case "priority":
-			if priority := int(val.(float64)); priority != entry.Priority {
-				changed = true
-				entry.Priority = priority
-			}
-		}
-	}
-
-	if !changed {
-		return ctx.End(204)
-	}
-
-	entrySum, err := entryDao.Update(EntryID, entry)
+	entrySum, err := entryDao.Update(userID, EntryID, *body)
 	if err != nil {
 		return ctx.Error(err)
 	}
@@ -156,8 +123,7 @@ func Delete(ctx *gear.Context) (err error) {
 		return ctx.ErrorStatus(403)
 	}
 
-	entry.IsDeleted = true
-	if _, err = entryDao.Update(EntryID, entry); err != nil {
+	if _, err = entryDao.UpdateDeleted(userID, EntryID, true); err != nil {
 		return ctx.Error(err)
 	}
 	return ctx.End(204)
@@ -179,8 +145,7 @@ func Restore(ctx *gear.Context) (err error) {
 		return ctx.ErrorStatus(403)
 	}
 
-	entry.IsDeleted = false
-	entrySum, err := entryDao.Update(EntryID, entry)
+	entrySum, err := entryDao.UpdateDeleted(userID, EntryID, false)
 	if err != nil {
 		return ctx.Error(err)
 	}
