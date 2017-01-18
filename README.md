@@ -30,13 +30,9 @@ A demo user `{id:"demo", pass:"demo"}` will be created for a new database.
 
 Start a development mode with memory database:
 ```sh
-go run cmd/kpass -dev
+make assets
+go run cmd/kpass/kpass.go -dev
 ```
-
-Start a development mode with local file database:
-```sh
-go run main.go -dev -dbpath=dev.kdb
-```
-It creates some demo data. You can find the encrypted secret in the `dev.kdb`.
+It creates some demo data. You can find the encrypted secret in the `kpass.kdb`.
 
 It will serve `./web` as static server too.

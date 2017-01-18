@@ -9,7 +9,6 @@ _obj
 _test
 debug
 dist
-kpass
 
 # Architecture specific extensions/prefixes
 *.[568vq]
