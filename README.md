@@ -30,7 +30,7 @@ A demo user `{id:"demo", pass:"demo"}` will be created for a new database.
 
 Start a development mode with memory database:
 ```sh
-go run main.go -dev
+go run cmd/kpass -dev
 ```
 
 Start a development mode with local file database:

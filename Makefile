@@ -1,52 +1,43 @@
-test: build-assets
-	go test --race ./app
-	go test --race ./app/api/entry
-	go test --race ./app/api/secret
-	go test --race ./app/api/user
-	go test --race ./app/crypto
-	go test --race ./app/dao
-	go test --race ./app/dao/entry
-	go test --race ./app/dao/secret
-	go test --race ./app/dao/share
-	go test --race ./app/dao/team
-	go test --race ./app/dao/user
-	go test --race ./app/pkg
+test: assets
+	go test --race ./pkg
+	go test --race ./pkg/api
+	go test --race ./pkg/auth
+	go test --race ./pkg/crypto
+	go test --race ./pkg/dao
+	go test --race ./pkg/logger
+	go test --race ./pkg/schema
+	go test --race ./pkg/service
+	go test --race ./pkg/util
 
-cover: build-assets
+cover: assets
 	rm -f *.coverprofile
-	go test -coverprofile=app.coverprofile ./app
-	go test -coverprofile=api-entry.coverprofile ./app/api/entry
-	go test -coverprofile=api-secret.coverprofile ./app/api/secret
-	go test -coverprofile=api-user.coverprofile ./app/api/user
-	go test -coverprofile=crypto.coverprofile ./app/crypto
-	go test -coverprofile=dao.coverprofile ./app/dao
-	go test -coverprofile=dao-entry.coverprofile ./app/dao/entry
-	go test -coverprofile=dao-secret.coverprofile ./app/dao/secret
-	go test -coverprofile=dao-share.coverprofile ./app/dao/share
-	go test -coverprofile=dao-team.coverprofile ./app/dao/team
-	go test -coverprofile=dao-user.coverprofile ./app/dao/user
-	go test -coverprofile=pkg.coverprofile ./app/pkg
+	go test -coverprofile=pkg.coverprofile ./pkg
+	go test -coverprofile=api.coverprofile ./pkg/api
+	go test -coverprofile=auth.coverprofile ./pkg/auth
+	go test -coverprofile=crypto.coverprofile ./pkg/crypto
+	go test -coverprofile=dao.coverprofile ./pkg/dao
+	go test -coverprofile=logger.coverprofile ./pkg/logger
+	go test -coverprofile=schema.coverprofile ./pkg/schema
+	go test -coverprofile=service.coverprofile ./pkg/service
+	go test -coverprofile=util.coverprofile ./pkg/util
 	gover
 	go tool cover -html=gover.coverprofile
 	rm -f *.coverprofile
 	make clean
 
-doc:
-	godoc -http=:6060
-
 GO=$(shell which go)
 
-build-assets:
-	go-bindata -ignore=\\.DS_Store -o ./app/bindata.go -pkg app web/...
+assets:
+	go-bindata -ignore=\\.DS_Store -o ./pkg/bindata.go -pkg pkg web/...
 clean:
-	go-bindata -ignore=\\.* -o ./app/bindata.go -pkg app web/...
+	go-bindata -ignore=\\.* -o ./pkg/bindata.go -pkg pkg web/...
 
 build-linux:
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GO) build -a -installsuffix cgo -o dist/kpass_linux .
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GO) build -a -installsuffix cgo -o dist/kpass_linux ./cmd/kpass
 build-osx:
-	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 $(GO) build -a -installsuffix cgo -o dist/kpass .
+	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 $(GO) build -a -installsuffix cgo -o dist/kpass ./cmd/kpass
 build-win:
-	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 $(GO) build -a -installsuffix cgo -o dist/kpass.exe .
-build: build-assets build-osx build-linux build-win clean
+	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 $(GO) build -a -installsuffix cgo -o dist/kpass.exe ./cmd/kpass
+build: assets build-osx build-linux build-win clean
 
-.PHONY: test build cover doc
+.PHONY: assets test build cover clean
