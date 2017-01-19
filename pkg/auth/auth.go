@@ -3,71 +3,81 @@ package auth
 import (
 	"time"
 
-	"github.com/SermoDigital/jose/jwt"
+	josejwt "github.com/SermoDigital/jose/jwt"
 	"github.com/google/uuid"
-	"github.com/seccom/kpass/pkg/crypto"
 	"github.com/seccom/kpass/pkg/util"
 	"github.com/teambition/gear"
-	gearAuth "github.com/teambition/gear-auth"
+	au "github.com/teambition/gear-auth"
+	"github.com/teambition/gear-auth/crypto"
+	"github.com/teambition/gear-auth/jwt"
 )
 
 // Auth ...
 type Auth struct {
-	c *crypto.Crypto
-	j *gearAuth.JWT
+	*au.Auth
 }
 
-var std = new(Auth)
+var std = &Auth{au.New(util.RandBytes(32))} // use a rand key
+var Middleware = std.Serve
+
+// Default returns the global Auth instance
+func Default() *Auth {
+	return std
+}
 
 // Crypto ...
 func Crypto() *crypto.Crypto {
-	return std.c
+	return std.Crypto()
 }
 
-// Jwt ...
-func Jwt() *gearAuth.JWT {
-	return std.j
+// JWT ...
+func JWT() *jwt.JWT {
+	return std.JWT()
 }
 
 // Init ...
-func Init(salt []byte, expiresIn time.Duration, keys ...interface{}) {
-	std.c = crypto.New(salt)
-	std.j = gearAuth.NewJWT(util.RandBytes(32))
-	std.j.SetExpiresIn(expiresIn)
+func Init(salt []byte, expiresIn time.Duration) {
+	std.SetCrypto(crypto.New(salt))
+	std.JWT().SetExpiresIn(expiresIn)
 }
 
 // AESKey ...
 func AESKey(userPass, dbPass string) string {
-	return std.c.AESKey(userPass, dbPass)
+	return std.Crypto().AESKey(userPass, dbPass)
 }
 
 // EncryptUserPass ...
 func EncryptUserPass(userID, userPass string) string {
-	return std.c.EncryptUserPass(userID, userPass)
+	return std.Crypto().EncryptUserPass(userID, userPass)
 }
 
 // ValidateUserPass ...
 func ValidateUserPass(userID, userPass, dbPass string) bool {
-	return std.c.ValidateUserPass(userID, userPass, dbPass)
+	return std.Crypto().ValidateUserPass(userID, userPass, dbPass)
 }
 
 // EncryptData ...
 func EncryptData(key, plainData string) (string, error) {
-	return std.c.EncryptData(key, plainData)
+	return std.Crypto().EncryptData(key, plainData)
 }
 
 // DecryptData ...
 func DecryptData(key, cipherData string) (string, error) {
-	return std.c.DecryptData(key, cipherData)
+	return std.Crypto().DecryptData(key, cipherData)
+}
+
+// Sign ...
+func Sign(c map[string]interface{}) (string, error) {
+	return std.JWT().Sign(c)
 }
 
 // NewToken ...
 func NewToken(userID, pass, dbPass string) (token string, err error) {
-	token = std.c.AESKey(pass, dbPass)
-	if token, err = std.c.EncryptData(userID, token); err != nil {
+	token = AESKey(pass, dbPass)
+	if token, err = EncryptData(userID, token); err != nil {
 		return
 	}
-	if token, err = std.j.Sign(map[string]interface{}{"id": userID, "key": token}); err != nil {
+	if token, err = Sign(map[string]interface{}{"id": userID, "key": token}); err != nil {
 		return
 	}
 	return
@@ -75,26 +85,31 @@ func NewToken(userID, pass, dbPass string) (token string, err error) {
 
 // AddTeamKey ...
 func AddTeamKey(ctx *gear.Context, TeamID uuid.UUID, pass, dbPass string) (token string, err error) {
-	var claims jwt.Claims
-	if claims, err = std.j.FromCtx(ctx); err != nil {
+	var claims josejwt.Claims
+	if claims, err = FromCtx(ctx); err != nil {
 		return
 	}
 	teamID := TeamID.String()
-	token = std.c.AESKey(pass, dbPass)
-	if token, err = std.c.EncryptData(teamID, token); err != nil {
+	token = AESKey(pass, dbPass)
+	if token, err = EncryptData(teamID, token); err != nil {
 		return
 	}
 	claims.Set(teamID, token)
-	if token, err = std.j.Sign(claims); err != nil {
+	if token, err = Sign(claims); err != nil {
 		return
 	}
 	return
 }
 
+// FromCtx ...
+func FromCtx(ctx *gear.Context) (josejwt.Claims, error) {
+	return std.FromCtx(ctx)
+}
+
 // KeyFromCtx ...
 func KeyFromCtx(ctx *gear.Context, ownerID string) (key string, err error) {
-	var claims jwt.Claims
-	if claims, err = std.j.FromCtx(ctx); err != nil {
+	var claims josejwt.Claims
+	if claims, err = FromCtx(ctx); err != nil {
 		return
 	}
 	userID := claims.Get("id").(string)
@@ -102,14 +117,14 @@ func KeyFromCtx(ctx *gear.Context, ownerID string) (key string, err error) {
 	if ownerID == "" || ownerID == userID {
 		key = claims.Get("key").(string)
 		// decrypt key
-		key, err = std.c.DecryptData(userID, key)
+		key, err = DecryptData(userID, key)
 		return
 	}
 
 	// return the team's key
 	if util.IsUUID(ownerID) {
 		if k := claims.Get(ownerID); k != nil {
-			key, err = std.c.DecryptData(ownerID, k.(string))
+			key, err = DecryptData(ownerID, k.(string))
 			return
 		}
 	}
@@ -122,8 +137,8 @@ func KeyFromCtx(ctx *gear.Context, ownerID string) (key string, err error) {
 
 // UserIDFromCtx ...
 func UserIDFromCtx(ctx *gear.Context) (userID string, err error) {
-	var claims jwt.Claims
-	if claims, err = std.j.FromCtx(ctx); err != nil {
+	var claims josejwt.Claims
+	if claims, err = FromCtx(ctx); err != nil {
 		return
 	}
 	return claims.Get("id").(string), nil

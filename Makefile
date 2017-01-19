@@ -2,7 +2,6 @@ test: assets
 	go test --race ./pkg
 	go test --race ./pkg/api
 	go test --race ./pkg/auth
-	go test --race ./pkg/crypto
 	go test --race ./pkg/dao
 	go test --race ./pkg/logger
 	go test --race ./pkg/schema
@@ -14,7 +13,6 @@ cover: assets
 	go test -coverprofile=pkg.coverprofile ./pkg
 	go test -coverprofile=api.coverprofile ./pkg/api
 	go test -coverprofile=auth.coverprofile ./pkg/auth
-	go test -coverprofile=crypto.coverprofile ./pkg/crypto
 	go test -coverprofile=dao.coverprofile ./pkg/dao
 	go test -coverprofile=logger.coverprofile ./pkg/logger
 	go test -coverprofile=schema.coverprofile ./pkg/schema

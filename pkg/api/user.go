@@ -1,6 +1,8 @@
 package api
 
 import (
+	"strconv"
+
 	"github.com/seccom/kpass/pkg/auth"
 	"github.com/seccom/kpass/pkg/dao"
 	"github.com/seccom/kpass/pkg/schema"
@@ -91,6 +93,29 @@ func (a *User) Login(ctx *gear.Context) (err error) {
 	return ctx.JSON(200, map[string]interface{}{
 		"access_token": token,
 		"token_type":   "Bearer",
-		"expires_in":   auth.Jwt().GetExpiresIn().Seconds(),
+		"expires_in":   auth.JWT().GetExpiresIn().Seconds(),
 	})
+}
+
+// Password generate a password
+func (a *User) Password(ctx *gear.Context) (err error) {
+	len := 12
+	num := 2
+	spec := 2
+	if val := ctx.Query("len"); val != "" {
+		if len, err = strconv.Atoi(val); err != nil || len < 4 {
+			return ctx.ErrorStatus(400)
+		}
+	}
+	if val := ctx.Query("num"); val != "" {
+		if num, err = strconv.Atoi(val); err != nil || num < 0 {
+			return ctx.ErrorStatus(400)
+		}
+	}
+	if val := ctx.Query("spec"); val != "" {
+		if spec, err = strconv.Atoi(val); err != nil || spec < 0 {
+			return ctx.ErrorStatus(400)
+		}
+	}
+	return ctx.JSON(200, map[string]string{"password": util.RandPass(len, num, spec)})
 }

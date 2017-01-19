@@ -53,7 +53,7 @@ func TestUserAPI(t *testing.T) {
 		assert.Equal(600, res.ExpiresIn)
 		assert.Equal("Bearer", res.TokenType)
 
-		claims, _ := auth.Jwt().Decode(res.AccessToken)
+		claims, _ := auth.JWT().Decode(res.AccessToken)
 		assert.Equal("admin", claims.Get("id").(string))
 		assert.True(len(claims.Get("key").(string)) > 0)
 	})

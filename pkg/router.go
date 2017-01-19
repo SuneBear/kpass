@@ -23,6 +23,8 @@ func newRouter(db *service.DB) (Router *gear.Router) {
 		return ctx.HTML(200, string(MustAsset("web/index.html")))
 	})
 
+	Router.Get("/password", userAPI.Password)
+
 	// Create a new user
 	// Request body:
 	//  {
@@ -48,13 +50,13 @@ func newRouter(db *service.DB) (Router *gear.Router) {
 	Router.Post("/login", userAPI.Login)
 
 	// Return current user info
-	Router.Get("/user", auth.Jwt().Serve, noOp)
+	Router.Get("/user", auth.Middleware, noOp)
 	// Update current user info
-	Router.Put("/user", auth.Jwt().Serve, noOp)
+	Router.Put("/user", auth.Middleware, noOp)
 	// Return the user info, for admin
-	Router.Get("/users/:id", auth.Jwt().Serve, noOp)
+	Router.Get("/users/:id", auth.Middleware, noOp)
 	// Update the user, block or unblock, for admin
-	Router.Put("/users/:id", auth.Jwt().Serve, noOp)
+	Router.Put("/users/:id", auth.Middleware, noOp)
 
 	// Create a new entry
 	// Request body:
@@ -63,17 +65,17 @@ func newRouter(db *service.DB) (Router *gear.Router) {
 	// 		"category":"登录信息"
 	//  }
 	// Return: entry info object
-	Router.Post("/entries", auth.Jwt().Serve, entryAPI.Create)
+	Router.Post("/entries", auth.Middleware, entryAPI.Create)
 	// Return current user's entries list with summary info.
-	Router.Get("/entries", auth.Jwt().Serve, entryAPI.FindByOwner)
+	Router.Get("/entries", auth.Middleware, entryAPI.FindByOwner)
 	// Get the full entry, with all secrets
-	Router.Get("/entries/:entryID", auth.Jwt().Serve, entryAPI.Find)
+	Router.Get("/entries/:entryID", auth.Middleware, entryAPI.Find)
 	// Update the entry
-	Router.Put("/entries/:entryID", auth.Jwt().Serve, entryAPI.Update)
+	Router.Put("/entries/:entryID", auth.Middleware, entryAPI.Update)
 	// Delete the entry
-	Router.Delete("/entries/:entryID", auth.Jwt().Serve, entryAPI.Delete)
+	Router.Delete("/entries/:entryID", auth.Middleware, entryAPI.Delete)
 	// Restore the entry
-	Router.Put("/entries/:entryID/restore", auth.Jwt().Serve, entryAPI.Restore)
+	Router.Put("/entries/:entryID/restore", auth.Middleware, entryAPI.Restore)
 
 	// Add a secret to the entry
 	// Request body:
@@ -84,36 +86,36 @@ func newRouter(db *service.DB) (Router *gear.Router) {
 	// 		"note":"other info",
 	//  }
 	// Return: secret info object
-	Router.Post("/entries/:entryID/secrets", auth.Jwt().Serve, secretAPI.Create)
+	Router.Post("/entries/:entryID/secrets", auth.Middleware, secretAPI.Create)
 	// Update the secret
-	Router.Put("/entries/:entryID/secrets/:secretID", auth.Jwt().Serve, secretAPI.Update)
+	Router.Put("/entries/:entryID/secrets/:secretID", auth.Middleware, secretAPI.Update)
 	// Delete the secret
-	Router.Delete("/entries/:entryID/secrets/:secretID", auth.Jwt().Serve, secretAPI.Delete)
+	Router.Delete("/entries/:entryID/secrets/:secretID", auth.Middleware, secretAPI.Delete)
 	// Add a share to the entry
-	Router.Post("/entries/:entryID/shares", auth.Jwt().Serve, noOp)
+	Router.Post("/entries/:entryID/shares", auth.Middleware, noOp)
 	// Update the share
-	Router.Put("/entries/:entryID/shares/:shareID", auth.Jwt().Serve, noOp)
+	Router.Put("/entries/:entryID/shares/:shareID", auth.Middleware, noOp)
 	// Delete the share
-	Router.Delete("/entries/:entryID/shares/:shareID", auth.Jwt().Serve, noOp)
+	Router.Delete("/entries/:entryID/shares/:shareID", auth.Middleware, noOp)
 
 	// Create a team
-	Router.Post("/teams", auth.Jwt().Serve, teamAPI.Create)
+	Router.Post("/teams", auth.Middleware, teamAPI.Create)
 	// // Return current user's teams joined.
-	Router.Get("/teams", auth.Jwt().Serve, teamAPI.FindByMember)
+	Router.Get("/teams", auth.Middleware, teamAPI.FindByMember)
 	// Get team's token
-	Router.Post("/teams/:teamID/token", auth.Jwt().Serve, teamAPI.Token)
+	Router.Post("/teams/:teamID/token", auth.Middleware, teamAPI.Token)
 	// Return the team's entries list
-	Router.Get("/teams/:teamID/entries", auth.Jwt().Serve, entryAPI.FindByOwner)
+	Router.Get("/teams/:teamID/entries", auth.Middleware, entryAPI.FindByOwner)
 	// Create a new entry for team
-	Router.Post("/teams/:teamID/entries", auth.Jwt().Serve, entryAPI.Create)
+	Router.Post("/teams/:teamID/entries", auth.Middleware, entryAPI.Create)
 	// Update the team
-	Router.Put("/teams/:teamID", auth.Jwt().Serve, teamAPI.Update)
+	Router.Put("/teams/:teamID", auth.Middleware, teamAPI.Update)
 	// change the team's members
-	Router.Put("/teams/:teamID/members", auth.Jwt().Serve, teamAPI.Members)
+	Router.Put("/teams/:teamID/members", auth.Middleware, teamAPI.Members)
 	// Delete the team
-	Router.Delete("/teams/:teamID", auth.Jwt().Serve, teamAPI.Delete)
+	Router.Delete("/teams/:teamID", auth.Middleware, teamAPI.Delete)
 
 	// Return the shared entry
-	// Router.Get("/shares/:shareID", auth.Jwt().Serve, noOp)
+	// Router.Get("/shares/:shareID", auth.Middleware, noOp)
 	return
 }

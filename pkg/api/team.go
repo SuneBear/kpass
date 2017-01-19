@@ -39,7 +39,7 @@ func (t *tplCreate) Validate() error {
 func (a *Team) Create(ctx *gear.Context) (err error) {
 	body := new(tplCreate)
 	if err = ctx.ParseBody(body); err == nil {
-		claims, _ := auth.Jwt().FromCtx(ctx)
+		claims, _ := auth.FromCtx(ctx)
 		userID := claims.Get("id").(string)
 		var res *schema.TeamResult
 		if res, err = a.team.Create(userID, body.Name, body.Pass); err == nil {
@@ -265,6 +265,6 @@ func (a *Team) Token(ctx *gear.Context) (err error) {
 	return ctx.JSON(200, map[string]interface{}{
 		"access_token": token,
 		"token_type":   "Bearer",
-		"expires_in":   auth.Jwt().GetExpiresIn().Seconds(),
+		"expires_in":   auth.JWT().GetExpiresIn().Seconds(),
 	})
 }

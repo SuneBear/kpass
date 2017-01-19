@@ -74,7 +74,7 @@ func initDemo(db *service.DB) {
 
 	// Add a secret to the entry
 	token, _ := auth.NewToken(user.ID, pass, user.Pass)
-	claims, _ := auth.Jwt().Decode(token)
+	claims, _ := auth.JWT().Decode(token)
 	key := claims.Get("key").(string)
 	key, _ = auth.DecryptData(user.ID, key)
 
