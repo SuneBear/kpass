@@ -9,11 +9,10 @@ import (
 
 // Share represents share info
 type Share struct {
-	Name    string    `json:"name"`
-	Salt    string    `json:"salt"`
-	ToUser  string    `json:"toUser"`
+	EntryID uuid.UUID `json:"entryId"`
+	Token   string    `json:"Token"`
+	To      string    `json:"to"`
 	TTL     int       `json:"ttl"`
-	Expire  time.Time `json:"expire"`
 	Created time.Time `json:"created"`
 	Updated time.Time `json:"updated"`
 }
@@ -36,10 +35,10 @@ func (s *Share) String() string {
 func (s *Share) Result(ID uuid.UUID) *ShareResult {
 	return &ShareResult{
 		ID:      ID,
-		Name:    s.Name,
-		ToUser:  s.ToUser,
+		EntryID: s.EntryID,
+		Token:   s.Token,
+		To:      s.To,
 		TTL:     s.TTL,
-		Expire:  s.Expire,
 		Created: s.Created,
 		Updated: s.Updated,
 	}
@@ -48,10 +47,10 @@ func (s *Share) Result(ID uuid.UUID) *ShareResult {
 // ShareResult represents desensitized share
 type ShareResult struct {
 	ID      uuid.UUID `json:"uuid"`
-	Name    string    `json:"name"`
-	ToUser  string    `json:"toUser"`
+	EntryID uuid.UUID `json:"entryId"`
+	Token   string    `json:"Token"`
+	To      string    `json:"to"`
 	TTL     int       `json:"ttl"`
-	Expire  time.Time `json:"expire"`
 	Created time.Time `json:"created"`
 	Updated time.Time `json:"updated"`
 }

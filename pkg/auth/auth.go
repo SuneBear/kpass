@@ -18,6 +18,8 @@ type Auth struct {
 }
 
 var std = &Auth{au.New(util.RandBytes(32))} // use a rand key
+
+// Middleware use to ...
 var Middleware = std.Serve
 
 // Default returns the global Auth instance

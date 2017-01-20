@@ -13,7 +13,7 @@ type Team struct {
 	Pass      string    `json:"pass"`
 	IsFrozen  bool      `json:"isFrozen"`
 	IsDeleted bool      `json:"isDeleted"`
-	OwnerID   string    `json:"ownerID"`
+	OwnerID   string    `json:"ownerId"`
 	Members   []string  `json:"members"`
 	Created   time.Time `json:"created"`
 	Updated   time.Time `json:"updated"`
@@ -70,7 +70,7 @@ type TeamResult struct {
 	ID       uuid.UUID `json:"uuid"`
 	Name     string    `json:"name"`
 	IsFrozen bool      `json:"isFrozen"`
-	OwnerID  string    `json:"ownerID"`
+	OwnerID  string    `json:"ownerId"`
 	Members  []string  `json:"members"`
 	Created  time.Time `json:"created"`
 	Updated  time.Time `json:"updated"`
