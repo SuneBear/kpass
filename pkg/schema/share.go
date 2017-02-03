@@ -10,6 +10,7 @@ import (
 // Share represents share info
 type Share struct {
 	EntryID uuid.UUID `json:"entryId"`
+	Name    string    `json:"name"`
 	Token   string    `json:"Token"`
 	To      string    `json:"to"`
 	TTL     int       `json:"ttl"`
@@ -36,7 +37,7 @@ func (s *Share) Result(ID uuid.UUID) *ShareResult {
 	return &ShareResult{
 		ID:      ID,
 		EntryID: s.EntryID,
-		Token:   s.Token,
+		Name:    s.Name,
 		To:      s.To,
 		TTL:     s.TTL,
 		Created: s.Created,
@@ -48,7 +49,7 @@ func (s *Share) Result(ID uuid.UUID) *ShareResult {
 type ShareResult struct {
 	ID      uuid.UUID `json:"uuid"`
 	EntryID uuid.UUID `json:"entryId"`
-	Token   string    `json:"Token"`
+	Name    string    `json:"name"`
 	To      string    `json:"to"`
 	TTL     int       `json:"ttl"`
 	Created time.Time `json:"created"`

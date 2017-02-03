@@ -47,6 +47,8 @@ func NewDB(path string) (db *DB, err error) {
 		db.DB.CreateIndex("user_by_created", schema.UserKey("*"), buntdb.IndexJSON("created"))
 		db.DB.CreateIndex("entry_by_owner", schema.EntryKey("*"), buntdb.IndexJSON("ownerId"))
 		db.DB.CreateIndex("team_by_owner", schema.TeamKey("*"), buntdb.IndexJSON("ownerId"))
+		db.DB.CreateIndex("share_by_user", schema.ShareKey("*"), buntdb.IndexJSON("to"))
+		db.DB.CreateIndex("share_by_entry", schema.ShareKey("*"), buntdb.IndexJSON("entryId"))
 	}
 	return
 }

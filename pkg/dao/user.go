@@ -51,7 +51,7 @@ func (o *User) CheckLogin(id, pass string) (user *schema.User, err error) {
 		if user.IsBlocked || user.Attempt > 5 {
 			return &gear.Error{Code: 403, Msg: "too many login attempts"}
 		}
-		if !auth.ValidateUserPass(id, pass, user.Pass) {
+		if !auth.VerifyPass(id, pass, user.Pass) {
 			user.Attempt++
 			tx.Set(userKey, user.String(), nil)
 			tx.Commit()
@@ -81,7 +81,7 @@ func (o *User) Create(userID, pass string) (user *schema.User, err error) {
 
 		user = &schema.User{
 			ID:        userID,
-			Pass:      auth.EncryptUserPass(userID, pass),
+			Pass:      auth.SignPass(userID, pass),
 			IsBlocked: false,
 			Created:   time.Now(),
 		}

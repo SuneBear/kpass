@@ -62,7 +62,7 @@ func initDemo(db *service.DB) {
 	// create a demo user
 	// client should make double sha256 hash.
 	pass := util.SHA256Sum(util.SHA256Sum("demo"))
-	pass = auth.EncryptUserPass("demo", pass)
+	pass = auth.SignPass("demo", pass)
 	user, _ := userDao.Create("demo", pass)
 	logger.Println(`create a demo user {id:"demo", pass:"demo"}:`)
 	logger.Println(user)
@@ -76,7 +76,7 @@ func initDemo(db *service.DB) {
 	token, _ := auth.NewToken(user.ID, pass, user.Pass)
 	claims, _ := auth.JWT().Decode(token)
 	key := claims.Get("key").(string)
-	key, _ = auth.DecryptData(user.ID, key)
+	key, _ = auth.DecryptText(user.ID, key)
 
 	secret := &schema.Secret{
 		Name: "my secret",

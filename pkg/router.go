@@ -93,6 +93,8 @@ func newRouter(db *service.DB) (Router *gear.Router) {
 	Router.Delete("/entries/:entryID/secrets/:secretID", auth.Middleware, secretAPI.Delete)
 	// Add a share to the entry
 	Router.Post("/entries/:entryID/shares", auth.Middleware, noOp)
+	// Get shares list of the entry
+	Router.Get("/entries/:entryID/shares", auth.Middleware, noOp)
 	// Update the share
 	Router.Put("/entries/:entryID/shares/:shareID", auth.Middleware, noOp)
 	// Delete the share
@@ -114,8 +116,14 @@ func newRouter(db *service.DB) (Router *gear.Router) {
 	Router.Put("/teams/:teamID/members", auth.Middleware, teamAPI.Members)
 	// Delete the team
 	Router.Delete("/teams/:teamID", auth.Middleware, teamAPI.Delete)
+	// Return the team's shares list
+	Router.Get("/teams/:teamID/shares", auth.Middleware, noOp)
 
-	// Return the shared entry
-	// Router.Get("/shares/:shareID", auth.Middleware, noOp)
+	// Get the current user's shares list
+	Router.Get("/shares", auth.Middleware, noOp)
+	// Get shares list to the current user
+	Router.Get("/shares/me", auth.Middleware, noOp)
+	// Get the share
+	Router.Get("/shares/:shareID", auth.Middleware, noOp)
 	return
 }

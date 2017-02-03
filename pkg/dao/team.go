@@ -29,7 +29,7 @@ func (o *Team) Create(ownerID, name, pass string) (teamResult *schema.TeamResult
 	TeamID := util.NewUUID(ownerID)
 	team := &schema.Team{
 		Name:    name,
-		Pass:    auth.EncryptUserPass(TeamID.String(), pass),
+		Pass:    auth.SignPass(TeamID.String(), pass),
 		OwnerID: ownerID,
 		Members: []string{ownerID},
 		Created: time.Now(),
@@ -204,7 +204,7 @@ func (o *Team) CheckToken(teamID, userID, pass string) (team *schema.Team, err e
 		if !team.HasMember(userID) {
 			return &gear.Error{Code: 403, Msg: "not team member"}
 		}
-		if !auth.ValidateUserPass(teamID, pass, team.Pass) {
+		if !auth.VerifyPass(teamID, pass, team.Pass) {
 			user.Attempt++
 			tx.Set(userKey, user.String(), nil)
 			tx.Commit()

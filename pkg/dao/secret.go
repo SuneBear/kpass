@@ -60,7 +60,7 @@ func (o *Secret) Create(userID, key string, EntryID uuid.UUID, secret *schema.Se
 
 		secretResult = secret.Result(SecretID)
 		entry.Secrets = append(entry.Secrets, secretID)
-		if value, e = auth.EncryptData(key, secret.String()); e == nil {
+		if value, e = auth.EncryptText(key, secret.String()); e == nil {
 			if _, _, e = tx.Set(schema.SecretKey(secretID), value, nil); e == nil {
 				_, _, e = tx.Set(entryKey, entry.String(), nil)
 			}
@@ -110,7 +110,7 @@ func (o *Secret) Update(userID, key string, EntryID, SecretID uuid.UUID, changes
 		if value, e = tx.Get(schema.SecretKey(SecretID.String())); e != nil {
 			return e
 		}
-		if value, e = auth.DecryptData(key, value); e != nil {
+		if value, e = auth.DecryptText(key, value); e != nil {
 			return e
 		}
 		secret, e := schema.SecretFrom(value)
@@ -146,7 +146,7 @@ func (o *Secret) Update(userID, key string, EntryID, SecretID uuid.UUID, changes
 
 		if changed {
 			secret.Updated = time.Now()
-			value, e = auth.EncryptData(key, secret.String())
+			value, e = auth.EncryptText(key, secret.String())
 			if e != nil {
 				return e
 			}
@@ -210,7 +210,7 @@ func (o *Secret) Find(key string, SecretID uuid.UUID) (secret *schema.Secret, er
 		if e != nil {
 			return e
 		}
-		res, e = auth.DecryptData(key, res)
+		res, e = auth.DecryptText(key, res)
 		if e != nil {
 			return e
 		}
@@ -232,7 +232,7 @@ func (o *Secret) FindSecrets(key string, ids ...string) (secrets []*schema.Secre
 			if e != nil {
 				return e
 			}
-			res, e = auth.DecryptData(key, res)
+			res, e = auth.DecryptText(key, res)
 			if e != nil {
 				return e
 			}
