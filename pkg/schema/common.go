@@ -3,7 +3,8 @@ package schema
 import (
 	"encoding/json"
 
-	"github.com/google/uuid"
+	"github.com/seccom/kpass/pkg/util"
+	"github.com/tidwall/buntdb"
 )
 
 const (
@@ -15,20 +16,30 @@ const (
 	keyPrefixShare  = "SH:"
 )
 
+// InitIndex ...
+func InitIndex(DB *buntdb.DB) {
+	DB.CreateIndex("user_by_id", "U:*", buntdb.IndexJSON("id"))
+	DB.CreateIndex("entry_by_team", "E:*", buntdb.IndexJSON("teamID"))
+	DB.CreateIndex("team_by_user", "T:*", buntdb.IndexJSON("userID"))
+	DB.CreateIndex("share_by_user", "SH:*", buntdb.IndexJSON("userID"))
+	DB.CreateIndex("share_by_entry", "SH:*", buntdb.IndexJSON("entryID"))
+	DB.CreateIndex("share_by_team", "SH:*", buntdb.IndexJSON("teamID"))
+}
+
 // UserKey returns the user's db key
 func UserKey(name string) string {
 	return keyPrefixUser + name
 }
 
 // TeamKey returns the team's db key
-func TeamKey(id string) string {
-	return keyPrefixTeam + id
+func TeamKey(id util.OID) string {
+	return keyPrefixTeam + id.String()
 }
 
 // TeamIDFromKey returns team' ID from key
-func TeamIDFromKey(key string) uuid.UUID {
+func TeamIDFromKey(key string) util.OID {
 	val := key[len(keyPrefixTeam):]
-	id, err := uuid.Parse(val)
+	id, err := util.ParseOID(val)
 	if err != nil {
 		panic(err)
 	}
@@ -36,14 +47,14 @@ func TeamIDFromKey(key string) uuid.UUID {
 }
 
 // EntryKey returns the entry's db key
-func EntryKey(id string) string {
-	return keyPrefixEntry + id
+func EntryKey(id util.OID) string {
+	return keyPrefixEntry + id.String()
 }
 
 // EntryIDFromKey returns entry' ID from key
-func EntryIDFromKey(key string) uuid.UUID {
+func EntryIDFromKey(key string) util.OID {
 	val := key[len(keyPrefixEntry):]
-	id, err := uuid.Parse(val)
+	id, err := util.ParseOID(val)
 	if err != nil {
 		panic(err)
 	}
@@ -51,19 +62,19 @@ func EntryIDFromKey(key string) uuid.UUID {
 }
 
 // SecretKey returns the secret's db key
-func SecretKey(id string) string {
-	return keyPrefixSecret + id
+func SecretKey(id util.OID) string {
+	return keyPrefixSecret + id.String()
 }
 
 // ShareKey returns the share's db key
-func ShareKey(id string) string {
-	return keyPrefixShare + id
+func ShareKey(id util.OID) string {
+	return keyPrefixShare + id.String()
 }
 
 // ShareIDFromKey returns share' ID from key
-func ShareIDFromKey(key string) uuid.UUID {
+func ShareIDFromKey(key string) util.OID {
 	val := key[len(keyPrefixShare):]
-	id, err := uuid.Parse(val)
+	id, err := util.ParseOID(val)
 	if err != nil {
 		panic(err)
 	}

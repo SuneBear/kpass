@@ -80,10 +80,9 @@ func (o *User) Create(userID, pass string) (user *schema.User, err error) {
 		}
 
 		user = &schema.User{
-			ID:        userID,
-			Pass:      auth.SignPass(userID, pass),
-			IsBlocked: false,
-			Created:   time.Now(),
+			ID:      userID,
+			Pass:    auth.SignPass(userID, pass),
+			Created: time.Now(),
 		}
 		user.Updated = user.Created
 		_, _, e = tx.Set(userKey, user.String(), nil)

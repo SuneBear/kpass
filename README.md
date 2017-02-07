@@ -24,8 +24,6 @@ cd ./dist
 ```
 It will run with default options, create a `kpass.kdb` file and open a browser.
 
-A demo user `{id:"demo", pass:"demo"}` will be created for a new database.
-
 ### Development
 
 Start a development mode with memory database:

@@ -4,19 +4,20 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/seccom/kpass/pkg/util"
 )
 
 // Team represents team info
 type Team struct {
-	Name      string    `json:"name"`
-	Pass      string    `json:"pass"`
-	IsFrozen  bool      `json:"isFrozen"`
-	IsDeleted bool      `json:"isDeleted"`
-	OwnerID   string    `json:"ownerId"`
-	Members   []string  `json:"members"`
-	Created   time.Time `json:"created"`
-	Updated   time.Time `json:"updated"`
+	UserID     string    `json:"userID"`
+	Name       string    `json:"name"`
+	Pass       string    `json:"pass"`
+	IsFrozen   bool      `json:"isFrozen"` // if true, member can't modify team's entires
+	IsDeleted  bool      `json:"isDeleted"`
+	Visibility string    `json:"visibility"` // enum: "private", "member"
+	Members    []string  `json:"members"`
+	Created    time.Time `json:"created"`
+	Updated    time.Time `json:"updated"`
 }
 
 // TeamFrom parse JSON string and returns a Team intance.
@@ -53,27 +54,30 @@ func (t *Team) RemoveMember(userID string) bool {
 }
 
 // Result returns TeamResult intance
-func (t *Team) Result(ID uuid.UUID) *TeamResult {
+func (t *Team) Result(ID util.OID) *TeamResult {
 	return &TeamResult{
-		ID:       ID,
-		Name:     t.Name,
-		IsFrozen: t.IsFrozen,
-		OwnerID:  t.OwnerID,
-		Members:  t.Members,
-		Created:  t.Created,
-		Updated:  t.Updated,
+		ID:         ID,
+		UserID:     t.UserID,
+		Name:       t.Name,
+		IsFrozen:   t.IsFrozen,
+		Visibility: t.Visibility,
+		Members:    t.Members,
+		Created:    t.Created,
+		Updated:    t.Updated,
 	}
 }
 
 // TeamResult represents desensitized team
 type TeamResult struct {
-	ID       uuid.UUID `json:"uuid"`
-	Name     string    `json:"name"`
-	IsFrozen bool      `json:"isFrozen"`
-	OwnerID  string    `json:"ownerId"`
-	Members  []string  `json:"members"`
-	Created  time.Time `json:"created"`
-	Updated  time.Time `json:"updated"`
+	ID         util.OID `json:"id"`
+	UserID     string    `json:"userID"`
+	Name       string    `json:"name"`
+	IsFrozen   bool      `json:"isFrozen"`
+	IsPrivate  bool      `json:"IsPrivate"`
+	Visibility string    `json:"visibility"`
+	Members    []string  `json:"members"`
+	Created    time.Time `json:"created"`
+	Updated    time.Time `json:"updated"`
 }
 
 // String returns JSON string with desensitized team info

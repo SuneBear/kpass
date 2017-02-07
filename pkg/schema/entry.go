@@ -4,19 +4,17 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/seccom/kpass/pkg/util"
 )
 
 // Entry represents entry info
 type Entry struct {
-	OwnerID   string    `json:"ownerId"`
-	OwnerType string    `json:"ownerType"`
+	TeamID    util.OID `json:"teamID"`
 	Name      string    `json:"name"`
 	Category  string    `json:"category"`
 	Priority  int       `json:"priority"`
-	Secrets   []string  `json:"secrets"`
-	Shares    []string  `json:"shares"`
 	IsDeleted bool      `json:"isDeleted"`
+	Secrets   []string  `json:"secrets"`
 	Created   time.Time `json:"created"`
 	Updated   time.Time `json:"updated"`
 }
@@ -35,12 +33,19 @@ func (e *Entry) String() string {
 	return jsonMarshal(e)
 }
 
-// HasSecret returns whether the secret is in the Entry.Secrets
+// HasSecret returns whether the entry has the secret
 func (e *Entry) HasSecret(secretID string) bool {
 	return StringSlice(e.Secrets).Has(secretID)
 }
 
-// RemoveSecret remove the secret from the Entry.Secrets
+// AddSecret adds the secret to the entry
+func (e *Entry) AddSecret(secretID string) bool {
+	ok := false
+	e.Secrets, ok = StringSlice(e.Secrets).Add(secretID)
+	return ok
+}
+
+// RemoveSecret removes the secret from the entry
 func (e *Entry) RemoveSecret(secretID string) bool {
 	ok := false
 	e.Secrets, ok = StringSlice(e.Secrets).Remove(secretID)
@@ -48,7 +53,7 @@ func (e *Entry) RemoveSecret(secretID string) bool {
 }
 
 // Result returns EntryResult intance
-func (e *Entry) Result(ID uuid.UUID, secrets []*SecretResult, shares []*ShareResult) *EntryResult {
+func (e *Entry) Result(ID util.OID, secrets []*SecretResult, shares []*ShareResult) *EntryResult {
 	if secrets == nil {
 		secrets = []*SecretResult{}
 	}
@@ -56,23 +61,23 @@ func (e *Entry) Result(ID uuid.UUID, secrets []*SecretResult, shares []*ShareRes
 		shares = []*ShareResult{}
 	}
 	return &EntryResult{
-		ID:        ID,
-		OwnerID:   e.OwnerID,
-		OwnerType: e.OwnerType,
-		Name:      e.Name,
-		Category:  e.Category,
-		Priority:  e.Priority,
-		Secrets:   secrets,
-		Shares:    shares,
-		Created:   e.Created,
-		Updated:   e.Updated,
+		ID:       ID,
+		TeamID:   e.TeamID,
+		Name:     e.Name,
+		Category: e.Category,
+		Priority: e.Priority,
+		Secrets:  secrets,
+		Shares:   shares,
+		Created:  e.Created,
+		Updated:  e.Updated,
 	}
 }
 
 // Summary returns EntrySum intance
-func (e *Entry) Summary(ID uuid.UUID) *EntrySum {
+func (e *Entry) Summary(ID util.OID) *EntrySum {
 	return &EntrySum{
 		ID:       ID,
+		TeamID:   e.TeamID,
 		Name:     e.Name,
 		Category: e.Category,
 		Priority: e.Priority,
@@ -83,16 +88,15 @@ func (e *Entry) Summary(ID uuid.UUID) *EntrySum {
 
 // EntryResult represents desensitized entry
 type EntryResult struct {
-	ID        uuid.UUID       `json:"uuid"`
-	OwnerID   string          `json:"ownerId"`
-	OwnerType string          `json:"ownerType"`
-	Name      string          `json:"name"`
-	Category  string          `json:"category"`
-	Priority  int             `json:"priority"`
-	Secrets   []*SecretResult `json:"secrets"`
-	Shares    []*ShareResult  `json:"shares"`
-	Created   time.Time       `json:"created"`
-	Updated   time.Time       `json:"updated"`
+	ID       util.OID       `json:"id"`
+	TeamID   util.OID       `json:"teamID"`
+	Name     string          `json:"name"`
+	Category string          `json:"category"`
+	Priority int             `json:"priority"`
+	Secrets  []*SecretResult `json:"secrets"`
+	Shares   []*ShareResult  `json:"shares"`
+	Created  time.Time       `json:"created"`
+	Updated  time.Time       `json:"updated"`
 }
 
 // String returns JSON string with desensitized entry info
@@ -102,7 +106,8 @@ func (e *EntryResult) String() string {
 
 // EntrySum represents desensitized entry
 type EntrySum struct {
-	ID       uuid.UUID `json:"uuid"`
+	ID       util.OID `json:"id"`
+	TeamID   util.OID `json:"teamID"`
 	Name     string    `json:"name"`
 	Category string    `json:"category"`
 	Priority int       `json:"priority"`

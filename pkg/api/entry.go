@@ -1,11 +1,13 @@
 package api
 
 import (
-	"github.com/google/uuid"
+	"fmt"
+
 	"github.com/seccom/kpass/pkg/auth"
 	"github.com/seccom/kpass/pkg/dao"
 	"github.com/seccom/kpass/pkg/schema"
 	"github.com/seccom/kpass/pkg/service"
+	"github.com/seccom/kpass/pkg/util"
 	"github.com/teambition/gear"
 )
 
@@ -13,11 +15,12 @@ import (
 type Entry struct {
 	entry  *dao.Entry
 	secret *dao.Secret
+	team   *dao.Team
 }
 
 // NewEntry returns a Entry API instance
 func NewEntry(db *service.DB) *Entry {
-	return &Entry{dao.NewEntry(db), dao.NewSecret(db)}
+	return &Entry{dao.NewEntry(db), dao.NewSecret(db), dao.NewTeam(db)}
 }
 
 type tplEntryCreate struct {
@@ -34,6 +37,11 @@ func (t *tplEntryCreate) Validate() error {
 
 // Create ...
 func (a *Entry) Create(ctx *gear.Context) (err error) {
+	TeamID, err := util.ParseOID(ctx.Param("teamID"))
+	if err != nil {
+		return ctx.ErrorStatus(400)
+	}
+
 	body := new(tplEntryCreate)
 	if err = ctx.ParseBody(body); err != nil {
 		return ctx.Error(err)
@@ -43,24 +51,16 @@ func (a *Entry) Create(ctx *gear.Context) (err error) {
 		return ctx.Error(err)
 	}
 
-	// POST /entries
-	ownerID := userID
-	ownerType := "user"
-	// POST /teams/:teamID/entries
-	if ctx.Param("teamID") != "" {
-		TeamID, err := uuid.Parse(ctx.Param("teamID"))
-		if err != nil {
-			return ctx.ErrorStatus(400)
-		}
-		ownerID = TeamID.String()
-		ownerType = "team"
+	entry, err := a.entry.Create(userID, &schema.Entry{
+		TeamID:   TeamID,
+		Name:     body.Name,
+		Category: body.Category,
+		Secrets:  []string{},
+	})
+	if err != nil {
+		return ctx.Error(err)
 	}
-
-	var entry *schema.EntrySum
-	if entry, err = a.entry.Create(userID, ownerID, ownerType, body.Name, body.Category); err == nil {
-		return ctx.JSON(200, entry)
-	}
-	return
+	return ctx.JSON(200, entry)
 }
 
 type tplEntryUpdate map[string]interface{}
@@ -100,7 +100,7 @@ func (t *tplEntryUpdate) Validate() error {
 
 // Update ...
 func (a *Entry) Update(ctx *gear.Context) (err error) {
-	EntryID, err := uuid.Parse(ctx.Param("entryID"))
+	EntryID, err := util.ParseOID(ctx.Param("entryID"))
 	if err != nil {
 		return ctx.ErrorStatus(400)
 	}
@@ -120,7 +120,7 @@ func (a *Entry) Update(ctx *gear.Context) (err error) {
 
 // Delete ...
 func (a *Entry) Delete(ctx *gear.Context) (err error) {
-	EntryID, err := uuid.Parse(ctx.Param("entryID"))
+	EntryID, err := util.ParseOID(ctx.Param("entryID"))
 	if err != nil {
 		return ctx.ErrorStatus(400)
 	}
@@ -130,8 +130,8 @@ func (a *Entry) Delete(ctx *gear.Context) (err error) {
 	if err != nil {
 		return ctx.Error(err)
 	}
-	if entry.OwnerID != userID {
-		return ctx.ErrorStatus(403)
+	if err = a.team.CheckUser(entry.TeamID, userID); err != nil {
+		return ctx.Error(err)
 	}
 
 	if _, err = a.entry.UpdateDeleted(userID, EntryID, true); err != nil {
@@ -142,7 +142,7 @@ func (a *Entry) Delete(ctx *gear.Context) (err error) {
 
 // Restore ...
 func (a *Entry) Restore(ctx *gear.Context) (err error) {
-	EntryID, err := uuid.Parse(ctx.Param("entryID"))
+	EntryID, err := util.ParseOID(ctx.Param("entryID"))
 	if err != nil {
 		return ctx.ErrorStatus(400)
 	}
@@ -152,8 +152,8 @@ func (a *Entry) Restore(ctx *gear.Context) (err error) {
 	if err != nil {
 		return ctx.Error(err)
 	}
-	if entry.OwnerID != userID {
-		return ctx.ErrorStatus(403)
+	if err = a.team.CheckUser(entry.TeamID, userID); err != nil {
+		return ctx.Error(err)
 	}
 
 	entrySum, err := a.entry.UpdateDeleted(userID, EntryID, false)
@@ -165,7 +165,7 @@ func (a *Entry) Restore(ctx *gear.Context) (err error) {
 
 // Find return the entry
 func (a *Entry) Find(ctx *gear.Context) error {
-	EntryID, err := uuid.Parse(ctx.Param("entryID"))
+	EntryID, err := util.ParseOID(ctx.Param("entryID"))
 	if err != nil {
 		return ctx.ErrorStatus(400)
 	}
@@ -174,7 +174,7 @@ func (a *Entry) Find(ctx *gear.Context) error {
 	if err != nil {
 		return ctx.Error(err)
 	}
-	key, err := auth.KeyFromCtx(ctx, entry.OwnerID)
+	key, err := auth.KeyFromCtx(ctx, entry.TeamID, "team")
 	if err != nil {
 		return ctx.Error(err)
 	}
@@ -189,26 +189,20 @@ func (a *Entry) Find(ctx *gear.Context) error {
 	return ctx.JSON(200, entry.Result(EntryID, secrets, nil))
 }
 
-// FindByOwner return entries for current user
-func (a *Entry) FindByOwner(ctx *gear.Context) (err error) {
-	userID, err := auth.UserIDFromCtx(ctx)
+// FindByTeam return entries for current user
+func (a *Entry) FindByTeam(ctx *gear.Context) (err error) {
+	TeamID, err := util.ParseOID(ctx.Param("teamID"))
 	if err != nil {
-		return ctx.Error(err)
-	}
-	// GET /entries
-	ownerID := userID
-	ownerType := "user"
-	// GET /teams/:teamID/entries
-	if ctx.Param("teamID") != "" {
-		TeamID, err := uuid.Parse(ctx.Param("teamID"))
-		if err != nil {
-			return ctx.ErrorStatus(400)
-		}
-		ownerID = TeamID.String()
-		ownerType = "team"
+		return ctx.ErrorStatus(400)
 	}
 
-	entries, err := a.entry.FindByOwnerID(userID, ownerID, ownerType, false)
+	userID, _ := auth.UserIDFromCtx(ctx)
+	if err = a.team.CheckUser(TeamID, userID); err != nil {
+		return ctx.Error(err)
+	}
+
+	entries, err := a.entry.FindByTeam(TeamID, userID, false)
+	fmt.Println(111111, TeamID, userID, entries, err)
 	if err != nil {
 		return ctx.Error(err)
 	}

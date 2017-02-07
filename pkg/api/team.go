@@ -1,7 +1,6 @@
 package api
 
 import (
-	"github.com/google/uuid"
 	"github.com/seccom/kpass/pkg/auth"
 	"github.com/seccom/kpass/pkg/dao"
 	"github.com/seccom/kpass/pkg/schema"
@@ -20,12 +19,12 @@ func NewTeam(db *service.DB) *Team {
 	return &Team{dao.NewTeam(db)}
 }
 
-type tplCreate struct {
+type tplTeamCreate struct {
 	Name string `json:"name"`
 	Pass string `json:"pass"` // should encrypt
 }
 
-func (t *tplCreate) Validate() error {
+func (t *tplTeamCreate) Validate() error {
 	if t.Name == "" {
 		return &gear.Error{Code: 400, Msg: "invalid team name"}
 	}
@@ -36,23 +35,30 @@ func (t *tplCreate) Validate() error {
 }
 
 // Create ...
-func (a *Team) Create(ctx *gear.Context) (err error) {
-	body := new(tplCreate)
-	if err = ctx.ParseBody(body); err == nil {
-		claims, _ := auth.FromCtx(ctx)
-		userID := claims.Get("id").(string)
-		var res *schema.TeamResult
-		if res, err = a.team.Create(userID, body.Name, body.Pass); err == nil {
-			return ctx.JSON(200, res)
-		}
+func (a *Team) Create(ctx *gear.Context) error {
+	body := new(tplTeamCreate)
+	if err := ctx.ParseBody(body); err != nil {
+		return ctx.Error(err)
 	}
-	return
+
+	userID, _ := auth.UserIDFromCtx(ctx)
+	res, err := a.team.Create(userID, body.Pass, &schema.Team{
+		Name:       body.Name,
+		UserID:     userID,
+		Visibility: "member",
+		Members:    []string{userID},
+	})
+
+	if err != nil {
+		return ctx.Error(err)
+	}
+	return ctx.JSON(200, res)
 }
 
-type tplUpdate map[string]interface{}
+type tplTeamUpdate map[string]interface{}
 
 // Validate ...
-func (t *tplUpdate) Validate() error {
+func (t *tplTeamUpdate) Validate() error {
 	empty := true
 	for key, val := range *t {
 		empty = false
@@ -81,13 +87,13 @@ func (t *tplUpdate) Validate() error {
 
 // Update ...
 func (a *Team) Update(ctx *gear.Context) (err error) {
-	TeamID, err := uuid.Parse(ctx.Param("teamID"))
+	TeamID, err := util.ParseOID(ctx.Param("teamID"))
 	if err != nil {
 		return ctx.ErrorStatus(400)
 	}
 
 	userID, _ := auth.UserIDFromCtx(ctx)
-	body := new(tplUpdate)
+	body := new(tplTeamUpdate)
 	if err = ctx.ParseBody(body); err != nil {
 		return ctx.Error(err)
 	}
@@ -96,7 +102,7 @@ func (a *Team) Update(ctx *gear.Context) (err error) {
 	if err != nil {
 		return ctx.Error(err)
 	}
-	if team.OwnerID != userID {
+	if team.UserID != userID {
 		return ctx.ErrorStatus(403)
 	}
 
@@ -127,13 +133,13 @@ func (a *Team) Update(ctx *gear.Context) (err error) {
 	return ctx.JSON(200, res)
 }
 
-type tplMembers struct {
+type tplTeamMembers struct {
 	Push []string `json:"$push"` // Removes members from team
 	Pull []string `json:"$pull"` // Adds members to team
 }
 
 // Validate ...
-func (t *tplMembers) Validate() error {
+func (t *tplTeamMembers) Validate() error {
 	if len(t.Push) == 0 && len(t.Pull) == 0 {
 		return &gear.Error{Code: 400, Msg: "no content"}
 	}
@@ -145,13 +151,13 @@ func (t *tplMembers) Validate() error {
 
 // Members ...
 func (a *Team) Members(ctx *gear.Context) (err error) {
-	TeamID, err := uuid.Parse(ctx.Param("teamID"))
+	TeamID, err := util.ParseOID(ctx.Param("teamID"))
 	if err != nil {
 		return ctx.ErrorStatus(400)
 	}
 
 	userID, _ := auth.UserIDFromCtx(ctx)
-	body := new(tplMembers)
+	body := new(tplTeamMembers)
 	if err = ctx.ParseBody(body); err != nil {
 		return ctx.Error(err)
 	}
@@ -165,7 +171,7 @@ func (a *Team) Members(ctx *gear.Context) (err error) {
 
 // Delete ...
 func (a *Team) Delete(ctx *gear.Context) (err error) {
-	TeamID, err := uuid.Parse(ctx.Param("teamID"))
+	TeamID, err := util.ParseOID(ctx.Param("teamID"))
 	if err != nil {
 		return ctx.ErrorStatus(400)
 	}
@@ -175,8 +181,11 @@ func (a *Team) Delete(ctx *gear.Context) (err error) {
 	if err != nil {
 		return ctx.Error(err)
 	}
-	if team.OwnerID != userID {
+	if team.UserID != userID {
 		return ctx.ErrorStatus(403)
+	}
+	if team.Visibility == "private" {
+		return ctx.Error(&gear.Error{Code: 403, Msg: "private team can't be deleted"})
 	}
 
 	team.IsDeleted = true
@@ -188,7 +197,7 @@ func (a *Team) Delete(ctx *gear.Context) (err error) {
 
 // Restore ...
 func (a *Team) Restore(ctx *gear.Context) (err error) {
-	TeamID, err := uuid.Parse(ctx.Param("teamID"))
+	TeamID, err := util.ParseOID(ctx.Param("teamID"))
 	if err != nil {
 		return ctx.ErrorStatus(400)
 	}
@@ -198,7 +207,7 @@ func (a *Team) Restore(ctx *gear.Context) (err error) {
 	if err != nil {
 		return ctx.Error(err)
 	}
-	if team.OwnerID != userID {
+	if team.UserID != userID {
 		return ctx.ErrorStatus(403)
 	}
 
@@ -216,19 +225,19 @@ func (a *Team) FindByMember(ctx *gear.Context) (err error) {
 	if err != nil {
 		return ctx.Error(err)
 	}
-	team, err := a.team.FindByMemberID(userID)
+	teams, err := a.team.FindByMemberID(userID)
 	if err != nil {
 		return ctx.Error(err)
 	}
-	return ctx.JSON(200, team)
+	return ctx.JSON(200, teams)
 }
 
-type tplToken struct {
+type tplTeamToken struct {
 	Type string `json:"grant_type"`
 	Pass string `json:"password"` // should encrypt
 }
 
-func (t *tplToken) Validate() error {
+func (t *tplTeamToken) Validate() error {
 	if t.Type != "password" {
 		return &gear.Error{Code: 400, Msg: "invalid_grant"}
 	}
@@ -240,18 +249,18 @@ func (t *tplToken) Validate() error {
 
 // Token ...
 func (a *Team) Token(ctx *gear.Context) (err error) {
-	TeamID, err := uuid.Parse(ctx.Param("teamID"))
+	TeamID, err := util.ParseOID(ctx.Param("teamID"))
 	if err != nil {
 		return ctx.ErrorStatus(400)
 	}
 
 	userID, _ := auth.UserIDFromCtx(ctx)
-	body := new(tplToken)
+	body := new(tplTeamToken)
 	if err = ctx.ParseBody(body); err != nil {
 		return
 	}
 
-	team, err := a.team.CheckToken(TeamID.String(), userID, body.Pass)
+	team, err := a.team.CheckToken(TeamID, userID, body.Pass)
 	if err != nil {
 		return ctx.Error(err)
 	}

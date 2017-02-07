@@ -1,12 +1,12 @@
 package api_test
 
 import (
-	"encoding/hex"
 	"strings"
 	"testing"
 
+	"fmt"
+
 	"github.com/DavidCai1993/request"
-	"github.com/google/uuid"
 	"github.com/seccom/kpass/pkg"
 	"github.com/seccom/kpass/pkg/schema"
 	"github.com/seccom/kpass/pkg/util"
@@ -20,47 +20,26 @@ func TestEntryAPI(t *testing.T) {
 	defer srv.Close()
 
 	host := "http://" + srv.Addr().String()
-	_, _, accessToken := func() (id, pass, accessToken string) {
-		id = "test" + hex.EncodeToString(util.RandBytes(8))
-		pass = util.SHA256Sum(util.SHA256Sum(util.RandPass(8, 2, 2)))
-		_, err := request.Post(host+"/join").
-			Set(gear.HeaderContentType, gear.MIMEApplicationJSON).
-			Send(map[string]interface{}{"id": id, "pass": pass}).
-			End()
-
-		if err != nil {
-			panic(err)
-		}
-
-		res, err := request.Post(host+"/login").
-			Set(gear.HeaderContentType, gear.MIMEApplicationJSON).
-			Send(map[string]interface{}{"username": id, "password": pass, "grant_type": "password"}).
-			JSON()
-		if err != nil {
-			panic(err)
-		}
-		accessToken = "Bearer " + (*res.(*map[string]interface{}))["access_token"].(string)
-		return
-	}()
+	userInfo := NewUser(host)
 
 	t.Run("Find with no content", func(t *testing.T) {
 		assert := assert.New(t)
-		res := new([]schema.EntrySum)
+		res := new([]*schema.EntrySum)
 
-		_, err := request.Get(host+"/entries").
-			Set(gear.HeaderAuthorization, accessToken).
+		_, err := request.Get(fmt.Sprintf(`%s/teams/%s/entries`, host, userInfo.TeamID)).
+			Set(gear.HeaderAuthorization, userInfo.AccessToken).
 			JSON(res)
 		assert.Nil(err)
 		assert.True(len(*res) == 0)
 	})
 
-	var entryID uuid.UUID
+	var entryID util.OID
 	t.Run("Create a entry", func(t *testing.T) {
 		assert := assert.New(t)
 		res := new(schema.EntrySum)
 
-		_, err := request.Post(host+"/entries").
-			Set(gear.HeaderAuthorization, accessToken).
+		_, err := request.Post(fmt.Sprintf(`%s/teams/%s/entries`, host, userInfo.TeamID)).
+			Set(gear.HeaderAuthorization, userInfo.AccessToken).
 			Set(gear.HeaderContentType, gear.MIMEApplicationJSON).
 			Send(map[string]interface{}{"name": "test"}).
 			JSON(res)
@@ -77,7 +56,7 @@ func TestEntryAPI(t *testing.T) {
 		res := new(schema.EntryResult)
 
 		_, err := request.Get(host+"/entries/"+entryID.String()).
-			Set(gear.HeaderAuthorization, accessToken).
+			Set(gear.HeaderAuthorization, userInfo.AccessToken).
 			JSON(res)
 		assert.Nil(err)
 
@@ -89,13 +68,13 @@ func TestEntryAPI(t *testing.T) {
 		assert.True(strings.Contains(res.String(), `"shares":[]`))
 	})
 
-	var secretID uuid.UUID
+	var secretID util.OID
 	t.Run("Add a secret", func(t *testing.T) {
 		assert := assert.New(t)
 		res := new(schema.SecretResult)
 
 		_, err := request.Post(host+"/entries/"+entryID.String()+"/secrets").
-			Set(gear.HeaderAuthorization, accessToken).
+			Set(gear.HeaderAuthorization, userInfo.AccessToken).
 			Set(gear.HeaderContentType, gear.MIMEApplicationJSON).
 			Send(map[string]interface{}{"name": "test secret", "url": "test.com", "password": "123456"}).
 			JSON(res)
@@ -112,7 +91,7 @@ func TestEntryAPI(t *testing.T) {
 		res := new(schema.EntryResult)
 
 		_, err := request.Get(host+"/entries/"+entryID.String()).
-			Set(gear.HeaderAuthorization, accessToken).
+			Set(gear.HeaderAuthorization, userInfo.AccessToken).
 			JSON(res)
 		assert.Nil(err)
 
@@ -133,8 +112,8 @@ func TestEntryAPI(t *testing.T) {
 		assert := assert.New(t)
 		res := new([]*schema.EntrySum)
 
-		_, err := request.Get(host+"/entries").
-			Set(gear.HeaderAuthorization, accessToken).
+		_, err := request.Get(fmt.Sprintf(`%s/teams/%s/entries`, host, userInfo.TeamID)).
+			Set(gear.HeaderAuthorization, userInfo.AccessToken).
 			JSON(res)
 		assert.Nil(err)
 
@@ -152,7 +131,7 @@ func TestEntryAPI(t *testing.T) {
 		res := new(schema.EntrySum)
 
 		_, err := request.Put(host+"/entries/"+entryID.String()).
-			Set(gear.HeaderAuthorization, accessToken).
+			Set(gear.HeaderAuthorization, userInfo.AccessToken).
 			Set(gear.HeaderContentType, gear.MIMEApplicationJSON).
 			Send(map[string]interface{}{"name": "test1", "category": "银行卡", "priority": 1}).
 			JSON(res)
@@ -169,12 +148,12 @@ func TestEntryAPI(t *testing.T) {
 		assert := assert.New(t)
 
 		res, err := request.Delete(host+"/entries/"+entryID.String()).
-			Set(gear.HeaderAuthorization, accessToken).End()
+			Set(gear.HeaderAuthorization, userInfo.AccessToken).End()
 		assert.Nil(err)
 		assert.Equal(204, res.StatusCode)
 
 		res, err = request.Get(host+"/entries/"+entryID.String()).
-			Set(gear.HeaderAuthorization, accessToken).End()
+			Set(gear.HeaderAuthorization, userInfo.AccessToken).End()
 		assert.Nil(err)
 		assert.Equal(404, res.StatusCode)
 	})
@@ -184,7 +163,7 @@ func TestEntryAPI(t *testing.T) {
 		res := new(schema.EntrySum)
 
 		_, err := request.Put(host+"/entries/"+entryID.String()+"/restore").
-			Set(gear.HeaderAuthorization, accessToken).
+			Set(gear.HeaderAuthorization, userInfo.AccessToken).
 			JSON(res)
 		assert.Nil(err)
 
@@ -195,7 +174,7 @@ func TestEntryAPI(t *testing.T) {
 
 		res = new(schema.EntrySum)
 		_, err = request.Get(host+"/entries/"+entryID.String()).
-			Set(gear.HeaderAuthorization, accessToken).
+			Set(gear.HeaderAuthorization, userInfo.AccessToken).
 			JSON(res)
 		assert.Nil(err)
 

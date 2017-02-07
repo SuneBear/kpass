@@ -4,20 +4,20 @@ import (
 	"time"
 
 	josejwt "github.com/SermoDigital/jose/jwt"
-	"github.com/google/uuid"
 	"github.com/seccom/kpass/pkg/util"
 	"github.com/teambition/gear"
-	au "github.com/teambition/gear-auth"
+	gearauth "github.com/teambition/gear-auth"
 	"github.com/teambition/gear-auth/crypto"
 	"github.com/teambition/gear-auth/jwt"
 )
 
 // Auth ...
 type Auth struct {
-	*au.Auth
+	*gearauth.Auth
 }
 
-var std = &Auth{au.New(util.RandBytes(32))} // use a rand key
+// use a rand key for JWT token, means that tokens will be invalid after service restart.
+var std = &Auth{gearauth.New(util.RandBytes(32))}
 
 // Middleware use to ...
 var Middleware = std.Serve
@@ -74,33 +74,42 @@ func Sign(c map[string]interface{}) (string, error) {
 }
 
 // NewToken ...
-func NewToken(userID, pass, dbPass string) (token string, err error) {
-	token = AESKey(pass, dbPass)
-	if token, err = EncryptText(userID, token); err != nil {
-		return
-	}
-	if token, err = Sign(map[string]interface{}{"id": userID, "key": token}); err != nil {
-		return
-	}
-	return
+func NewToken(userID string) (string, error) {
+	return Sign(map[string]interface{}{"id": userID})
 }
 
 // AddTeamKey ...
-func AddTeamKey(ctx *gear.Context, TeamID uuid.UUID, pass, dbPass string) (token string, err error) {
+func AddTeamKey(ctx *gear.Context, TeamID util.OID, pass, checkPass string) (token string, err error) {
 	var claims josejwt.Claims
 	if claims, err = FromCtx(ctx); err != nil {
 		return
 	}
-	teamID := TeamID.String()
-	token = AESKey(pass, dbPass)
-	if token, err = EncryptText(teamID, token); err != nil {
+
+	key := AESKey(pass, checkPass)
+	userID := claims.Get("id").(string)
+	if key, err = EncryptText(userID, key); err != nil {
 		return
 	}
-	claims.Set(teamID, token)
-	if token, err = Sign(claims); err != nil {
+	claims.Set("team"+TeamID.String(), key)
+	return Sign(claims)
+}
+
+// AddShareKey ...
+func AddShareKey(ctx *gear.Context, ShareID util.OID, pass, key string) (token string, err error) {
+	var claims josejwt.Claims
+	if claims, err = FromCtx(ctx); err != nil {
 		return
 	}
-	return
+
+	userID := claims.Get("id").(string)
+	if key, err = DecryptText(SignPass(userID, pass), key); err != nil {
+		return
+	}
+	if key, err = EncryptText(userID, key); err != nil {
+		return
+	}
+	claims.Set("share"+ShareID.String(), key)
+	return Sign(claims)
 }
 
 // FromCtx ...
@@ -109,31 +118,25 @@ func FromCtx(ctx *gear.Context) (josejwt.Claims, error) {
 }
 
 // KeyFromCtx ...
-func KeyFromCtx(ctx *gear.Context, ownerID string) (key string, err error) {
+func KeyFromCtx(ctx *gear.Context, ID util.OID, keyType string) (key string, err error) {
 	var claims josejwt.Claims
 	if claims, err = FromCtx(ctx); err != nil {
 		return
 	}
-	userID := claims.Get("id").(string)
-	// return current user's key.
-	if ownerID == "" || ownerID == userID {
-		key = claims.Get("key").(string)
-		// decrypt key
-		key, err = DecryptText(userID, key)
-		return
-	}
 
-	// return the team's key
-	if util.IsUUID(ownerID) {
-		if k := claims.Get(ownerID); k != nil {
-			key, err = DecryptText(ownerID, k.(string))
-			return
+	id := ID.String()
+	userID := claims.Get("id").(string)
+	switch keyType {
+	case "team", "share":
+		// return the team's key or share's key
+		if k := claims.Get(keyType + id); k != nil {
+			return DecryptText(userID, k.(string))
 		}
 	}
 
 	return "", &gear.Error{
 		Code: 403,
-		Msg:  "forbidden: " + ownerID,
+		Msg:  "forbidden: " + id,
 	}
 }
 

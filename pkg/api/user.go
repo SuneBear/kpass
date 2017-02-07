@@ -13,20 +13,21 @@ import (
 
 // User is API oject for users
 type User struct {
+	team *dao.Team
 	user *dao.User
 }
 
 // NewUser returns a User API instance
 func NewUser(db *service.DB) *User {
-	return &User{dao.NewUser(db)}
+	return &User{dao.NewTeam(db), dao.NewUser(db)}
 }
 
-type tplJoin struct {
+type tplUserJoin struct {
 	ID   string `json:"id"`
 	Pass string `json:"pass"` // should encrypt
 }
 
-func (t *tplJoin) Validate() error {
+func (t *tplUserJoin) Validate() error {
 	if len(t.ID) < 3 {
 		return &gear.Error{Code: 400, Msg: "invalid id, length of id should >= 3"}
 	}
@@ -37,29 +38,41 @@ func (t *tplJoin) Validate() error {
 }
 
 // Join ...
-func (a *User) Join(ctx *gear.Context) (err error) {
-	body := new(tplJoin)
-	if err = ctx.ParseBody(body); err == nil {
-		if err = a.user.CheckID(body.ID); err != nil {
-			return
-		}
-
-		var user *schema.User
-		if user, err = a.user.Create(body.ID, body.Pass); err == nil {
-			return ctx.JSON(200, user.Result())
-		}
+func (a *User) Join(ctx *gear.Context) error {
+	body := new(tplUserJoin)
+	if err := ctx.ParseBody(body); err != nil {
+		return ctx.Error(err)
 	}
-	return
+	if err := a.user.CheckID(body.ID); err != nil {
+		return ctx.Error(err)
+	}
+
+	user, err := a.user.Create(body.ID, body.Pass)
+	if err != nil {
+		return ctx.Error(err)
+	}
+	// create a private team for the user.
+	_, err = a.team.Create(body.ID, body.Pass, &schema.Team{
+		Name:       body.ID,
+		UserID:     body.ID,
+		Visibility: "private",
+		Members:    []string{body.ID},
+	})
+	if err != nil {
+		return ctx.Error(err)
+	}
+
+	return ctx.JSON(200, user.Result())
 }
 
 // Resource Owner Password Credentials Grant https://tools.ietf.org/html/rfc6749#page-37
-type tplLogin struct {
+type tplUserLogin struct {
 	Type string `json:"grant_type"`
 	ID   string `json:"username"`
 	Pass string `json:"password"` // should encrypt
 }
 
-func (t *tplLogin) Validate() error {
+func (t *tplUserLogin) Validate() error {
 	if t.Type != "password" {
 		return &gear.Error{Code: 400, Msg: "invalid_grant"}
 	}
@@ -74,7 +87,7 @@ func (t *tplLogin) Validate() error {
 
 // Login ...
 func (a *User) Login(ctx *gear.Context) (err error) {
-	body := new(tplLogin)
+	body := new(tplUserLogin)
 	if err = ctx.ParseBody(body); err != nil {
 		return
 	}
@@ -84,7 +97,7 @@ func (a *User) Login(ctx *gear.Context) (err error) {
 		return
 	}
 
-	token, err := auth.NewToken(user.ID, body.Pass, user.Pass)
+	token, err := auth.NewToken(user.ID)
 	if err != nil {
 		return ctx.Error(err)
 	}

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/seccom/kpass/pkg/util"
 )
 
 // Secret represents secret info
@@ -32,7 +32,7 @@ func (s *Secret) String() string {
 }
 
 // Result returns EntryResult intance
-func (s *Secret) Result(id uuid.UUID) *SecretResult {
+func (s *Secret) Result(id util.OID) *SecretResult {
 	return &SecretResult{
 		ID:      id,
 		Name:    s.Name,
@@ -46,7 +46,7 @@ func (s *Secret) Result(id uuid.UUID) *SecretResult {
 
 // SecretResult represents secret info
 type SecretResult struct {
-	ID      uuid.UUID `json:"uuid"`
+	ID      util.OID `json:"id"`
 	Name    string    `json:"name"`
 	URL     string    `json:"url"`
 	Pass    string    `json:"password"`

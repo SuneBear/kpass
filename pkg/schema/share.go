@@ -4,16 +4,16 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/seccom/kpass/pkg/util"
 )
 
 // Share represents share info
 type Share struct {
-	EntryID uuid.UUID `json:"entryId"`
+	TeamID  util.OID  `json:"teamID"`
+	EntryID util.OID  `json:"entryID"`
 	Name    string    `json:"name"`
 	Token   string    `json:"Token"`
-	To      string    `json:"to"`
-	TTL     int       `json:"ttl"`
+	UserID  string    `json:"userID"`
 	Created time.Time `json:"created"`
 	Updated time.Time `json:"updated"`
 }
@@ -33,13 +33,13 @@ func (s *Share) String() string {
 }
 
 // Result returns ShareResult intance
-func (s *Share) Result(ID uuid.UUID) *ShareResult {
+func (s *Share) Result(ID util.OID) *ShareResult {
 	return &ShareResult{
 		ID:      ID,
+		TeamID:  s.TeamID,
 		EntryID: s.EntryID,
 		Name:    s.Name,
-		To:      s.To,
-		TTL:     s.TTL,
+		UserID:  s.UserID,
 		Created: s.Created,
 		Updated: s.Updated,
 	}
@@ -47,11 +47,11 @@ func (s *Share) Result(ID uuid.UUID) *ShareResult {
 
 // ShareResult represents desensitized share
 type ShareResult struct {
-	ID      uuid.UUID `json:"uuid"`
-	EntryID uuid.UUID `json:"entryId"`
+	ID      util.OID  `json:"id"`
+	TeamID  util.OID  `json:"teamID"`
+	EntryID util.OID  `json:"entryID"`
+	UserID  string    `json:"userID"`
 	Name    string    `json:"name"`
-	To      string    `json:"to"`
-	TTL     int       `json:"ttl"`
 	Created time.Time `json:"created"`
 	Updated time.Time `json:"updated"`
 }

@@ -1,11 +1,11 @@
 package api
 
 import (
-	"github.com/google/uuid"
 	"github.com/seccom/kpass/pkg/auth"
 	"github.com/seccom/kpass/pkg/dao"
 	"github.com/seccom/kpass/pkg/schema"
 	"github.com/seccom/kpass/pkg/service"
+	"github.com/seccom/kpass/pkg/util"
 	"github.com/teambition/gear"
 )
 
@@ -36,7 +36,7 @@ func (t *tplSecretCreate) Validate() error {
 
 // Create ...
 func (a *Secret) Create(ctx *gear.Context) error {
-	EntryID, err := uuid.Parse(ctx.Param("entryID"))
+	EntryID, err := util.ParseOID(ctx.Param("entryID"))
 	if err != nil {
 		return ctx.ErrorStatus(400)
 	}
@@ -54,11 +54,11 @@ func (a *Secret) Create(ctx *gear.Context) error {
 	if err != nil {
 		return ctx.Error(err)
 	}
-	key, err := auth.KeyFromCtx(ctx, entry.OwnerID)
+	key, err := auth.KeyFromCtx(ctx, entry.TeamID, "team")
 	if err != nil {
 		return ctx.Error(err)
 	}
-	secret, err := a.secret.Create(userID, key, EntryID, &schema.Secret{
+	secretResult, err := a.secret.Create(EntryID, userID, key, &schema.Secret{
 		Name: body.Name,
 		URL:  body.URL,
 		Pass: body.Pass,
@@ -67,7 +67,7 @@ func (a *Secret) Create(ctx *gear.Context) error {
 	if err != nil {
 		return ctx.Error(err)
 	}
-	return ctx.JSON(200, secret)
+	return ctx.JSON(200, secretResult)
 }
 
 type tplSecretUpdate map[string]interface{}
@@ -95,11 +95,11 @@ func (t *tplSecretUpdate) Validate() error {
 
 // Update ...
 func (a *Secret) Update(ctx *gear.Context) error {
-	EntryID, err := uuid.Parse(ctx.Param("entryID"))
+	EntryID, err := util.ParseOID(ctx.Param("entryID"))
 	if err != nil {
 		return ctx.ErrorStatus(400)
 	}
-	SecretID, err := uuid.Parse(ctx.Param("secretID"))
+	SecretID, err := util.ParseOID(ctx.Param("secretID"))
 	if err != nil {
 		return ctx.ErrorStatus(400)
 	}
@@ -113,21 +113,16 @@ func (a *Secret) Update(ctx *gear.Context) error {
 	if err != nil {
 		return ctx.Error(err)
 	}
-	// ensure the secret belong to the entry.
-	if !entry.HasSecret(SecretID.String()) {
-		return ctx.ErrorStatus(404)
-	}
 	userID, err := auth.UserIDFromCtx(ctx)
 	if err != nil {
 		return ctx.Error(err)
 	}
-	// ensure current user (owner or team member) has right.
-	key, err := auth.KeyFromCtx(ctx, entry.OwnerID)
+	key, err := auth.KeyFromCtx(ctx, entry.TeamID, "team")
 	if err != nil {
 		return ctx.Error(err)
 	}
 
-	res, err := a.secret.Update(userID, key, EntryID, SecretID, *body)
+	res, err := a.secret.Update(EntryID, SecretID, userID, key, *body)
 	if err != nil {
 		return ctx.Error(err)
 	}
@@ -136,11 +131,11 @@ func (a *Secret) Update(ctx *gear.Context) error {
 
 // Delete ...
 func (a *Secret) Delete(ctx *gear.Context) error {
-	EntryID, err := uuid.Parse(ctx.Param("entryID"))
+	EntryID, err := util.ParseOID(ctx.Param("entryID"))
 	if err != nil {
 		return ctx.ErrorStatus(400)
 	}
-	SecretID, err := uuid.Parse(ctx.Param("secretID"))
+	SecretID, err := util.ParseOID(ctx.Param("secretID"))
 	if err != nil {
 		return ctx.ErrorStatus(400)
 	}
@@ -149,7 +144,7 @@ func (a *Secret) Delete(ctx *gear.Context) error {
 		return ctx.Error(err)
 	}
 
-	if err := a.secret.Delete(userID, EntryID, SecretID); err != nil {
+	if err := a.secret.Delete(EntryID, SecretID, userID); err != nil {
 		return ctx.Error(err)
 	}
 	return ctx.End(204)
