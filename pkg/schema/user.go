@@ -41,6 +41,7 @@ func (u *User) Result() *UserResult {
 // UserResult represents desensitized user
 type UserResult struct {
 	ID      string    `json:"id"`
+	Avatar  string    `json:"avatar"`
 	Created time.Time `json:"created"`
 	Updated time.Time `json:"updated"`
 }

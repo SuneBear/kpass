@@ -1,8 +1,6 @@
 package api
 
 import (
-	"fmt"
-
 	"github.com/seccom/kpass/pkg/auth"
 	"github.com/seccom/kpass/pkg/dao"
 	"github.com/seccom/kpass/pkg/schema"
@@ -202,7 +200,6 @@ func (a *Entry) FindByTeam(ctx *gear.Context) (err error) {
 	}
 
 	entries, err := a.entry.FindByTeam(TeamID, userID, false)
-	fmt.Println(111111, TeamID, userID, entries, err)
 	if err != nil {
 		return ctx.Error(err)
 	}

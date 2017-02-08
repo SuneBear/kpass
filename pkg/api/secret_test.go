@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	"github.com/DavidCai1993/request"
-	"github.com/seccom/kpass/pkg/util"
 	"github.com/seccom/kpass/pkg"
 	"github.com/seccom/kpass/pkg/schema"
+	"github.com/seccom/kpass/pkg/util"
 	"github.com/stretchr/testify/assert"
 	"github.com/teambition/gear"
 )
@@ -21,7 +21,7 @@ func TestSecretAPI(t *testing.T) {
 	userInfo := NewUser(host)
 
 	entry := new(schema.EntrySum)
-	_, err := request.Post(fmt.Sprintf(`%s/teams/%s/entries`, host, userInfo.TeamID)).
+	_, err := request.Post(fmt.Sprintf(`%s/api/teams/%s/entries`, host, userInfo.TeamID)).
 		Set(gear.HeaderAuthorization, userInfo.AccessToken).
 		Set(gear.HeaderContentType, gear.MIMEApplicationJSON).
 		Send(map[string]interface{}{"name": "test"}).
@@ -33,7 +33,7 @@ func TestSecretAPI(t *testing.T) {
 		assert := assert.New(t)
 		res := new(schema.SecretResult)
 
-		_, err := request.Post(host+"/entries/"+entry.ID.String()+"/secrets").
+		_, err := request.Post(host+"/api/entries/"+entry.ID.String()+"/secrets").
 			Set(gear.HeaderAuthorization, userInfo.AccessToken).
 			Set(gear.HeaderContentType, gear.MIMEApplicationJSON).
 			Send(map[string]interface{}{"name": "test secret", "url": "test.com", "password": "123456"}).
@@ -50,7 +50,7 @@ func TestSecretAPI(t *testing.T) {
 		assert := assert.New(t)
 		res := new(schema.SecretResult)
 
-		_, err := request.Put(host+"/entries/"+entry.ID.String()+"/secrets/"+secretID.String()).
+		_, err := request.Put(host+"/api/entries/"+entry.ID.String()+"/secrets/"+secretID.String()).
 			Set(gear.HeaderAuthorization, userInfo.AccessToken).
 			Set(gear.HeaderContentType, gear.MIMEApplicationJSON).
 			Send(map[string]interface{}{"url": "www.test.com", "password": "abcdefg", "note": "note"}).
@@ -67,13 +67,13 @@ func TestSecretAPI(t *testing.T) {
 	t.Run("Delete a secret", func(t *testing.T) {
 		assert := assert.New(t)
 
-		res, err := request.Delete(host+"/entries/"+entry.ID.String()+"/secrets/"+secretID.String()).
+		res, err := request.Delete(host+"/api/entries/"+entry.ID.String()+"/secrets/"+secretID.String()).
 			Set(gear.HeaderAuthorization, userInfo.AccessToken).End()
 		assert.Nil(err)
 		assert.Equal(204, res.StatusCode)
 
 		res2 := new(schema.EntryResult)
-		_, err = request.Get(host+"/entries/"+entry.ID.String()).
+		_, err = request.Get(host+"/api/entries/"+entry.ID.String()).
 			Set(gear.HeaderAuthorization, userInfo.AccessToken).
 			JSON(res)
 		assert.Nil(err)

@@ -26,7 +26,7 @@ func TestEntryAPI(t *testing.T) {
 		assert := assert.New(t)
 		res := new([]*schema.EntrySum)
 
-		_, err := request.Get(fmt.Sprintf(`%s/teams/%s/entries`, host, userInfo.TeamID)).
+		_, err := request.Get(fmt.Sprintf(`%s/api/teams/%s/entries`, host, userInfo.TeamID)).
 			Set(gear.HeaderAuthorization, userInfo.AccessToken).
 			JSON(res)
 		assert.Nil(err)
@@ -38,7 +38,7 @@ func TestEntryAPI(t *testing.T) {
 		assert := assert.New(t)
 		res := new(schema.EntrySum)
 
-		_, err := request.Post(fmt.Sprintf(`%s/teams/%s/entries`, host, userInfo.TeamID)).
+		_, err := request.Post(fmt.Sprintf(`%s/api/teams/%s/entries`, host, userInfo.TeamID)).
 			Set(gear.HeaderAuthorization, userInfo.AccessToken).
 			Set(gear.HeaderContentType, gear.MIMEApplicationJSON).
 			Send(map[string]interface{}{"name": "test"}).
@@ -55,7 +55,7 @@ func TestEntryAPI(t *testing.T) {
 		assert := assert.New(t)
 		res := new(schema.EntryResult)
 
-		_, err := request.Get(host+"/entries/"+entryID.String()).
+		_, err := request.Get(host+"/api/entries/"+entryID.String()).
 			Set(gear.HeaderAuthorization, userInfo.AccessToken).
 			JSON(res)
 		assert.Nil(err)
@@ -73,7 +73,7 @@ func TestEntryAPI(t *testing.T) {
 		assert := assert.New(t)
 		res := new(schema.SecretResult)
 
-		_, err := request.Post(host+"/entries/"+entryID.String()+"/secrets").
+		_, err := request.Post(host+"/api/entries/"+entryID.String()+"/secrets").
 			Set(gear.HeaderAuthorization, userInfo.AccessToken).
 			Set(gear.HeaderContentType, gear.MIMEApplicationJSON).
 			Send(map[string]interface{}{"name": "test secret", "url": "test.com", "password": "123456"}).
@@ -90,7 +90,7 @@ func TestEntryAPI(t *testing.T) {
 		assert := assert.New(t)
 		res := new(schema.EntryResult)
 
-		_, err := request.Get(host+"/entries/"+entryID.String()).
+		_, err := request.Get(host+"/api/entries/"+entryID.String()).
 			Set(gear.HeaderAuthorization, userInfo.AccessToken).
 			JSON(res)
 		assert.Nil(err)
@@ -112,7 +112,7 @@ func TestEntryAPI(t *testing.T) {
 		assert := assert.New(t)
 		res := new([]*schema.EntrySum)
 
-		_, err := request.Get(fmt.Sprintf(`%s/teams/%s/entries`, host, userInfo.TeamID)).
+		_, err := request.Get(fmt.Sprintf(`%s/api/teams/%s/entries`, host, userInfo.TeamID)).
 			Set(gear.HeaderAuthorization, userInfo.AccessToken).
 			JSON(res)
 		assert.Nil(err)
@@ -130,7 +130,7 @@ func TestEntryAPI(t *testing.T) {
 		assert := assert.New(t)
 		res := new(schema.EntrySum)
 
-		_, err := request.Put(host+"/entries/"+entryID.String()).
+		_, err := request.Put(host+"/api/entries/"+entryID.String()).
 			Set(gear.HeaderAuthorization, userInfo.AccessToken).
 			Set(gear.HeaderContentType, gear.MIMEApplicationJSON).
 			Send(map[string]interface{}{"name": "test1", "category": "银行卡", "priority": 1}).
@@ -147,12 +147,12 @@ func TestEntryAPI(t *testing.T) {
 	t.Run("Delete a entry", func(t *testing.T) {
 		assert := assert.New(t)
 
-		res, err := request.Delete(host+"/entries/"+entryID.String()).
+		res, err := request.Delete(host+"/api/entries/"+entryID.String()).
 			Set(gear.HeaderAuthorization, userInfo.AccessToken).End()
 		assert.Nil(err)
 		assert.Equal(204, res.StatusCode)
 
-		res, err = request.Get(host+"/entries/"+entryID.String()).
+		res, err = request.Get(host+"/api/entries/"+entryID.String()).
 			Set(gear.HeaderAuthorization, userInfo.AccessToken).End()
 		assert.Nil(err)
 		assert.Equal(404, res.StatusCode)
@@ -162,7 +162,7 @@ func TestEntryAPI(t *testing.T) {
 		assert := assert.New(t)
 		res := new(schema.EntrySum)
 
-		_, err := request.Put(host+"/entries/"+entryID.String()+"/restore").
+		_, err := request.Put(host+"/api/entries/"+entryID.String()+"/restore").
 			Set(gear.HeaderAuthorization, userInfo.AccessToken).
 			JSON(res)
 		assert.Nil(err)
@@ -173,7 +173,7 @@ func TestEntryAPI(t *testing.T) {
 		assert.Equal(1, res.Priority)
 
 		res = new(schema.EntrySum)
-		_, err = request.Get(host+"/entries/"+entryID.String()).
+		_, err = request.Get(host+"/api/entries/"+entryID.String()).
 			Set(gear.HeaderAuthorization, userInfo.AccessToken).
 			JSON(res)
 		assert.Nil(err)

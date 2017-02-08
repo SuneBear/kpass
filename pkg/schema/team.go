@@ -69,7 +69,7 @@ func (t *Team) Result(ID util.OID) *TeamResult {
 
 // TeamResult represents desensitized team
 type TeamResult struct {
-	ID         util.OID `json:"id"`
+	ID         util.OID  `json:"id"`
 	UserID     string    `json:"userID"`
 	Name       string    `json:"name"`
 	IsFrozen   bool      `json:"isFrozen"`

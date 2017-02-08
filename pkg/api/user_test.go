@@ -29,7 +29,7 @@ func TestUserAPI(t *testing.T) {
 		assert := assert.New(t)
 		user := &schema.UserResult{}
 
-		_, err := request.Post(host+"/join").
+		_, err := request.Post(host+"/api/join").
 			Set(gear.HeaderContentType, gear.MIMEApplicationJSON).
 			Send(map[string]interface{}{"id": id, "pass": pass}).
 			JSON(user)
@@ -48,7 +48,7 @@ func TestUserAPI(t *testing.T) {
 			AccessToken string `json:"access_token"`
 		}{}
 
-		_, err := request.Post(host+"/login").
+		_, err := request.Post(host+"/api/login").
 			Set(gear.HeaderContentType, gear.MIMEApplicationJSON).
 			Send(map[string]interface{}{"username": id, "password": pass, "grant_type": "password"}).
 			JSON(res)
@@ -62,7 +62,7 @@ func TestUserAPI(t *testing.T) {
 
 		teams := &[]*schema.TeamResult{}
 
-		_, err = request.Get(host+"/teams").
+		_, err = request.Get(host+"/api/teams").
 			Set(gear.HeaderAuthorization, "Bearer "+res.AccessToken).
 			Set(gear.HeaderContentType, gear.MIMEApplicationJSON).
 			JSON(teams)
@@ -86,7 +86,7 @@ func NewUser(host string) *UserInfo {
 	info := &UserInfo{}
 	info.ID = "user" + strconv.Itoa(count)
 	info.Pass = util.SHA256Sum(util.SHA256Sum(util.RandPass(8, 2, 2)))
-	_, err := request.Post(host+"/join").
+	_, err := request.Post(host+"/api/join").
 		Set(gear.HeaderContentType, gear.MIMEApplicationJSON).
 		Send(map[string]interface{}{"id": info.ID, "pass": info.Pass}).
 		End()
@@ -95,7 +95,7 @@ func NewUser(host string) *UserInfo {
 		panic(err)
 	}
 
-	res, err := request.Post(host+"/login").
+	res, err := request.Post(host+"/api/login").
 		Set(gear.HeaderContentType, gear.MIMEApplicationJSON).
 		Send(map[string]interface{}{"username": info.ID, "password": info.Pass, "grant_type": "password"}).
 		JSON()
@@ -106,7 +106,7 @@ func NewUser(host string) *UserInfo {
 	info.AccessToken = "Bearer " + (*res.(*map[string]interface{}))["access_token"].(string)
 
 	teams := &[]*schema.TeamResult{}
-	_, err = request.Get(host+"/teams").
+	_, err = request.Get(host+"/api/teams").
 		Set(gear.HeaderAuthorization, info.AccessToken).
 		Set(gear.HeaderContentType, gear.MIMEApplicationJSON).
 		JSON(teams)
@@ -115,7 +115,7 @@ func NewUser(host string) *UserInfo {
 	}
 
 	info.TeamID = (*teams)[0].ID.String()
-	res, err = request.Post(fmt.Sprintf(`%s/teams/%s/token`, host, info.TeamID)).
+	res, err = request.Post(fmt.Sprintf(`%s/api/teams/%s/token`, host, info.TeamID)).
 		Set(gear.HeaderAuthorization, info.AccessToken).
 		Set(gear.HeaderContentType, gear.MIMEApplicationJSON).
 		Send(map[string]interface{}{"password": info.Pass, "grant_type": "password"}).

@@ -24,7 +24,7 @@ func newRouter(db *service.DB) (Router *gear.Router) {
 	})
 
 	// generate a random password
-	Router.Get("/password", userAPI.Password)
+	Router.Get("/api/password", userAPI.Password)
 
 	// Create a new user
 	// Request body:
@@ -33,7 +33,7 @@ func newRouter(db *service.DB) (Router *gear.Router) {
 	// 		"pass":"SHA256 hashed password"
 	//  }
 	// Return: user info object
-	Router.Post("/join", userAPI.Join)
+	Router.Post("/api/join", userAPI.Join)
 	// login
 	// Request body:
 	//  {
@@ -48,25 +48,25 @@ func newRouter(db *service.DB) (Router *gear.Router) {
 	// 		"expires_in": 600,
 	//  }
 	//
-	Router.Post("/login", userAPI.Login)
+	Router.Post("/api/login", userAPI.Login)
 
 	// Return current user info
-	// Router.Get("/user", auth.Middleware, noOp)
+	// Router.Get("/api/user", auth.Middleware, noOp)
 	// Update current user info
-	// Router.Put("/user", auth.Middleware, noOp)
+	// Router.Put("/api/user", auth.Middleware, noOp)
 	// Return the user info, for admin
-	// Router.Get("/users/:id", auth.Middleware, noOp)
+	// Router.Get("/api/users/:id", auth.Middleware, noOp)
 	// Update the user, block or unblock, for admin
-	// Router.Put("/users/:id", auth.Middleware, noOp)
+	// Router.Put("/api/users/:id", auth.Middleware, noOp)
 
 	// Create a team
-	Router.Post("/teams", auth.Middleware, teamAPI.Create)
+	Router.Post("/api/teams", auth.Middleware, teamAPI.Create)
 	// // Return current user's teams joined.
-	Router.Get("/teams", auth.Middleware, teamAPI.FindByMember)
+	Router.Get("/api/teams", auth.Middleware, teamAPI.FindByMember)
 	// Get team's token
-	Router.Post("/teams/:teamID/token", auth.Middleware, teamAPI.Token)
+	Router.Post("/api/teams/:teamID/token", auth.Middleware, teamAPI.Token)
 	// Return the team's entries list
-	Router.Get("/teams/:teamID/entries", auth.Middleware, entryAPI.FindByTeam)
+	Router.Get("/api/teams/:teamID/entries", auth.Middleware, entryAPI.FindByTeam)
 	// Create a new entry for team
 	// Request body:
 	//  {
@@ -74,24 +74,24 @@ func newRouter(db *service.DB) (Router *gear.Router) {
 	// 		"category":"登录信息"
 	//  }
 	// Return: entry info object
-	Router.Post("/teams/:teamID/entries", auth.Middleware, entryAPI.Create)
+	Router.Post("/api/teams/:teamID/entries", auth.Middleware, entryAPI.Create)
 	// Update the team
-	Router.Put("/teams/:teamID", auth.Middleware, teamAPI.Update)
+	Router.Put("/api/teams/:teamID", auth.Middleware, teamAPI.Update)
 	// change the team's members
-	Router.Put("/teams/:teamID/members", auth.Middleware, teamAPI.Members)
+	Router.Put("/api/teams/:teamID/members", auth.Middleware, teamAPI.Members)
 	// Delete the team
-	Router.Delete("/teams/:teamID", auth.Middleware, teamAPI.Delete)
+	Router.Delete("/api/teams/:teamID", auth.Middleware, teamAPI.Delete)
 	// Return the team's shares list
-	Router.Get("/teams/:teamID/shares", auth.Middleware, noOp)
+	Router.Get("/api/teams/:teamID/shares", auth.Middleware, noOp)
 
 	// Get the full entry, with all secrets
-	Router.Get("/entries/:entryID", auth.Middleware, entryAPI.Find)
+	Router.Get("/api/entries/:entryID", auth.Middleware, entryAPI.Find)
 	// Update the entry
-	Router.Put("/entries/:entryID", auth.Middleware, entryAPI.Update)
+	Router.Put("/api/entries/:entryID", auth.Middleware, entryAPI.Update)
 	// Delete the entry
-	Router.Delete("/entries/:entryID", auth.Middleware, entryAPI.Delete)
+	Router.Delete("/api/entries/:entryID", auth.Middleware, entryAPI.Delete)
 	// Restore the entry
-	Router.Put("/entries/:entryID/restore", auth.Middleware, entryAPI.Restore)
+	Router.Put("/api/entries/:entryID/restore", auth.Middleware, entryAPI.Restore)
 
 	// Add a secret to the entry
 	// Request body:
@@ -102,23 +102,23 @@ func newRouter(db *service.DB) (Router *gear.Router) {
 	// 		"note":"other info",
 	//  }
 	// Return: secret info object
-	Router.Post("/entries/:entryID/secrets", auth.Middleware, secretAPI.Create)
+	Router.Post("/api/entries/:entryID/secrets", auth.Middleware, secretAPI.Create)
 	// Update the secret
-	Router.Put("/entries/:entryID/secrets/:secretID", auth.Middleware, secretAPI.Update)
+	Router.Put("/api/entries/:entryID/secrets/:secretID", auth.Middleware, secretAPI.Update)
 	// Delete the secret
-	Router.Delete("/entries/:entryID/secrets/:secretID", auth.Middleware, secretAPI.Delete)
+	Router.Delete("/api/entries/:entryID/secrets/:secretID", auth.Middleware, secretAPI.Delete)
 	// Add a share to the entry
-	Router.Post("/entries/:entryID/shares", auth.Middleware, noOp)
+	Router.Post("/api/entries/:entryID/shares", auth.Middleware, noOp)
 	// Get shares list of the entry
-	Router.Get("/entries/:entryID/shares", auth.Middleware, noOp)
+	Router.Get("/api/entries/:entryID/shares", auth.Middleware, noOp)
 
 	// Get the current user's shares list
-	Router.Get("/shares", auth.Middleware, noOp)
+	Router.Get("/api/shares", auth.Middleware, noOp)
 	// Get shares list to the current user
-	Router.Get("/shares/me", auth.Middleware, noOp)
+	Router.Get("/api/shares/me", auth.Middleware, noOp)
 	// Get the share
-	Router.Get("/shares/:shareID", auth.Middleware, noOp)
+	Router.Get("/api/shares/:shareID", auth.Middleware, noOp)
 	// Delete the share
-	Router.Delete("/shares/:shareID", auth.Middleware, noOp)
+	Router.Delete("/api/shares/:shareID", auth.Middleware, noOp)
 	return
 }
