@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/seccom/kpass/pkg/auth"
@@ -94,6 +95,7 @@ func (a *User) Login(ctx *gear.Context) (err error) {
 
 	var user *schema.User
 	if user, err = a.user.CheckLogin(body.ID, body.Pass); err != nil {
+		fmt.Println(111111, user, err)
 		return
 	}
 

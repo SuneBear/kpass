@@ -27,7 +27,7 @@ func NewTeam(db *service.DB) *Team {
 func (o *Team) Create(userID, pass string, team *schema.Team) (teamResult *schema.TeamResult, err error) {
 	TeamID := util.NewOID()
 	team.Pass = auth.SignPass(TeamID.String(), pass)
-	team.Created = time.Now()
+	team.Created = util.Time(time.Now())
 	team.Updated = team.Created
 	teamResult = team.Result(TeamID)
 	err = o.db.DB.Update(func(tx *buntdb.Tx) error {
@@ -43,7 +43,7 @@ func (o *Team) Create(userID, pass string, team *schema.Team) (teamResult *schem
 // Update ...
 func (o *Team) Update(TeamID util.OID, team *schema.Team) (teamResult *schema.TeamResult, err error) {
 	err = o.db.DB.Update(func(tx *buntdb.Tx) error {
-		team.Updated = time.Now()
+		team.Updated = util.Time(time.Now())
 		_, _, e := tx.Set(schema.TeamKey(TeamID), team.String(), nil)
 		return e
 	})

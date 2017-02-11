@@ -3,12 +3,15 @@ package schema
 import (
 	"encoding/json"
 	"time"
+
+	"github.com/seccom/kpass/pkg/util"
 )
 
 // User represents user info
 type User struct {
 	ID        string    `json:"id"`
 	Pass      string    `json:"pass"` // encrypt
+	Avatar    util.OID  `json:"avatar"`
 	IsBlocked bool      `json:"isBlocked"`
 	Attempt   int       `json:"attempt"` // login attempts
 	Created   time.Time `json:"created"`
@@ -33,6 +36,7 @@ func (u *User) String() string {
 func (u *User) Result() *UserResult {
 	return &UserResult{
 		ID:      u.ID,
+		Avatar:  u.Avatar,
 		Created: u.Created,
 		Updated: u.Updated,
 	}
@@ -41,7 +45,7 @@ func (u *User) Result() *UserResult {
 // UserResult represents desensitized user
 type UserResult struct {
 	ID      string    `json:"id"`
-	Avatar  string    `json:"avatar"`
+	Avatar  util.OID  `json:"avatar"`
 	Created time.Time `json:"created"`
 	Updated time.Time `json:"updated"`
 }

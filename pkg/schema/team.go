@@ -9,6 +9,7 @@ import (
 
 // Team represents team info
 type Team struct {
+	Logo       util.OID  `json:"logo"`
 	UserID     string    `json:"userID"`
 	Name       string    `json:"name"`
 	Pass       string    `json:"pass"`
@@ -57,6 +58,7 @@ func (t *Team) RemoveMember(userID string) bool {
 func (t *Team) Result(ID util.OID) *TeamResult {
 	return &TeamResult{
 		ID:         ID,
+		Logo:       t.Logo,
 		UserID:     t.UserID,
 		Name:       t.Name,
 		IsFrozen:   t.IsFrozen,
@@ -70,6 +72,7 @@ func (t *Team) Result(ID util.OID) *TeamResult {
 // TeamResult represents desensitized team
 type TeamResult struct {
 	ID         util.OID  `json:"id"`
+	Logo       util.OID  `json:"logo"`
 	UserID     string    `json:"userID"`
 	Name       string    `json:"name"`
 	IsFrozen   bool      `json:"isFrozen"`

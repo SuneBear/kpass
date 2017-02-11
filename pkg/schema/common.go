@@ -9,11 +9,13 @@ import (
 
 const (
 	// KeyPrefixUser ...
-	keyPrefixUser   = "U:"
-	keyPrefixTeam   = "T:"
-	keyPrefixEntry  = "E:"
-	keyPrefixSecret = "S:"
-	keyPrefixShare  = "SH:"
+	keyPrefixUser     = "U:"
+	keyPrefixTeam     = "T:"
+	keyPrefixEntry    = "E:"
+	keyPrefixSecret   = "S:"
+	keyPrefixShare    = "SH:"
+	keyPrefixFile     = "F:"
+	keyPrefixFileBlob = "FB:"
 )
 
 // InitIndex ...
@@ -32,53 +34,73 @@ func UserKey(name string) string {
 }
 
 // TeamKey returns the team's db key
-func TeamKey(id util.OID) string {
-	return keyPrefixTeam + id.String()
+func TeamKey(ID util.OID) string {
+	return keyPrefixTeam + ID.String()
 }
 
 // TeamIDFromKey returns team' ID from key
 func TeamIDFromKey(key string) util.OID {
 	val := key[len(keyPrefixTeam):]
-	id, err := util.ParseOID(val)
+	ID, err := util.ParseOID(val)
 	if err != nil {
 		panic(err)
 	}
-	return id
+	return ID
 }
 
 // EntryKey returns the entry's db key
-func EntryKey(id util.OID) string {
-	return keyPrefixEntry + id.String()
+func EntryKey(ID util.OID) string {
+	return keyPrefixEntry + ID.String()
 }
 
 // EntryIDFromKey returns entry' ID from key
 func EntryIDFromKey(key string) util.OID {
 	val := key[len(keyPrefixEntry):]
-	id, err := util.ParseOID(val)
+	ID, err := util.ParseOID(val)
 	if err != nil {
 		panic(err)
 	}
-	return id
+	return ID
 }
 
 // SecretKey returns the secret's db key
-func SecretKey(id util.OID) string {
-	return keyPrefixSecret + id.String()
+func SecretKey(ID util.OID) string {
+	return keyPrefixSecret + ID.String()
 }
 
 // ShareKey returns the share's db key
-func ShareKey(id util.OID) string {
-	return keyPrefixShare + id.String()
+func ShareKey(ID util.OID) string {
+	return keyPrefixShare + ID.String()
 }
 
 // ShareIDFromKey returns share' ID from key
 func ShareIDFromKey(key string) util.OID {
 	val := key[len(keyPrefixShare):]
-	id, err := util.ParseOID(val)
+	ID, err := util.ParseOID(val)
 	if err != nil {
 		panic(err)
 	}
-	return id
+	return ID
+}
+
+// FileKey returns the file's db key
+func FileKey(ID util.OID) string {
+	return keyPrefixFile + ID.String()
+}
+
+// FileIDFromKey returns file' ID from key
+func FileIDFromKey(key string) util.OID {
+	val := key[len(keyPrefixFile):]
+	ID, err := util.ParseOID(val)
+	if err != nil {
+		panic(err)
+	}
+	return ID
+}
+
+// FileBlobKey returns file blob' key
+func FileBlobKey(ID util.OID) string {
+	return keyPrefixFileBlob + ID.String()
 }
 
 func jsonMarshal(v interface{}) (str string) {

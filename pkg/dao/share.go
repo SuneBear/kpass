@@ -31,7 +31,7 @@ func (o *Share) Create(EntryID util.OID, key, pass string, expire time.Duration,
 		return nil, dbError(err)
 	}
 	share.Token = token
-	share.Created = time.Now()
+	share.Created = util.Time(time.Now())
 	share.Updated = share.Created
 	shareResult = share.Result(ShareID)
 	err = o.db.DB.Update(func(tx *buntdb.Tx) error {

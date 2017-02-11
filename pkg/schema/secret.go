@@ -46,7 +46,7 @@ func (s *Secret) Result(id util.OID) *SecretResult {
 
 // SecretResult represents secret info
 type SecretResult struct {
-	ID      util.OID `json:"id"`
+	ID      util.OID  `json:"id"`
 	Name    string    `json:"name"`
 	URL     string    `json:"url"`
 	Pass    string    `json:"password"`

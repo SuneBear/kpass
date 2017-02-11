@@ -38,7 +38,7 @@ func NewOID() OID {
 func ParseOID(str string) (OID, error) {
 	i, _ := strconv.ParseUint(str, 36, 64)
 	id := OID(i)
-	if id.IsValid() {
+	if id.Valid() {
 		return id, nil
 	}
 	return id, errors.New("invalid OID: " + str)
@@ -49,18 +49,21 @@ func (s OID) Equal(a OID) bool {
 	return uint64(s) == uint64(a)
 }
 
-// IsValid ...
-func (s OID) IsValid() bool {
-	return s.GetTime().After(since)
+// Valid ...
+func (s OID) Valid() bool {
+	return s.Time().After(since)
 }
 
-// GetTime ...
-func (s OID) GetTime() time.Time {
+// Time ...
+func (s OID) Time() time.Time {
 	t := int64(uint64(s)>>mask) + gosnow.Since
-	return time.Unix(t/1000, t%1000)
+	return time.Unix(0, t*1e6)
 }
 
 func (s OID) String() string {
+	if s == 0 {
+		return ""
+	}
 	return strconv.FormatUint(uint64(s), 36)
 }
 
@@ -75,5 +78,5 @@ func (s *OID) UnmarshalText(b []byte) error {
 	if err == nil {
 		*s = id
 	}
-	return err
+	return nil
 }

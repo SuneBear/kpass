@@ -9,12 +9,14 @@ import (
 
 // Entry represents entry info
 type Entry struct {
-	TeamID    util.OID `json:"teamID"`
+	TeamID    util.OID  `json:"teamID"`
 	Name      string    `json:"name"`
 	Category  string    `json:"category"`
 	Priority  int       `json:"priority"`
 	IsDeleted bool      `json:"isDeleted"`
 	Secrets   []string  `json:"secrets"`
+	Shares    []string  `json:"shares"`
+	Files     []string  `json:"files"`
 	Created   time.Time `json:"created"`
 	Updated   time.Time `json:"updated"`
 }
@@ -49,6 +51,25 @@ func (e *Entry) AddSecret(secretID string) bool {
 func (e *Entry) RemoveSecret(secretID string) bool {
 	ok := false
 	e.Secrets, ok = StringSlice(e.Secrets).Remove(secretID)
+	return ok
+}
+
+// HasFile returns whether the entry has the file
+func (e *Entry) HasFile(fileID string) bool {
+	return StringSlice(e.Files).Has(fileID)
+}
+
+// AddFile adds the file to the entry
+func (e *Entry) AddFile(fileID string) bool {
+	ok := false
+	e.Files, ok = StringSlice(e.Files).Add(fileID)
+	return ok
+}
+
+// RemoveFile removes the file from the entry
+func (e *Entry) RemoveFile(fileID string) bool {
+	ok := false
+	e.Files, ok = StringSlice(e.Files).Remove(fileID)
 	return ok
 }
 
@@ -88,12 +109,13 @@ func (e *Entry) Summary(ID util.OID) *EntrySum {
 
 // EntryResult represents desensitized entry
 type EntryResult struct {
-	ID       util.OID       `json:"id"`
-	TeamID   util.OID       `json:"teamID"`
+	ID       util.OID        `json:"id"`
+	TeamID   util.OID        `json:"teamID"`
 	Name     string          `json:"name"`
 	Category string          `json:"category"`
 	Priority int             `json:"priority"`
 	Secrets  []*SecretResult `json:"secrets"`
+	Files    []*FileResult   `json:"files"`
 	Shares   []*ShareResult  `json:"shares"`
 	Created  time.Time       `json:"created"`
 	Updated  time.Time       `json:"updated"`
@@ -106,8 +128,8 @@ func (e *EntryResult) String() string {
 
 // EntrySum represents desensitized entry
 type EntrySum struct {
-	ID       util.OID `json:"id"`
-	TeamID   util.OID `json:"teamID"`
+	ID       util.OID  `json:"id"`
+	TeamID   util.OID  `json:"teamID"`
 	Name     string    `json:"name"`
 	Category string    `json:"category"`
 	Priority int       `json:"priority"`

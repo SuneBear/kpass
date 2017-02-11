@@ -28,8 +28,14 @@ func New(dbPath string, env string) *gear.App {
 	auth.Init(db.Salt, 10*time.Minute)
 
 	app := gear.New()
+	app.Use(secure.Default)
+	app.Use(func(ctx *gear.Context) (err error) {
+		if ctx.Path == "/" {
+			return ctx.HTML(200, string(MustAsset("web/index.html")))
+		}
+		return nil
+	})
 	app.Use(favicon.NewWithIco(MustAsset("web/image/favicon.ico")))
-	app.Use(secure.Default())
 
 	if env == "development" {
 		app.Use(static.New(static.Options{

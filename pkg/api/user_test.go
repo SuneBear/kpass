@@ -95,6 +95,8 @@ func NewUser(host string) *UserInfo {
 		panic(err)
 	}
 
+	fmt.Println(1111, info)
+
 	res, err := request.Post(host+"/api/login").
 		Set(gear.HeaderContentType, gear.MIMEApplicationJSON).
 		Send(map[string]interface{}{"username": info.ID, "password": info.Pass, "grant_type": "password"}).

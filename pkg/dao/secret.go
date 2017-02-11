@@ -25,7 +25,7 @@ func NewSecret(db *service.DB) *Secret {
 func (o *Secret) Create(EntryID util.OID, userID, key string, secret *schema.Secret) (
 	secretResult *schema.SecretResult, err error) {
 	SecretID := util.NewOID()
-	secret.Created = time.Now()
+	secret.Created = util.Time(time.Now())
 	secret.Updated = secret.Created
 
 	err = o.db.DB.Update(func(tx *buntdb.Tx) error {
@@ -140,7 +140,7 @@ func (o *Secret) Update(EntryID, SecretID util.OID, userID, key string, changes 
 		}
 
 		if changed {
-			secret.Updated = time.Now()
+			secret.Updated = util.Time(time.Now())
 			value, e = auth.EncryptText(key, secret.String())
 			if e != nil {
 				return e

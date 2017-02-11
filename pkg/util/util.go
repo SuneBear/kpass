@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/hex"
+	"time"
 )
 
 // SHA256Sum ...
@@ -28,4 +29,9 @@ func IsHashString(str string) bool {
 		return false
 	}
 	return len(res) == 32
+}
+
+// Time returns the time with millisecond precision.
+func Time(t time.Time) time.Time {
+	return time.Unix(0, t.UnixNano()/1e6*1e6)
 }

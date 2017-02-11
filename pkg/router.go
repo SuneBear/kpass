@@ -3,6 +3,7 @@ package pkg
 import (
 	"github.com/seccom/kpass/pkg/api"
 	"github.com/seccom/kpass/pkg/auth"
+	"github.com/seccom/kpass/pkg/ctl"
 	"github.com/seccom/kpass/pkg/service"
 	"github.com/teambition/gear"
 )
@@ -14,14 +15,18 @@ func noOp(ctx *gear.Context) error {
 func newRouter(db *service.DB) (Router *gear.Router) {
 	Router = gear.NewRouter()
 
+	fileCtl := ctl.NewFile(db)
+
 	entryAPI := api.NewEntry(db)
 	secretAPI := api.NewSecret(db)
 	teamAPI := api.NewTeam(db)
 	userAPI := api.NewUser(db)
 
-	Router.Get("/", func(ctx *gear.Context) error {
-		return ctx.HTML(200, string(MustAsset("web/index.html")))
-	})
+	Router.Post("/upload", auth.Middleware, fileCtl.Upload)
+	// GET /download/fileID?refType=user&refID=userID
+	// GET /download/fileID?refType=team&refID=teamID
+	// GET /download/fileID?refType=entry&refID=entryID&signed=xxxx
+	Router.Get("/download/:fileID", fileCtl.Download)
 
 	// generate a random password
 	Router.Get("/api/password", userAPI.Password)

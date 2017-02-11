@@ -8,6 +8,7 @@ import (
 	"github.com/seccom/kpass/pkg/auth"
 	"github.com/seccom/kpass/pkg/schema"
 	"github.com/seccom/kpass/pkg/service"
+	"github.com/seccom/kpass/pkg/util"
 	"github.com/teambition/gear"
 	"github.com/tidwall/buntdb"
 )
@@ -82,7 +83,7 @@ func (o *User) Create(userID, pass string) (user *schema.User, err error) {
 		user = &schema.User{
 			ID:      userID,
 			Pass:    auth.SignPass(userID, pass),
-			Created: time.Now(),
+			Created: util.Time(time.Now()),
 		}
 		user.Updated = user.Created
 		_, _, e = tx.Set(userKey, user.String(), nil)
@@ -114,7 +115,7 @@ func (o *User) Find(id string) (user *schema.User, err error) {
 // Update ...
 func (o *User) Update(user *schema.User) error {
 	err := o.db.DB.Update(func(tx *buntdb.Tx) error {
-		user.Updated = time.Now()
+		user.Updated = util.Time(time.Now())
 		_, _, e := tx.Set(schema.UserKey(user.ID), user.String(), nil)
 		return e
 	})

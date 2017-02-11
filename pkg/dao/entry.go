@@ -24,7 +24,7 @@ func NewEntry(db *service.DB) *Entry {
 // Create ...
 func (o *Entry) Create(userID string, entry *schema.Entry) (entrySum *schema.EntrySum, err error) {
 	EntryID := util.NewOID()
-	entry.Created = time.Now()
+	entry.Created = util.Time(time.Now())
 	entry.Updated = entry.Created
 	entrySum = entry.Summary(EntryID)
 	err = o.db.DB.Update(func(tx *buntdb.Tx) error {
@@ -103,7 +103,7 @@ func (o *Entry) Update(userID string, EntryID util.OID, changes map[string]inter
 		}
 
 		if changed {
-			entry.Updated = time.Now()
+			entry.Updated = util.Time(time.Now())
 			_, _, e = tx.Set(schema.EntryKey(EntryID), entry.String(), nil)
 		}
 		entrySum = entry.Summary(EntryID)
@@ -130,7 +130,7 @@ func (o *Entry) UpdateDeleted(userID string, EntryID util.OID, isDeleted bool) (
 		}
 
 		entry.IsDeleted = isDeleted
-		entry.Updated = time.Now()
+		entry.Updated = util.Time(time.Now())
 		_, _, e = tx.Set(schema.EntryKey(EntryID), entry.String(), nil)
 		entrySum = entry.Summary(EntryID)
 		return e

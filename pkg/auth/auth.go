@@ -58,6 +58,16 @@ func VerifyPass(userID, userPass, dbPass string) bool {
 	return std.Crypto().VerifyPass(userID, userPass, dbPass)
 }
 
+// Encrypt ...
+func Encrypt(key, plainData []byte) ([]byte, error) {
+	return std.Crypto().Encrypt(key, plainData)
+}
+
+// Decrypt ...
+func Decrypt(key, cipherData []byte) ([]byte, error) {
+	return std.Crypto().Decrypt(key, cipherData)
+}
+
 // EncryptText ...
 func EncryptText(key, plainData string) (string, error) {
 	return std.Crypto().EncryptText(key, plainData)
@@ -69,8 +79,13 @@ func DecryptText(key, cipherData string) (string, error) {
 }
 
 // Sign ...
-func Sign(c map[string]interface{}) (string, error) {
-	return std.JWT().Sign(c)
+func Sign(c map[string]interface{}, expiresIn ...time.Duration) (string, error) {
+	return std.JWT().Sign(c, expiresIn...)
+}
+
+// Verify ...
+func Verify(token string) (josejwt.Claims, error) {
+	return std.JWT().Verify(token)
 }
 
 // NewToken ...
@@ -147,4 +162,25 @@ func UserIDFromCtx(ctx *gear.Context) (userID string, err error) {
 		return
 	}
 	return claims.Get("id").(string), nil
+}
+
+// SignedFileKey ...
+func SignedFileKey(FileID util.OID, key string) (signed string, err error) {
+	if signed, err = Sign(map[string]interface{}{"key": key}, time.Minute); err != nil {
+		return
+	}
+	signed, err = EncryptText(FileID.String(), signed)
+	return
+}
+
+// FileKeyFromSigned ...
+func FileKeyFromSigned(FileID util.OID, signed string) (key string, err error) {
+	if signed, err = DecryptText(FileID.String(), signed); err != nil {
+		return
+	}
+	var claims josejwt.Claims
+	if claims, err = Verify(signed); err == nil {
+		key = claims.Get("key").(string)
+	}
+	return
 }
