@@ -1,0 +1,31 @@
+// Global
+[class*='-transition']
+  transition-duration: 368ms
+
+// Switch　Card
+// TODO: Duration & Margin Tuning
+.switch-transition
+  &-enter,
+  &-leave-active
+    opacity: 0.01
+    transition-timing-function: ease-in-out
+    transition-property: opacity, transform
+
+  &-enter
+    transform: translate3d(0, 40px, 0)
+
+    &-active
+      transition-duration: 368ms
+      transition-delay: 150ms
+
+  &-leave-active
+    z-index: $zIndexLayer
+    transition-duration: 468ms
+    transform: translate3d(0, -60px, 0)
+
+.expand-width-transition
+  transition-property: width
+
+  &-expand-width-enter,
+  &-expand-width-leave-active
+    width: 0
