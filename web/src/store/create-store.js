@@ -1,14 +1,22 @@
-import { applyMiddleware, compose, createStore } from 'redux'
-import thunk from 'redux-thunk'
+import { applyMiddleware, compose, createStore as reduxCreateStore } from 'redux'
+import { createEpicMiddleware } from 'redux-observable'
+import { I18n, syncTranslationWithStore } from 'react-redux-i18n'
 import { browserHistory } from 'react-router'
-import makeRootReducer from './reducers'
-import { updateLocation } from './reducers/context'
+import { syncReduxAndTitle } from 'redux-title'
+import { routerMiddleware, syncHistoryWithStore } from 'react-router-redux'
 
-export default (initialState = {}) => {
+import { subscribeHTTPError } from 'utils'
+import { toast } from 'uis'
+import { makeRootEpic, makeRootReducer } from './modules'
+
+export const createStore = (initialState = {}) => {
   // ======================================================
   // Middleware Configuration
   // ======================================================
-  const middleware = [thunk]
+  const middleware = [
+    routerMiddleware(browserHistory),
+    createEpicMiddleware(makeRootEpic())
+  ]
 
   // ======================================================
   // Store Enhancers
@@ -27,7 +35,7 @@ export default (initialState = {}) => {
   // ======================================================
   // Store Instantiation and HMR Setup
   // ======================================================
-  const store = createStore(
+  const store = reduxCreateStore(
     makeRootReducer(),
     initialState,
     composeEnhancers(
@@ -35,14 +43,38 @@ export default (initialState = {}) => {
       ...enhancers
     )
   )
+
+  // Sync with Store
+  syncTranslationWithStore(store)
+  syncReduxAndTitle(store,
+    (state) => store.getState().context.title
+  )
+  const history = syncHistoryWithStore(browserHistory, store, {
+    selectLocationState: (state) => state.context.routing
+  })
+
+  // @SideEffect: Handle HTTP Error
+  subscribeHTTPError((res) => {
+    const status = res.error.status
+    switch (status) {
+      case 401:
+        return toast.error({
+          message: I18n.t('account.unauthorized')
+        })
+    }
+  })
+
+  // @Property: Async Reducers
   store.asyncReducers = {}
 
-  // To unsubscribe, invoke `store.unsubscribeHistory()` anytime
-  store.unsubscribeHistory = browserHistory.listen(updateLocation(store))
+  // @Property: Enhanced Utils
+  store.enhancedUtils = {
+    history
+  }
 
   if (module.hot) {
-    module.hot.accept('./reducers', () => {
-      const reducers = require('./reducers').default
+    module.hot.accept('./modules/root.reducer', () => {
+      const reducers = require('./modules/root.reducer').makeRootReducer
       store.replaceReducer(reducers(store.asyncReducers))
     })
   }

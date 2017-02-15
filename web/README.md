@@ -45,16 +45,17 @@ While developing, you will probably rely mostly on `npm start`; however, there a
 │   │       ├── container.js # Connect components to actions and store
 │   │       ├── assets       # Assets required to render components
 │   │       ├── modules      # Collections of reducers/constants/actions
-│   │       ├── views        # Presentational React View Components
+│   │       ├── views        # Presentational View Components
 │   │       └── routes **    # Fractal sub-routes (** optional)
 │   ├── store                # Redux-specific pieces
-│   │   └── reducers         # Reducer registry and injection
+│   │   └── modules          # Reducer & Epic registry and injection
 │   │   ├── createStore.js   # Create and instrument redux store
 │   │   ├── initialState.js  # Redux store's initial state
 │   └── styles               # Application-wide styles (generally settings)
 │   ├── uis                  # Global Reusable UI Components
 │   ├── utils                # Global Utilities
 │   ├── views                # Global Reusable Presentational View Components
+│   ├── config               # Client configurations
 └── tests                    # Unit tests
 ```
 

@@ -1,9 +1,12 @@
-import { languages, dictionaries } from '../locales'
+import { dictionaries } from '../locales'
 
-export default {
+/**
+ * State Tree
+ * @types: API, View (UI), Form, Context
+ */
+export const initialState = {
   i18n: {
-    currentLanguage: 'en-US',
-    languages,
-    dictionaries
+    locale: 'en-US',
+    translations: dictionaries
   }
 }

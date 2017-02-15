@@ -1,10 +1,22 @@
-import ExampleRoute from './example'
+import { isAuthedUserMe } from 'utils'
+import { Layout } from './layout'
+import accountRoutes, { redirectToSignIn } from './account'
+import workspaceRoutes, { redirectToPersonal } from './workspace'
+
+export * from './account'
+export * from './workspace'
+
+const redirectByAuth = (store) => {
+  return isAuthedUserMe(store) ? redirectToPersonal : redirectToSignIn
+}
 
 export const createRoutes = (store) => ({
   path          : '/',
-  indexRoute    : { onEnter: (nextState, replace) => replace('/example') },
+  indexRoute    : { onEnter: redirectByAuth(store) },
+  component     : Layout,
   childRoutes   : [
-    ExampleRoute(store)
+    accountRoutes(store),
+    workspaceRoutes(store)
   ]
 })
 

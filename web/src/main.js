@@ -1,8 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import createStore from './store/create-store'
-import initialState from './store/initial-state'
-import AppContainer from './app.container'
+
+import { createStore, initialState } from './store'
+import App from './app'
+
+import './styles/main.styl'
 
 // ========================================================
 // Store Instantiation
@@ -18,7 +20,7 @@ let render = () => {
   const routes = require('./routes/index').default(store)
 
   ReactDOM.render(
-    <AppContainer store={store} routes={routes} />,
+    <App store={store} routes={routes} />,
     MOUNT_NODE
   )
 }
@@ -58,3 +60,4 @@ if (__DEV__) {
 // Go!
 // ========================================================
 render()
+

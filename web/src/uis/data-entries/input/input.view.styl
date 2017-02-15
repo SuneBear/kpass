@@ -1,0 +1,22 @@
+@require '../../../styles/ref'
+
+.input
+  height: qu(10)
+  min-width: qu(19)
+  padding: qu(3)
+  font-size: 14px
+  line-height: 14px
+  color: $black
+  vertical-align: top
+  background-color: transparent
+  border: 1px solid $gray85
+  border-radius: qu(1)
+  outline: 0
+  transition: border 318ms
+
+  &[disabled]
+    cursor: not-allowed
+    background-color: $gray97
+
+  &:focus
+    border-color: $gray65

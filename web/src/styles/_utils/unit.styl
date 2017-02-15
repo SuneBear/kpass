@@ -1,0 +1,10 @@
+$base-quid-unit = 4px
+
+quid-unit()
+  $result = 0
+  for value in arguments
+    $result = $result + value
+  return unit($base-quid-unit * $result, 'px')
+
+qu()
+  return quid-unit(arguments)

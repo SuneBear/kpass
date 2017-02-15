@@ -1,0 +1,113 @@
+@require '../../../styles/ref'
+
+// Variables
+$noticeMinHeight = 52px
+$noticeMaxHeight = 100px
+$animationDuration = 468ms
+
+// Toast
+.toast
+  position: fixed
+  display: flex
+  flex-direction: column
+  z-index: $zIndexToast
+  width: qu(74)
+
+  // Placement Hack
+  &
+    top: auto !important
+    bottom: auto !important
+    left: auto !important
+    right: auto !important
+
+  &.placementBottomLeft
+    left: qu(8) !important
+    bottom: qu(4) !important
+
+  .toast-notice
+    position: relative
+    margin-bottom: qu(4)
+    border-radius: $radius
+    overflow: hidden
+    box-shadow: 0px 7px 21px 0px rgba(0, 0, 0, .1)
+
+    // Hack
+    &
+      right: 0 !important
+
+    // Animation
+    @keyframes NoticeEnter {
+      0% {
+        max-height: $noticeMinHeight
+        margin-bottom: -($noticeMinHeight)
+        opacity: 0
+      }
+
+      100% {
+        max-height: $noticeMaxHeight
+        margin-bottom: qu(4)
+        opacity: 1
+      }
+    }
+
+    @keyframes NoticeLeave {
+      0% {
+        max-height: $noticeMaxHeight
+        margin-bottom: qu(4)
+        transform: translateY(0)
+        opacity: 1
+      }
+
+      100% {
+        max-height: 0
+        margin-bottom: 0
+        transform: translateY(qu(10))
+        opacity: 0
+      }
+    }
+
+    &.toast-fade-enter
+      animation-name: NoticeEnter
+      animation-duration: $animationDuration
+      animation-timing-function: cubic-bezier(0, 1, 0.39, 1)
+      animation-play-state: paused
+
+    &.toast-fade-leave
+      animation-name: NoticeLeave
+      animation-duration: ($animationDuration - 100)
+      animation-timing-function: cubic-bezier(0.5, 0, 0.2, 1)
+      animation-play-state: paused
+
+    &.toast-fade-enter-active,
+    &.toast-fade-leave-active
+      animation-play-state: running
+
+  // @FIXME: Redraw the icon
+  .toast-notice-close
+    position: absolute
+    top: 19px
+    right: 16px
+    width: 16px
+    height: 16px
+    opacity: .7
+    cursor: pointer
+    transition: opacity 218ms ease-in-out
+
+    &:hover
+      opacity: 1
+
+    &:before,
+    &:after
+      content: ''
+      position: absolute
+      top: 6px
+      width: 16px
+      height: 2px
+      background-color: $gray65
+      backface-visibility: hidden
+
+    &:before
+      transform: rotate(45deg)
+
+    &:after
+      transform: rotate(-45deg)

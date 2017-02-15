@@ -17,7 +17,16 @@ const webpackConfig = {
   devtool : project.compiler_devtool,
   resolve : {
     root       : project.paths.client(),
-    extensions : ['', '.js', '.jsx', '.json']
+    extensions : ['', '.js', '.jsx', '.json'],
+    alias      : {
+      assets : `${project.paths.client()}/assets`,
+      config : `${project.paths.client()}/config`,
+      modules : `${project.paths.client()}/store/modules`,
+      routes : `${project.paths.client()}/routes`,
+      uis : `${project.paths.client()}/uis`,
+      utils : `${project.paths.client()}/utils`,
+      views : `${project.paths.client()}/views`
+    }
   },
   module : {}
 }
