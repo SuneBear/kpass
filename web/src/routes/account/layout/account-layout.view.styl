@@ -1,0 +1,46 @@
+@require '../../../styles/ref'
+
+.accountLayout
+  $layoutWidth = 340px
+
+  display: flex
+  justify-content: center
+  align-items: center
+  height: 100vh
+
+  &Viewport
+    display: flex
+    flex-direction: column
+    justify-content: center
+    width: $layoutWidth
+    padding: qu(8)
+    overflow: hidden
+    background: $white
+    border-radius: $radius
+    box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.10)
+
+  &Logo
+    height: 28px
+    margin-top: qu(4)
+    margin-bottom: qu(8)
+    opacity: 0.9
+
+  &Form
+    .input
+      margin-bottom: qu(5)
+
+  &Footer
+    display: block
+    width: $layoutWidth
+    margin: qu(-8)
+    margin-top: qu(8)
+    background: $gray97
+    height: qu(11)
+    line-height: qu(11)
+    font-size: 14px
+    text-align: center
+    transition: all 318ms
+
+    &:hover
+      background-color: lighten($gray97, 0.7)
+      color: $gray50

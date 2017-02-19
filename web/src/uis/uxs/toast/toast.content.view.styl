@@ -1,0 +1,51 @@
+@require '../../../styles/ref'
+
+// Variables
+$colorInfo = $blue
+$colorWarning = $brand
+$colorError = $red
+$colorSuccess = $brand
+
+// Mixin
+toastStyle($color)
+  border-color: $color
+
+  .icon
+    color: $color
+
+.toastContent
+  padding: qu(4) qu(7) qu(4) qu(11)
+  border-left: 4px solid $brand
+  background-color: alpha($white, 95)
+  font-size: 14px
+  color: $black
+
+  &.typeInfo
+    toastStyle($colorInfo)
+
+  &.typeWarning
+    toastStyle($colorWarning)
+
+  &.typeError
+    toastStyle($colorError)
+
+  &.typeSuccess
+    toastStyle($colorSuccess)
+
+  .icon
+    position: absolute
+    top: qu(4)
+    left: qu(5)
+    font-size: 16px
+
+  .toastMessage
+    display: inline-block
+    padding-right: 10px
+    a
+      handler()
+
+  .toastDescription
+    display: block
+    margin-top: 6px
+    color: $gray65
+    multiline-overflow()

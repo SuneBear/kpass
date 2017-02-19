@@ -1,0 +1,11 @@
+/* TEAM */
+
+    Backend developer: Zensh
+    GitHub: @zensh
+
+    Frontend developer: SuneBear
+    GitHub: @SuneBear
+
+/* SITE */
+
+    Language: English / Chinese

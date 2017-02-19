@@ -1,0 +1,13 @@
+text-overflow()
+  text-overflow: ellipsis
+  white-space: nowrap
+  overflow: hidden
+
+multiline-overflow($line = 2, $lineHeight = 20px)
+  display: -webkit-box
+  -webkit-line-clamp: $line
+  -webkit-box-orient: vertical
+  overflow: hidden
+  text-overflow: ellipsis
+  white-space: normal
+  max-height: ($line * $lineHeight) // Compatibility with Firefox & IE
