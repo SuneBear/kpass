@@ -5,18 +5,61 @@ import { Observable } from 'rxjs/Observable'
 
 import { request, sha256 } from 'utils'
 import { toast } from 'uis'
+import { readTeamsAction } from '../team'
 import { userSchema } from './user.schema'
 import {
+  signUpUserAction,
+  signUpUserSuccessAction,
+  signUpUserFailureAction,
+  signUpUserAbortAction,
+
   signInUserAction,
   signInUserSuccessAction,
   signInUserFailureAction,
   signInUserAbortAction,
+
   readUserMeAction,
   readUserMeSuccessAction,
   readUserMeFailureAction,
+
   setUserMeIdAction,
   setUserEntitiesAction
 } from './user.reducer'
+
+const signUpUserEpic = (action$) => {
+  return action$
+    .ofType(`${signUpUserAction}`)
+    .switchMap((action) => {
+      const { username, password } = action.payload
+
+      const body = {
+        id: username,
+        pass: sha256(password)
+      }
+
+      return request
+        .post('join', body)
+        .takeUntil(action$.ofType(
+          `${signUpUserAbortAction}`
+        ))
+        .concatMap((response) => {
+          const token = response.access_token
+          request.setToken(token)
+          return Observable.of(
+            signInUserSuccessAction(),
+            readTeamsAction()
+          )
+        })
+        .catch((error) => {
+          toast.error({
+            message: I18n.t('account.signUpFailed')
+          })
+          return Observable.of(
+            signInUserFailureAction(error)
+          )
+        })
+    })
+}
 
 const signInUserEpic = (action$) => {
   return action$
@@ -36,8 +79,11 @@ const signInUserEpic = (action$) => {
           `${signInUserAbortAction}`
         ))
         .concatMap((response) => {
+          const token = response.access_token
+          request.setToken(token)
           return Observable.of(
-            signInUserSuccessAction()
+            signInUserSuccessAction(),
+            readTeamsAction()
           )
         })
         .catch((error) => {
@@ -79,6 +125,7 @@ const readUserMeEpic = (action$) => {
 }
 
 export const userEpic = combineEpics(
+  signUpUserEpic,
   signInUserEpic,
   readUserMeEpic
 )
