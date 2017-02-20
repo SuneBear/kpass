@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/seccom/kpass/pkg"
-	"github.com/seccom/kpass/pkg/logger"
+	"github.com/seccom/kpass/src"
+	"github.com/seccom/kpass/src/logger"
 )
 
 var (
@@ -33,7 +33,7 @@ func main() {
 	}
 
 	env := os.Getenv("APP_ENV")
-	app := pkg.New(*dbPath, env)
+	app := src.New(*dbPath, env)
 	srv := app.Start(*address)
 	go func() {
 		host := "http://" + srv.Addr().String()

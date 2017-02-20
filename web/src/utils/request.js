@@ -111,7 +111,7 @@ export class RequestClient {
   // Export APIs
   setToken (token) {
     delete this.options.credentials
-    this.options.headers.Authorization = `OAuth2 ${token}`
+    this.options.headers.Authorization = `Bearer ${token}`
   }
 
   get (url, query) {
