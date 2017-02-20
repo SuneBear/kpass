@@ -8,20 +8,12 @@ import './field-text.view.styl'
 
 export class FieldText extends Component {
 
-  static PropTypes = {
+  static propTypes = {
     className: PropTypes.string,
-    input: {
-      value: PropTypes.string,
-      onBlur: PropTypes.func,
-      onChange: PropTypes.func,
-      onFocus: PropTypes.func
-    },
+    input: PropTypes.object,
+    meta: PropTypes.object,
     label: PropTypes.string,
-    meta: {
-      error: PropTypes.bool,
-      touched: PropTypes.bool
-    },
-    name: PropTypes.string.isRequired,
+    name: PropTypes.string,
     placeholder: PropTypes.string,
     autoFocus: PropTypes.bool,
     type: PropTypes.string
