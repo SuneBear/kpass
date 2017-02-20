@@ -2,15 +2,15 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { reduxForm } from 'redux-form'
 
-import { signInUserAction } from 'modules'
-import { SignIn as SignInView } from './sign-in.view'
-import { signInValidate } from './sign-in.validate'
+import { signUpUserAction } from 'modules'
+import { SignUp as SignUpView } from './sign-up.view'
+import { signUpValidate } from './sign-up.validate'
 
 const mapStateToProps = (state) => ({})
 
 const mapDispatchToProps = (dispatch) => ({
   actions: bindActionCreators({
-    signInUser: signInUserAction
+    signUpUser: signUpUserAction
   }, dispatch)
 })
 
@@ -21,9 +21,9 @@ const createContainer = (component) => {
   )(component)
 
   return reduxForm({
-    form: 'signInForm',
-    validate: signInValidate
+    form: 'signUpForm',
+    validate: signUpValidate
   })(connectedComponent)
 }
 
-export const SignIn = createContainer(SignInView)
+export const SignUp = createContainer(SignUpView)

@@ -1,8 +1,10 @@
 import { AccountLayout } from './layout'
 import { SignIn } from './sign-in'
+import { SignUp } from './sign-Up'
 
 export const ACCOUNT_BASE_PATH = '/account'
 export const SIGN_IN_PATH = 'sign-in'
+export const SIGN_UP_PATH = 'sign-up'
 
 export const redirectToSignIn = (nextState, replace) => {
   return replace(`${ACCOUNT_BASE_PATH}/${SIGN_IN_PATH}`)
@@ -16,6 +18,10 @@ export default (store) => ({
     {
       path : SIGN_IN_PATH,
       component: SignIn
+    },
+    {
+      path : SIGN_UP_PATH,
+      component: SignUp
     }
   ]
 })

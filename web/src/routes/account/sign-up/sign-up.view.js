@@ -6,11 +6,11 @@ import cx from 'classnames'
 
 import { Button, FieldText } from 'uis'
 
-import './sign-in.view.styl'
+import './sign-up.view.styl'
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
-export class SignIn extends Component {
+export class SignUp extends Component {
 
   static propTypes = {
     className: PropTypes.string,
@@ -19,7 +19,7 @@ export class SignIn extends Component {
 
   getRootClassNames () {
     return cx(
-      'signInView',
+      'signUpView',
       this.props.className
     )
   }
@@ -29,7 +29,7 @@ export class SignIn extends Component {
       actions
     } = this.props
 
-    actions.signInUser({
+    actions.signUpUser({
       username: values.username,
       password: values.password
     })
@@ -38,7 +38,7 @@ export class SignIn extends Component {
       .then(() => {})
   }
 
-  renderSignInForm () {
+  renderSignUpForm () {
     const { handleSubmit, anyTouched, valid, submitting } = this.props
 
     return (
@@ -56,14 +56,14 @@ export class SignIn extends Component {
           placeholder={I18n.t('account.password')}
         />
         <Button
-          className={'SignInHandler'}
+          className={'SignUpHandler'}
           type={'primary'}
           htmlType={'submit'}
           disabled={!anyTouched || !valid}
           loading={submitting}
           block
         >
-          <Translate value={'account.signIn'} />
+          <Translate value={'account.signUp'} />
         </Button>
       </form>
     )
@@ -73,10 +73,10 @@ export class SignIn extends Component {
     return (
       <div className={this.getRootClassNames()}>
         <div className={'accountLayoutForm'}>
-          {this.renderSignInForm()}
+          {this.renderSignUpForm()}
         </div>
-        <Link className={'accountLayoutFooter'} to={'/account/sign-up'}>
-          <Translate value={'account.signUpTip'} />
+        <Link className={'accountLayoutFooter'} to={'/account/sign-in'}>
+          <Translate value={'account.signInTip'} />
         </Link>
       </div>
     )
