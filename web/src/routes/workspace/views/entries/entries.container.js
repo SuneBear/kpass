@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 
-import { Personal as PersonalView } from './personal.view'
+import { Entries as EntriesView } from './entries.view'
 
 const mapStateToProps = (state) => ({})
 
@@ -13,4 +13,4 @@ const makeContainer = (component) => {
   )(component)
 }
 
-export const Personal = makeContainer(PersonalView)
+export const Entries = makeContainer(EntriesView)

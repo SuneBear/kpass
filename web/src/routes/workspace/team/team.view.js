@@ -1,8 +1,8 @@
 import React, { Component, PropTypes } from 'react'
 
-import './personal.view.styl'
+import './team.view.styl'
 
-export class Personal extends Component {
+export class Team extends Component {
 
   static propTypes = {
     children: PropTypes.element
@@ -10,7 +10,7 @@ export class Personal extends Component {
 
   render () {
     return (
-      <div className={'personalView'}>
+      <div className={'teamView'}>
         {this.props.children}
       </div>
     )

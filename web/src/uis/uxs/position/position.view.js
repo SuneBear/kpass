@@ -42,6 +42,7 @@ const placeConfig = {
 export class Position extends Component {
 
   static propTypes = {
+    children: PropTypes.element,
     placement: PropTypes.oneOf([
       'bottom', 'bottomLeft', 'bottomRight',
       'top', 'topLeft', 'topRight',
@@ -67,7 +68,7 @@ export class Position extends Component {
     const {
       offset,
       placement
-    } =  this.props
+    } = this.props
 
     const points = placeConfig[placement].points
 

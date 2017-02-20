@@ -1,9 +1,8 @@
-import { I18n } from 'react-redux-i18n'
 import { combineEpics } from 'redux-observable'
 import { normalize } from 'normalizr'
 import { Observable } from 'rxjs/Observable'
 
-import { request, sha256 } from 'utils'
+import { request } from 'utils'
 import { teamSchema } from './team.schema'
 import {
   readTeamsAction,
@@ -20,7 +19,6 @@ const readTeamsEpic = (action$) => {
       return request
         .get('teams')
         .concatMap((response) => {
-
           const normalizedResponse = normalize(response, teamSchema)
 
           return Observable.of(

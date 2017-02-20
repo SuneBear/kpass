@@ -70,19 +70,19 @@ export class Dropdown extends Component {
     })
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps (nextProps) {
     if (nextProps.content !== this.props.content) {
       this.content = this.getContent(nextProps.content)
     }
   }
 
-  render() {
+  render () {
     const props = {
       ...this.props,
       content: this.content
     }
 
-    return <Popup {...props}  ref={this.savePopup} />
+    return <Popup {...props} ref={this.savePopup} />
   }
 
 }

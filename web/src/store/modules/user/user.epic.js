@@ -46,7 +46,7 @@ const signUpUserEpic = (action$) => {
           const token = response.access_token
           request.setToken(token)
           return Observable.of(
-            signInUserSuccessAction(),
+            signUpUserSuccessAction(),
             readTeamsAction()
           )
         })
@@ -55,7 +55,7 @@ const signUpUserEpic = (action$) => {
             message: I18n.t('account.signUpFailed')
           })
           return Observable.of(
-            signInUserFailureAction(error)
+            signUpUserFailureAction(error)
           )
         })
     })

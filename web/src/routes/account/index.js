@@ -1,6 +1,6 @@
 import { AccountLayout } from './layout'
 import { SignIn } from './sign-in'
-import { SignUp } from './sign-Up'
+import { SignUp } from './sign-up'
 
 export const ACCOUNT_BASE_PATH = '/account'
 export const SIGN_IN_PATH = 'sign-in'

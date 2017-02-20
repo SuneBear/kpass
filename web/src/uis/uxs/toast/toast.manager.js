@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react'
+import React from 'react'
 // @REF: https://github.com/react-component/notification
 import Notification from 'rc-notification'
 

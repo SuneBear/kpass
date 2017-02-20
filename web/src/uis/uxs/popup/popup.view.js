@@ -11,6 +11,7 @@ export class Popup extends Component {
   static propTypes = {
     style: PropTypes.object,
     className: PropTypes.string,
+    children: PropTypes.children,
     prefixCls: PropTypes.string,
     transitionCls: PropTypes.string,
     action: PropTypes.oneOf(['click', 'hover', 'focus']),
@@ -37,7 +38,7 @@ export class Popup extends Component {
     transitionCls: ''
   }
 
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       visible: this.props.opened
