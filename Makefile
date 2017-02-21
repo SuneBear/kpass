@@ -1,32 +1,31 @@
-test: assets
-	go test --race ./src
-	go test --race ./src/api
-	go test --race ./src/auth
-	go test --race ./src/dao
-	go test --race ./src/logger
-	go test --race ./src/schema
-	go test --race ./src/service
-	go test --race ./src/util
+test:
+	APP_ENV=test go test --race ./src
+	APP_ENV=test go test --race ./src/api
+	APP_ENV=test go test --race ./src/auth
+	APP_ENV=test go test --race ./src/dao
+	APP_ENV=test go test --race ./src/logger
+	APP_ENV=test go test --race ./src/schema
+	APP_ENV=test go test --race ./src/service
+	APP_ENV=test go test --race ./src/util
 
-cover: assets
+cover:
 	rm -f *.coverprofile
-	go test -coverprofile=src.coverprofile ./src
-	go test -coverprofile=api.coverprofile ./src/api
-	go test -coverprofile=auth.coverprofile ./src/auth
-	go test -coverprofile=dao.coverprofile ./src/dao
-	go test -coverprofile=logger.coverprofile ./src/logger
-	go test -coverprofile=schema.coverprofile ./src/schema
-	go test -coverprofile=service.coverprofile ./src/service
-	go test -coverprofile=util.coverprofile ./src/util
+	APP_ENV=test go test -coverprofile=src.coverprofile ./src
+	APP_ENV=test go test -coverprofile=api.coverprofile ./src/api
+	APP_ENV=test go test -coverprofile=auth.coverprofile ./src/auth
+	APP_ENV=test go test -coverprofile=dao.coverprofile ./src/dao
+	APP_ENV=test go test -coverprofile=logger.coverprofile ./src/logger
+	APP_ENV=test go test -coverprofile=schema.coverprofile ./src/schema
+	APP_ENV=test go test -coverprofile=service.coverprofile ./src/service
+	APP_ENV=test go test -coverprofile=util.coverprofile ./src/util
 	gover
 	go tool cover -html=gover.coverprofile
 	rm -f *.coverprofile
-	make clean
 
 GO=$(shell which go)
 
 assets:
-	go-bindata -ignore=\\.DS_Store -o ./src/bindata.go -pkg src web/dist/...
+	go-bindata -ignore=\\.DS_Store -o ./src/bindata.go -pkg src -prefix web/dist/ web/dist/...
 clean:
 	go-bindata -ignore=\\.* -o ./src/bindata.go -pkg src web/dist/...
 

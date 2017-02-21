@@ -14,7 +14,7 @@ import (
 )
 
 // Version is app version
-const Version = "0.4.0"
+const Version = "0.5.0"
 
 // New returns a app instance
 func New(dbPath string, env string) *gear.App {
@@ -28,26 +28,40 @@ func New(dbPath string, env string) *gear.App {
 	}
 	auth.Init(db.Salt, 10*time.Minute)
 
+	indexBody := "<h1>Kpass</h1>"
+	faviconBin := []byte{}
+
+	if env != "test" {
+		indexBody = string(MustAsset("index.html"))
+		faviconBin = MustAsset("favicon.ico")
+	}
+
+	staticOpts := static.Options{
+		Root:        "",
+		Prefix:      "/static/",
+		StripPrefix: true,
+		Files:       make(map[string][]byte),
+	}
+	for _, name := range AssetNames() {
+		staticOpts.Files[name] = MustAsset(name)
+	}
+	if env == "development" {
+		staticOpts.Root = "./web"
+	}
+
 	app := gear.New()
 	app.Use(secure.Default)
 	app.Use(cors.New(cors.Options{}))
 	app.Use(func(ctx *gear.Context) (err error) {
 		if ctx.Path == "/" {
-			return ctx.HTML(200, string(MustAsset("web/dist/index.html")))
+			return ctx.HTML(200, indexBody)
 		}
 		return nil
 	})
-	app.Use(favicon.NewWithIco(MustAsset("web/dist/favicon.ico")))
+	app.Use(favicon.NewWithIco(faviconBin))
 
-	if env == "development" {
-		app.Use(static.New(static.Options{
-			Root:        "./web",
-			Prefix:      "/dev",
-			StripPrefix: true,
-		}))
-	}
+	app.Use(static.New(staticOpts))
 	app.UseHandler(logger.Default())
 	app.UseHandler(newRouter(db))
-
 	return app
 }

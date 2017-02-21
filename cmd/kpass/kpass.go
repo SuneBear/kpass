@@ -37,9 +37,6 @@ func main() {
 	srv := app.Start(*address)
 	go func() {
 		host := "http://" + srv.Addr().String()
-		if env == "development" {
-			host += "/dev"
-		}
 		logger.Info("Start KPass: " + host)
 		time.Sleep(time.Second)
 		startBrowser(host)
