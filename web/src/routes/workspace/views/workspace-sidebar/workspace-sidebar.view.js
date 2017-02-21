@@ -4,6 +4,7 @@ import { Translate } from 'react-redux-i18n'
 import cx from 'classnames'
 
 import { Icon } from 'uis'
+import { isPublicTeam } from 'utils'
 
 import './workspace-sidebar.view.styl'
 
@@ -43,7 +44,7 @@ export class WorkspaceSidebar extends Component {
   renderTeamNav () {
     const { team, basePath } = this.props
 
-    if (team.visibility === 'private') {
+    if (!isPublicTeam(team)) {
       return null
     }
 

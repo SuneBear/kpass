@@ -1,16 +1,19 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import { push } from 'react-router-redux'
 
-import { userMeSelector, currentTeamSelector } from 'modules'
+import { userMeSelector, teamsSelector, currentTeamSelector } from 'modules'
 import { WorkspaceHeader as WorkspaceHeaderView } from './workspace-header.view'
 
 const mapStateToProps = (state) => ({
   userMe: userMeSelector(state),
+  teams: teamsSelector(state),
   currentTeam: currentTeamSelector(state)
 })
 
 const mapDispatchToProps = (dispatch) => ({
   actions: bindActionCreators({
+    push: push
   }, dispatch)
 })
 

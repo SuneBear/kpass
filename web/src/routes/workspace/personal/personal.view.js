@@ -5,7 +5,20 @@ import './personal.view.styl'
 export class Personal extends Component {
 
   static propTypes = {
+    actions: PropTypes.object,
     children: PropTypes.element
+  }
+
+  componentDidMount () {
+    this.props.actions.setCurrentTeam({
+      currentTeamId: null
+    })
+  }
+
+  componentWillReceiveProps (nextProps) {
+    this.props.actions.setCurrentTeam({
+      currentTeamId: null
+    })
   }
 
   render () {

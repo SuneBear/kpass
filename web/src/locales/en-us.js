@@ -22,6 +22,10 @@ export const enUS = {
     title: 'Entries'
   },
 
+  team: {
+    newTeam: 'New Team'
+  },
+
   teamMembers: {
     title: 'Members'
   },

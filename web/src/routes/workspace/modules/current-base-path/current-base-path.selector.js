@@ -1,11 +1,7 @@
 import { createSelector } from 'reselect'
 
 import { currentTeamSelector } from 'modules'
-import {
-  WORKSPACE_BASE_PATH,
-  PERSONAL_PATH,
-  TEAM_PATH
-} from '../../index'
+import { getWorkspaceBashPath } from '../../index'
 
 export const currentBasePathSelector = createSelector(
   (state) => currentTeamSelector(state),
@@ -14,10 +10,6 @@ export const currentBasePathSelector = createSelector(
       return null
     }
 
-    if (currentTeam.visibility === 'private') {
-      return `${WORKSPACE_BASE_PATH}/${PERSONAL_PATH}`
-    } else {
-      return `${WORKSPACE_BASE_PATH}/${TEAM_PATH}/${currentTeam.id}`
-    }
+    return getWorkspaceBashPath(currentTeam)
   }
 )

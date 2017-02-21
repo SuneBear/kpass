@@ -25,7 +25,7 @@ export const teamReducer = handleActions({
 
     const { currentTeamId } = action.payload
 
-    if (!currentTeamId) {
+    if (typeof currentTeamId === undefined) {
       return state
     }
 
