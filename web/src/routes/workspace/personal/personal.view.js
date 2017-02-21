@@ -4,15 +4,14 @@ import './personal.view.styl'
 
 export class Personal extends Component {
 
-  static PropTypes = {
-    userMe: PropTypes.object
+  static propTypes = {
+    children: PropTypes.element
   }
 
   render () {
     return (
-      <div className='personalView'>
-        <div>Personal View</div>
-        { this.props.children }
+      <div className={'personalView'}>
+        {this.props.children}
       </div>
     )
   }

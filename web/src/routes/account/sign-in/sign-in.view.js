@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 import { Link } from 'react-router'
 import { I18n, Translate } from 'react-redux-i18n'
-import { Field } from 'redux-form'
+import { Field, propTypes as formPropTypes } from 'redux-form'
 import cx from 'classnames'
 
 import { Button, FieldText } from 'uis'
@@ -14,7 +14,8 @@ export class SignIn extends Component {
 
   static propTypes = {
     className: PropTypes.string,
-    actions: PropTypes.object
+    actions: PropTypes.object,
+    ...formPropTypes
   }
 
   getRootClassNames () {
@@ -39,7 +40,7 @@ export class SignIn extends Component {
   }
 
   renderSignInForm () {
-    const { handleSubmit, valid, submitting } = this.props
+    const { handleSubmit, anyTouched, valid, submitting } = this.props
 
     return (
       <form onSubmit={handleSubmit(this.handleSubmit)}>
@@ -59,7 +60,7 @@ export class SignIn extends Component {
           className={'SignInHandler'}
           type={'primary'}
           htmlType={'submit'}
-          disabled={!valid}
+          disabled={!anyTouched || !valid}
           loading={submitting}
           block
         >

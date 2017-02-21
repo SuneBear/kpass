@@ -1,0 +1,60 @@
+@require '../../../../styles/ref'
+
+.workspaceSidebarView
+
+  .navGroup
+    padding-top: qu(5)
+
+    & + .nav-group
+      margin-top: qu(4)
+
+    .navGroupTitle
+      margin-left: qu(5)
+      margin-bottom: qu(4)
+      font-weight: 500
+      color: $gray50
+
+    .navGroupList
+      margin-bottom: qu(3)
+
+      .navItem
+        position: relative
+        display: flex
+        align-items: center
+        color: $black
+        padding: 10px 20px
+        cursor: pointer
+        overflow: hidden
+        transition: background-color 218ms
+
+        &:after
+          content: ' '
+          display: block
+          position: absolute
+          top: 50%
+          right: 20px
+          width: 5px
+          height: 5px
+          margin-top: -2.5px
+          background: $brand
+          border-radius: 50%
+          opacity: 0
+          transition: transform 418ms, opacity 318ms
+          transform: translate3d(25px, 0 ,0)
+
+        &:hover
+          background: $gray98
+
+        &.isActive
+          background: $gray98
+          color: $black
+
+          &:after
+            transform: translate3d(0, 0 ,0)
+            opacity: 1
+
+      .icon
+        color: $gray50
+        font-size: 16px
+        margin-right: 9px
+        margin-left: 3px

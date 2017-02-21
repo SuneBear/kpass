@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
 import cx from 'classnames'
 
 // @REF: https://ant.design/components/input/
@@ -22,7 +22,7 @@ export class Input extends Component {
 
   render () {
     const {
-      className, ...props
+      ...props
     } = this.props
 
     return (

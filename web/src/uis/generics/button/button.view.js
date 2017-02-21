@@ -9,6 +9,7 @@ export class Button extends Component {
 
   static propTypes = {
     className: PropTypes.string,
+    children: PropTypes.element,
     onClick: PropTypes.func,
     icon: PropTypes.string,
     type: PropTypes.oneOf(['primary', 'danger', 'normal']),

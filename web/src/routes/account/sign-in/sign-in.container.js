@@ -6,9 +6,7 @@ import { signInUserAction } from 'modules'
 import { SignIn as SignInView } from './sign-in.view'
 import { signInValidate } from './sign-in.validate'
 
-const mapStateToProps = (state) => ({
-
-})
+const mapStateToProps = (state) => ({})
 
 const mapDispatchToProps = (dispatch) => ({
   actions: bindActionCreators({

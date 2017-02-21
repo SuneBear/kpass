@@ -5,7 +5,7 @@ import './field-label.view.styl'
 
 export class FieldLabel extends Component {
 
-  static PropTypes = {
+  static propTypes = {
     className: PropTypes.string,
     htmlFor: PropTypes.string,
     text: PropTypes.string

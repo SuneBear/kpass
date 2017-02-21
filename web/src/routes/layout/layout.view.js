@@ -5,7 +5,8 @@ import config from 'config'
 
 export class Layout extends Component {
 
-  static PropTypes = {
+  static propTypes = {
+    children: PropTypes.element,
     userMe: PropTypes.object,
     actions: PropTypes.object
   }
@@ -17,8 +18,8 @@ export class Layout extends Component {
   render () {
     return (
       <DocumentTitle title={config.NAME}>
-        <div className='rootLayout'>
-          { this.props.children }
+        <div className={'rootLayout'}>
+          {this.props.children}
         </div>
       </DocumentTitle>
     )

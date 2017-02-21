@@ -1,15 +1,10 @@
-import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
-import { userMeSelector, readUserMeAction } from 'modules'
 import { Personal as PersonalView } from './personal.view'
 
-const mapStateToProps = (state) => ({
-  userMe: userMeSelector(state)
-})
+const mapStateToProps = (state) => ({})
 
-const mapDispatchToProps = (dispatch) => ({
-})
+const mapDispatchToProps = (dispatch) => ({})
 
 const makeContainer = (component) => {
   return connect(

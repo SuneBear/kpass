@@ -1,2 +1,24 @@
+@require '../../../styles/ref'
+
 .workspaceLayout
-  null
+  $sidebarWidth = 286px
+  $contentWidth = $layoutMinWidth - $sidebarWidth
+
+  .workspaceMain
+    display: flex
+    align-items: flex-start
+    min-width: $layoutMinWidth
+    padding: qu(5)
+    margin: 0 auto
+    margin-bottom: qu(5)
+
+    .workspaceSidebar
+      width: $sidebarWidth
+      min-width: ($sidebarWidth * 0.8)
+      margin-right: qu(5)
+      transition: all 368ms
+
+    .workspaceContent
+      position: relative
+      min-width: $contentWidth
+      flex: 1

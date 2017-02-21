@@ -3,6 +3,7 @@ import { combineReducers } from 'redux'
 import { contextReducer as context } from './context'
 import { formReducer as form } from './form'
 import { i18nReducer as i18n } from './i18n'
+import { teamReducer as team } from './team'
 import { userReducer as user } from './user'
 
 export const makeRootReducer = (asyncReducers) => {
@@ -10,6 +11,7 @@ export const makeRootReducer = (asyncReducers) => {
     context,
     form,
     i18n,
+    team,
     user,
     ...asyncReducers
   })

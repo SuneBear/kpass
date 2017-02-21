@@ -8,23 +8,17 @@ import './field-text.view.styl'
 
 export class FieldText extends Component {
 
-  static PropTypes = {
+  static propTypes = {
     className: PropTypes.string,
-    input: {
-      value: PropTypes.string,
-      onBlur: PropTypes.func,
-      onChange: PropTypes.func,
-      onFocus: PropTypes.func
-    },
     label: PropTypes.string,
-    meta: {
-      error: PropTypes.bool,
-      touched: PropTypes.bool
-    },
-    name: PropTypes.string.isRequired,
+    name: PropTypes.string,
     placeholder: PropTypes.string,
     autoFocus: PropTypes.bool,
-    type: PropTypes.string
+    type: PropTypes.string,
+
+    // Redux from
+    input: PropTypes.object,
+    meta: PropTypes.object
   }
 
   getRootClassNames () {
@@ -72,7 +66,7 @@ export class FieldText extends Component {
 
   renderInput () {
     const {
-      value,
+      input,
       name,
       placeholder,
       autoFocus,
@@ -82,7 +76,7 @@ export class FieldText extends Component {
     return (
       <div className='inputWrap'>
         <Input
-          defaultValue={value}
+          defaultValue={input.value}
           name={name}
           placeholder={placeholder}
           autoFocus={autoFocus}
