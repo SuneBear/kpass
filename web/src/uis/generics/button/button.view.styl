@@ -12,6 +12,9 @@
   outline: 0
   transition: all 300ms
 
+  &:focus
+    box-shadow: inset 0 0 0 2px alpha($black, 10%)
+
   // With icon
   > .icon
     position: relative
@@ -42,11 +45,13 @@
     cursor: not-allowed
 
     &,
+    &:focus,
     &:hover,
     &:active
       color: $gray65 !important
       border-color: $gray85 !important
       background-color: $gray90 !important
+      box-shadow: none !important
 
   // @TODO: Update loading style
   &.isLoading

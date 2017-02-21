@@ -8,6 +8,7 @@ import './dropdown.view.styl'
 export class Dropdown extends Component {
 
   static propTypes = {
+    style: PropTypes.object,
     className: PropTypes.string,
     prefixCls: PropTypes.string,
     transitionCls: PropTypes.string,
@@ -30,19 +31,19 @@ export class Dropdown extends Component {
 
   constructor (props) {
     super(props)
-    this.ref = Object.create(null)
+    this.refPopup = Object.create(null)
     this.content = this.getContent(this.props.content)
   }
 
   savePopup = (el) => {
-    this.ref = el
+    this.refPopup = el
   }
 
-  onClick = (e) => {
+  handleClick = (e) => {
     const { content } = this.props
 
-    if (this.ref) {
-      this.ref.close()
+    if (this.refPopup) {
+      this.refPopup.close()
     }
 
     if (content.onClick) {
@@ -50,9 +51,16 @@ export class Dropdown extends Component {
     }
   }
 
+  getRootClassNames () {
+    return cx(
+      'popup',
+      this.props.className
+    )
+  }
+
   getContentClassnames (content) {
     return cx(
-      'dropdownMenu',
+      'dropdownContent',
       content.props.className
     )
   }
@@ -65,8 +73,8 @@ export class Dropdown extends Component {
     }
 
     return React.cloneElement(content, {
-      onClick: this.onClick,
-      className: this.getContentClassnames(content)
+      className: this.getContentClassnames(content),
+      onClick: this.handleClick
     })
   }
 
@@ -82,7 +90,13 @@ export class Dropdown extends Component {
       content: this.content
     }
 
-    return <Popup {...props} ref={this.savePopup} />
+    return (
+      <Popup
+        {...props}
+        className={this.getRootClassNames()}
+        ref={this.savePopup}
+      />
+    )
   }
 
 }

@@ -1,3 +1,21 @@
+@require '../../../styles/ref'
+
 .popup
-  &-hidden
+  min-width: 170px
+  max-width: none
+  padding: 0
+  text-align: left
+  background-color: $white
+  border-radius: $radius
+  box-shadow: 0 7px 21px rgba(0, 0, 0, 0.1)
+
+  &[class*=-hidden]
     display: none
+
+.popupContent
+  max-height: 30vh
+  padding: 4px 0
+  margin-bottom: 0
+  list-style: none
+  overflow-y: auto
+  thin-scroll()

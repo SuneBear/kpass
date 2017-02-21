@@ -11,7 +11,7 @@ export class Popup extends Component {
   static propTypes = {
     style: PropTypes.object,
     className: PropTypes.string,
-    children: PropTypes.children,
+    children: PropTypes.element,
     prefixCls: PropTypes.string,
     transitionCls: PropTypes.string,
     action: PropTypes.oneOf(['click', 'hover', 'focus']),
