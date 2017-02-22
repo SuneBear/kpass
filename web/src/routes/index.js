@@ -10,13 +10,19 @@ const redirectByAuth = (store) => {
   return isAuthedUserMe(store) ? redirectToPersonal : redirectToSignIn
 }
 
+const notFoundRoute = (store) => ({
+  path: '*',
+  indexRoute : { onEnter: redirectByAuth(store) }
+})
+
 export const createRoutes = (store) => ({
   path          : '/',
   indexRoute    : { onEnter: redirectByAuth(store) },
   component     : Layout,
   childRoutes   : [
     accountRoutes(store),
-    workspaceRoutes(store)
+    workspaceRoutes(store),
+    notFoundRoute(store)
   ]
 })
 

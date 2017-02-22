@@ -1,0 +1,80 @@
+@require '../../../styles/ref'
+@require '../../uxs/popup/popup.view'
+
+// Trigger
+.select
+  display: flex
+  align-items: center
+  height: qu(10)
+  min-width: qu(19)
+  padding: 0 qu(3)
+  font-size: 14px
+  color: $black
+  vertical-align: top
+  background-color: transparent
+  border: 1px solid $gray85
+  border-radius: qu(1)
+  outline: 0
+  cursor: pointer
+  transition: border 318ms
+
+  &.select-focused
+    border-color: $gray65
+
+  &.select-disabled
+    background-color: $gray97
+    color: $gray50
+    cursor: not-allowed
+
+  &-selection
+    display: flex
+    justify-content: space-between
+    width: 100%
+
+    &__rendered
+      margin-right: qu(2)
+      overflow: hidden
+
+      .selectedLabel
+        display: none
+
+    // @FIXME: Display placeholder
+    &__placeholder
+      color: $gray65
+
+    &-selected-value
+      text-overflow()
+
+  &-arrow
+    font-size: 12px
+    color: $gray65
+
+// Popup
+.select-dropdown
+  &-menu
+    @extend .popupContent
+
+    &-item
+      position: relative
+      align-items: center
+      padding: 10px 32px 10px 12px
+      cursor: pointer
+      text-overflow()
+
+      .selectedLabel
+        position: absolute
+        right: 11px
+        top: 10px
+        color: $gray50
+        display: none
+
+      &-selected
+        .selectedLabel
+          display: block
+
+      &-disabled
+        color: $gray50
+        cursor: not-allowed
+
+      &-active
+        background: $gray97

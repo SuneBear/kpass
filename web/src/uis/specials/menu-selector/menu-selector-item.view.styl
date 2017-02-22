@@ -1,0 +1,57 @@
+@require '../../../styles/ref'
+
+.menuSelectorItem
+  position: relative
+  display: flex
+  align-items: center
+  padding: 8px 36px 8px 16px
+  cursor: pointer
+
+  &:hover
+  &.isFocused
+    background: $gray97
+
+  &.isSelected
+    null
+
+  &.isDisabled
+    color: $gray50
+    cursor: not-allowed
+
+    &:hover
+      background: transparent
+
+  .mainInfoWrap
+    display: inline-flex
+    flex-direction: column
+    flex: 1 1 0
+    min-width: 0
+
+  .title,
+  .description
+    display: inline-block
+    text-overflow()
+
+  .description
+    font-size: 12px
+    color: $gray65
+
+  .selectedLabel
+    position: absolute
+
+  .icon
+    margin-right: qu(4)
+    color: $gray50
+
+  .avatar
+    margin-right: qu(4)
+
+  .selectedLabel
+    right: 0
+    color: $gray50
+
+  &.typeDivider
+    margin: qu(1) 0
+    padding: 0
+    cursor: default
+    border-top: 1px solid $gray93

@@ -1,15 +1,19 @@
 import React, { Component, PropTypes } from 'react'
-import { Translate } from 'react-redux-i18n'
+import { I18n } from 'react-redux-i18n'
 
-import { Icon, Dropdown } from 'uis'
+import { Icon, Dropdown, MenuSelector } from 'uis'
 import { Avatar, Logo } from 'views'
+import { isPublicTeam } from 'utils'
+import { getWorkspaceBashPath } from '../../index'
 
 import './workspace-header.view.styl'
 
 export class WorkspaceHeader extends Component {
 
   static propTypes = {
+    actions: PropTypes.object,
     userMe: PropTypes.object,
+    teams: PropTypes.array,
     currentTeam: PropTypes.object
   }
 
@@ -17,12 +21,58 @@ export class WorkspaceHeader extends Component {
     const { currentTeam } = this.props
 
     return (
-      <div className={'workspaceInfo workspaceSwitcherHandler'}>
-        <div className={'workspaceName'}>
-          {currentTeam.name}
+      <Dropdown
+        className={'workspaceSwitcherDropdown'}
+        content={this.getWorkspaceSwitcher()}
+      >
+        <div className={'workspaceInfo workspaceSwitcherHandler'}>
+          <div className={'workspaceName'}>
+            {currentTeam.name}
+          </div>
+          <Icon className={'handlerIcon'} name={'chevron-down'} />
         </div>
-        <Icon className={'handlerIcon'} name={'chevron-down'} />
-      </div>
+      </Dropdown>
+    )
+  }
+
+  handleSwitchWorkspace = (teamSelector) => {
+    const { teams } = this.props
+    const { push } = this.props.actions
+    const nextTeam = teams.filter(team => teamSelector.value === team.id)[0]
+    push(getWorkspaceBashPath(nextTeam))
+  }
+
+  handleCreateTeam = () => {
+    // Not implemented
+    console.log('Create Team')
+  }
+
+  getWorkspaceSwitcher () {
+    const { currentTeam, teams } = this.props
+
+    const dataList = teams.map((team) => ({
+      className: 'workspaceSwitcherItem',
+      value: team.id,
+      title: team.name,
+      iconName: isPublicTeam(team) ? 'building' : 'user',
+      onClick: this.handleSwitchWorkspace
+    }))
+
+    const extraList = [
+      {
+        className: 'workspaceSwitcherItem',
+        title: I18n.t('team.newTeam'),
+        iconName: 'plus',
+        onClick: this.handleCreateTeam
+      }
+    ]
+
+    return (
+      <MenuSelector
+        dataList={dataList}
+        extraList={extraList}
+        hasSelected={[currentTeam.id]}
+      />
     )
   }
 
@@ -39,7 +89,7 @@ export class WorkspaceHeader extends Component {
 
     return (
       <Dropdown
-        content={this.getUserInfoDropdownItems()}
+        content={this.getUserInfoDropdownMenu()}
         placement={'bottomRight'}
         offset={[-8, 8]}
       >
@@ -51,13 +101,17 @@ export class WorkspaceHeader extends Component {
     )
   }
 
-  getUserInfoDropdownItems () {
+  getUserInfoDropdownMenu () {
+    const dataList = [
+      { title: I18n.t('account.settings'), onClick: () => { console.log('settings') } },
+      { type: 'divider' },
+      { title: I18n.t('account.signOut'), onClick: () => { console.log('signOut') } }
+    ]
+
     return (
-      <ul>
-        <li><a><Translate value={'account.settings'} /></a></li>
-        <div className={'divider'} />
-        <li><a><Translate value={'account.signOut'} /></a></li>
-      </ul>
+      <MenuSelector
+        dataList={dataList}
+      />
     )
   }
 

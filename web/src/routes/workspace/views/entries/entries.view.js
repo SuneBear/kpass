@@ -22,7 +22,9 @@ export class Entries extends Component {
   render () {
     return (
       <Card className={this.getRootClassNames()} title={I18n.t('entries.title')}>
-        <div>Workspace Entries</div>
+        <div>
+          Workspace Entries
+        </div>
       </Card>
     )
   }
