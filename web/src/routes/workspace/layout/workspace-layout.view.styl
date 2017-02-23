@@ -2,6 +2,7 @@
 
 .workspaceLayout
   $sidebarWidth = 286px
+  $sidebarMinWidth = ($sidebarWidth * 0.7)
   $contentWidth = $layoutMinWidth - $sidebarWidth
 
   .workspaceMain
@@ -14,7 +15,7 @@
 
     .workspaceSidebar
       width: $sidebarWidth
-      min-width: ($sidebarWidth * 0.8)
+      min-width: $sidebarMinWidth
       margin-right: qu(5)
       transition: all 368ms
 

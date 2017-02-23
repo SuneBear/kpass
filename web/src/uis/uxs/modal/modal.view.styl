@@ -1,0 +1,161 @@
+@require '../../../styles/ref'
+
+.modal
+  $baseVerticalSpacing = qu(12)
+  display: flex
+  max-height: 100%
+  margin: 0 auto
+
+  // Size
+  &.size-large
+    width: 800px
+
+  &.size-normal
+    width: 600px
+
+  &.size-small
+    width: 360px
+
+  // Wrap
+  &-wrap
+    display: flex
+    align-items: flex-start
+    position: absolute
+    z-index: $zIndexModal
+    top: 0px
+    left: 0px
+    width: 100%
+    height: 100%
+    padding: $baseVerticalSpacing qu(6)
+
+    // Status
+    &.center-align
+      align-items: center
+
+  // Content
+  &-content
+    display: flex
+    flex-direction: column
+    flex: 1 0 auto
+    border-radius: $radius
+    background: $white
+    box-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.05)
+
+  &-header
+    flex: 0 0 auto
+    padding: 14px qu(12)
+    border-bottom: 1px solid $gray90
+
+  &-title
+    font-size: 16px
+    font-weight: 500
+    text-align: center
+    text-overflow()
+
+  &-body
+    position: relative
+    display: flex
+    flex: 1
+
+    .scrollable-viewport
+      padding: qu(4)
+      flex: 1
+      overflow: auto
+      thin-scroll()
+
+  &-close
+    position: absolute
+    z-index: 2
+    right: qu(4)
+    top: -34px
+    font-size: 16px
+    color: $gray65
+    cursor: pointer
+
+    &:hover
+      color: $brand
+
+  &-footer
+    display: flex
+    align-items: center
+    flex: 0 0 auto
+    min-height: qu(12) + 1
+    padding: qu(2) qu(4)
+    border-top: 1px solid $gray90
+
+  // Animation
+  &-slide-enter,
+  &-slide-appear
+    opacity: 0
+
+  &-slide-enter,
+  &-slide-appear,
+  &-slide-leave
+    animation-duration: 268ms
+    animation-fill-mode: both
+    animation-timing-function: ease-out
+    animation-play-state: paused
+
+  &-slide-leave
+    animation-duration: 168ms
+
+  &-slide-enter&-slide-enter-active,
+  &-slide-appear&-slide-appear-active
+    animation-name: slideIn
+    animation-play-state: running
+
+  &-slide-leave&-slide-leave-active
+    animation-name: slideOut
+    animation-play-state: running
+
+  @keyframes slideIn
+    to
+      opacity: 1
+
+  @keyframes slideOut
+    to
+      opacity: 0
+      transform: translate3d(0, -25%, 0)
+
+  /* == Mask == */
+  &-mask
+    position: fixed
+    z-index: $zIndexModal
+    top: 0
+    left: 0
+    width: 100%
+    height: 100%
+    background: alpha($black, 50%)
+
+    &-hidden
+      display: none
+
+    // Animation
+    &-fade-enter,
+    &-fade-appear
+      opacity: 0
+
+    &-fade-enter,
+    &-fade-appear,
+    &-fade-leave
+      animation-duration: 168ms
+      animation-fill-mode: both
+      animation-timing-function: cubic-bezier(0.55, 0, 0.55, 0.2)
+      animation-play-state: paused
+
+    &-fade-enter&-fade-enter-active,
+    &-fade-appear&-fade-appear-active
+      animation-name: fadeIn
+      animation-play-state: running
+
+    &-fade-leave&-fade-leave-active
+      animation-name: fadeOut
+      animation-play-state: running
+
+    @keyframes fadeIn
+      to
+        opacity: 1
+
+    @keyframes fadeOut
+      to
+        opacity: 0
