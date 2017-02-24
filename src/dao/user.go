@@ -1,7 +1,6 @@
 package dao
 
 import (
-	"encoding/json"
 	"fmt"
 	"time"
 
@@ -101,7 +100,7 @@ func (o *User) Find(id string) (user *schema.User, err error) {
 	err = o.db.DB.View(func(tx *buntdb.Tx) error {
 		res, e := tx.Get(schema.UserKey(id))
 		if e == nil {
-			e = json.Unmarshal([]byte(res), user)
+			user, e = schema.UserFrom(res)
 		}
 		return e
 	})
@@ -120,4 +119,16 @@ func (o *User) Update(user *schema.User) error {
 		return e
 	})
 	return dbError(err)
+}
+
+// FindUsers ...
+func (o *User) FindUsers(ids ...string) (users []*schema.UserResult, err error) {
+	err = o.db.DB.View(func(tx *buntdb.Tx) error {
+		users = IdsToUsers(tx, ids)
+		return nil
+	})
+	if err != nil {
+		return nil, dbError(err)
+	}
+	return
 }

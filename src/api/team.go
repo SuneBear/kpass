@@ -10,6 +10,11 @@ import (
 )
 
 // Team is API oject for teams
+//
+// @Name Team
+// @Description Team API
+// @Accepts json
+// @Produces json
 type Team struct {
 	team *dao.Team
 }
@@ -20,8 +25,8 @@ func NewTeam(db *service.DB) *Team {
 }
 
 type tplTeamCreate struct {
-	Name string `json:"name"`
-	Pass string `json:"pass"` // should encrypt
+	Name string `json:"name" swaggo:"true,team name,Teambition"`
+	Pass string `json:"pass" swaggo:"true,team password hashed by sha256,xxxxxxxxxxxxxxxx..."`
 }
 
 func (t *tplTeamCreate) Validate() error {
@@ -35,6 +40,16 @@ func (t *tplTeamCreate) Validate() error {
 }
 
 // Create ...
+//
+// @Title Create
+// @Summary Create a team
+// @Description Create a team
+// @Param Authorization header string true "access_token"
+// @Param body body tplTeamCreate true "team body"
+// @Success 200 schema.TeamResult
+// @Failure 400 string
+// @Failure 401 string
+// @Router POST /api/teams
 func (a *Team) Create(ctx *gear.Context) error {
 	body := new(tplTeamCreate)
 	if err := ctx.ParseBody(body); err != nil {
@@ -86,6 +101,17 @@ func (t *tplTeamUpdate) Validate() error {
 }
 
 // Update ...
+//
+// @Title Update
+// @Summary Update the team
+// @Description only the team owner can update the team
+// @Param Authorization header string true "access_token"
+// @Param teamID path string true "team ID"
+// @Param body body tplTeamUpdate true "team body"
+// @Success 200 schema.TeamResult
+// @Failure 400 string
+// @Failure 401 string
+// @Router PUT /api/teams/{teamID}
 func (a *Team) Update(ctx *gear.Context) (err error) {
 	TeamID, err := util.ParseOID(ctx.Param("teamID"))
 	if err != nil {
@@ -134,8 +160,8 @@ func (a *Team) Update(ctx *gear.Context) (err error) {
 }
 
 type tplTeamMembers struct {
-	Push []string `json:"$push"` // Removes members from team
-	Pull []string `json:"$pull"` // Adds members to team
+	Push []string `json:"$push" swaggo:"false,add some team members,[\"joe\"]"`
+	Pull []string `json:"$pull" swaggo:"false,remove some team members,[]"`
 }
 
 // Validate ...
@@ -150,6 +176,17 @@ func (t *tplTeamMembers) Validate() error {
 }
 
 // Members ...
+//
+// @Title Members
+// @Summary Add or remove team members
+// @Description only the team owner can update the team members
+// @Param Authorization header string true "access_token"
+// @Param teamID path string true "team ID"
+// @Param body body tplTeamMembers true "team members"
+// @Success 200 schema.TeamResult
+// @Failure 400 string
+// @Failure 401 string
+// @Router PUT /api/teams/{teamID}/members
 func (a *Team) Members(ctx *gear.Context) (err error) {
 	TeamID, err := util.ParseOID(ctx.Param("teamID"))
 	if err != nil {
@@ -170,6 +207,16 @@ func (a *Team) Members(ctx *gear.Context) (err error) {
 }
 
 // Delete ...
+//
+// @Title Delete
+// @Summary Delete the team
+// @Description only the team owner can delete the team
+// @Param Authorization header string true "access_token"
+// @Param teamID path string true "team ID"
+// @Success 204
+// @Failure 400 string
+// @Failure 401 string
+// @Router DELETE /api/entries/{teamID}
 func (a *Team) Delete(ctx *gear.Context) (err error) {
 	TeamID, err := util.ParseOID(ctx.Param("teamID"))
 	if err != nil {
@@ -196,6 +243,16 @@ func (a *Team) Delete(ctx *gear.Context) (err error) {
 }
 
 // Restore ...
+//
+// @Title Restore
+// @Summary Restore the deleted team
+// @Description only the team owner can restore the deleted team
+// @Param Authorization header string true "access_token"
+// @Param teamID path string true "entry ID"
+// @Success 204
+// @Failure 400 string
+// @Failure 401 string
+// @Router PUT /api/entries/{teamID}/restore
 func (a *Team) Restore(ctx *gear.Context) (err error) {
 	TeamID, err := util.ParseOID(ctx.Param("teamID"))
 	if err != nil {
@@ -220,6 +277,16 @@ func (a *Team) Restore(ctx *gear.Context) (err error) {
 }
 
 // FindByMember return teams for current user
+//
+// @Title FindByMember
+// @Summary Get teams for current user
+// @Description Get teams for current user.
+// @Param Authorization header string true "access_token"
+// @Param teamID path string true "team ID"
+// @Success 200 []schema.TeamResult
+// @Failure 400 string
+// @Failure 401 string
+// @Router GET /api/teams
 func (a *Team) FindByMember(ctx *gear.Context) (err error) {
 	userID, err := auth.UserIDFromCtx(ctx)
 	if err != nil {
@@ -233,8 +300,8 @@ func (a *Team) FindByMember(ctx *gear.Context) (err error) {
 }
 
 type tplTeamToken struct {
-	Type string `json:"grant_type"`
-	Pass string `json:"password"` // should encrypt
+	Type string `json:"grant_type" swaggo:"true,should always be \"password\",password"`
+	Pass string `json:"password" swaggo:"true,team password hashed by sha256,xxxxxxxxxxxxxxxx..."`
 }
 
 func (t *tplTeamToken) Validate() error {
@@ -248,6 +315,17 @@ func (t *tplTeamToken) Validate() error {
 }
 
 // Token ...
+//
+// @Title Token
+// @Summary Verify for the team
+// @Description Verify the team pass and get the new access_token
+// @Param Authorization header string true "access_token"
+// @Param teamID path string true "team ID"
+// @Param body body tplTeamToken true "team auth info"
+// @Success 200 AuthResult
+// @Failure 400 string
+// @Failure 401 string
+// @Router POST /api/teams/{teamID}/token
 func (a *Team) Token(ctx *gear.Context) (err error) {
 	TeamID, err := util.ParseOID(ctx.Param("teamID"))
 	if err != nil {
@@ -271,9 +349,9 @@ func (a *Team) Token(ctx *gear.Context) (err error) {
 	}
 	ctx.Set(gear.HeaderPragma, "no-cache")
 	ctx.Set(gear.HeaderCacheControl, "no-store")
-	return ctx.JSON(200, map[string]interface{}{
-		"access_token": token,
-		"token_type":   "Bearer",
-		"expires_in":   auth.JWT().GetExpiresIn().Seconds(),
+	return ctx.JSON(200, &AuthResult{
+		Token:  token,
+		Type:   "Bearer",
+		Expire: auth.JWT().GetExpiresIn().Seconds(),
 	})
 }

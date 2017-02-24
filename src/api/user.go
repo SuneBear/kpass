@@ -12,6 +12,11 @@ import (
 )
 
 // User is API oject for users
+//
+// @Name User
+// @Description User API
+// @Accepts json
+// @Produces json
 type User struct {
 	team *dao.Team
 	user *dao.User
@@ -23,8 +28,8 @@ func NewUser(db *service.DB) *User {
 }
 
 type tplUserJoin struct {
-	ID   string `json:"id"`
-	Pass string `json:"pass"` // should encrypt
+	ID   string `json:"id" swaggo:"true,user id,admin"`
+	Pass string `json:"pass" swaggo:"true,user password hashed by sha256,xxxxxxxxxxxxxxxx..."`
 }
 
 func (t *tplUserJoin) Validate() error {
@@ -38,6 +43,15 @@ func (t *tplUserJoin) Validate() error {
 }
 
 // Join ...
+//
+// @Title Join
+// @Summary Create a user
+// @Description Create a user
+// @Param body body tplUserJoin true "user info"
+// @Success 200 schema.UserResult
+// @Failure 400 string
+// @Failure 401 string
+// @Router POST /api/join
 func (a *User) Join(ctx *gear.Context) error {
 	body := new(tplUserJoin)
 	if err := ctx.ParseBody(body); err != nil {
@@ -67,9 +81,9 @@ func (a *User) Join(ctx *gear.Context) error {
 
 // Resource Owner Password Credentials Grant https://tools.ietf.org/html/rfc6749#page-37
 type tplUserLogin struct {
-	Type string `json:"grant_type"`
-	ID   string `json:"username"`
-	Pass string `json:"password"` // should encrypt
+	Type string `json:"grant_type" swaggo:"true,should always be \"password\",password"`
+	ID   string `json:"username" swaggo:"true,user id,admin"`
+	Pass string `json:"password" swaggo:"true,user password hashed by sha256,xxxxxxxxxxxxxxxx..."`
 }
 
 func (t *tplUserLogin) Validate() error {
@@ -86,6 +100,15 @@ func (t *tplUserLogin) Validate() error {
 }
 
 // Login ...
+//
+// @Title Login
+// @Summary Login
+// @Description Login with user id and pass, get the new access_token
+// @Param body body tplUserLogin true "user auth info"
+// @Success 200 AuthResult
+// @Failure 400 string
+// @Failure 401 string
+// @Router POST /api/login
 func (a *User) Login(ctx *gear.Context) (err error) {
 	body := new(tplUserLogin)
 	if err = ctx.ParseBody(body); err != nil {
@@ -103,14 +126,50 @@ func (a *User) Login(ctx *gear.Context) (err error) {
 	}
 	ctx.Set(gear.HeaderPragma, "no-cache")
 	ctx.Set(gear.HeaderCacheControl, "no-store")
-	return ctx.JSON(200, map[string]interface{}{
-		"access_token": token,
-		"token_type":   "Bearer",
-		"expires_in":   auth.JWT().GetExpiresIn().Seconds(),
+	return ctx.JSON(200, &AuthResult{
+		Token:  token,
+		Type:   "Bearer",
+		Expire: auth.JWT().GetExpiresIn().Seconds(),
 	})
 }
 
+// Find ...
+//
+// @Title Find
+// @Summary get a user public info
+// @Description get a user public info
+// @Param userID path string true "user id"
+// @Success 200 schema.UserResult
+// @Failure 400 string
+// @Failure 401 string
+// @Router GET /api/user/{userID}
+func (a *User) Find(ctx *gear.Context) (err error) {
+	userID := ctx.Param("userID")
+	if userID != "" {
+		return ctx.ErrorStatus(400)
+	}
+	user, err := a.user.Find(userID)
+	if err != nil {
+		return ctx.Error(err)
+	}
+	return ctx.JSON(200, user.Result())
+}
+
+// PassResult ...
+type PassResult struct {
+	Pass string `json:"password" swaggo:"true,a random password,OG/O3QPm6Y)A"`
+}
+
 // Password generate a password
+//
+// @Title Password
+// @Summary get a random password
+// @Description get a random password by query options
+// @Param len query uint false "password length" 12
+// @Param num query uint false "numbers length that password include" 2
+// @Param spec query uint false "special characters length that password include" 2
+// @Success 200 PassResult
+// @Router GET /api/password
 func (a *User) Password(ctx *gear.Context) (err error) {
 	len := 12
 	num := 2
@@ -130,5 +189,5 @@ func (a *User) Password(ctx *gear.Context) (err error) {
 			return ctx.ErrorStatus(400)
 		}
 	}
-	return ctx.JSON(200, map[string]string{"password": util.RandPass(len, num, spec)})
+	return ctx.JSON(200, &PassResult{util.RandPass(len, num, spec)})
 }

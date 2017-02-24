@@ -55,7 +55,7 @@ func (t *Team) RemoveMember(userID string) bool {
 }
 
 // Result returns TeamResult intance
-func (t *Team) Result(ID util.OID) *TeamResult {
+func (t *Team) Result(ID util.OID, Members []*UserResult) *TeamResult {
 	return &TeamResult{
 		ID:         ID,
 		Logo:       t.Logo,
@@ -63,7 +63,7 @@ func (t *Team) Result(ID util.OID) *TeamResult {
 		Name:       t.Name,
 		IsFrozen:   t.IsFrozen,
 		Visibility: t.Visibility,
-		Members:    t.Members,
+		Members:    Members,
 		Created:    t.Created,
 		Updated:    t.Updated,
 	}
@@ -71,16 +71,15 @@ func (t *Team) Result(ID util.OID) *TeamResult {
 
 // TeamResult represents desensitized team
 type TeamResult struct {
-	ID         util.OID  `json:"id"`
-	Logo       util.OID  `json:"logo"`
-	UserID     string    `json:"userID"`
-	Name       string    `json:"name"`
-	IsFrozen   bool      `json:"isFrozen"`
-	IsPrivate  bool      `json:"IsPrivate"`
-	Visibility string    `json:"visibility"`
-	Members    []string  `json:"members"`
-	Created    time.Time `json:"created"`
-	Updated    time.Time `json:"updated"`
+	ID         util.OID      `json:"id"`
+	Logo       util.OID      `json:"logo"`
+	UserID     string        `json:"userID"`
+	Name       string        `json:"name"`
+	IsFrozen   bool          `json:"isFrozen"`
+	Visibility string        `json:"visibility"`
+	Members    []*UserResult `json:"members"`
+	Created    time.Time     `json:"created"`
+	Updated    time.Time     `json:"updated"`
 }
 
 // String returns JSON string with desensitized team info

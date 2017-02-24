@@ -1,6 +1,7 @@
 package src
 
 import (
+	"strings"
 	"time"
 
 	"github.com/seccom/kpass/src/auth"
@@ -14,7 +15,7 @@ import (
 )
 
 // Version is app version
-const Version = "0.5.0"
+const Version = "0.5.1"
 
 // New returns a app instance
 func New(dbPath string, env string) *gear.App {
@@ -38,7 +39,7 @@ func New(dbPath string, env string) *gear.App {
 
 	staticOpts := static.Options{
 		Root:        "",
-		Prefix:      "/static/",
+		Prefix:      "/",
 		StripPrefix: true,
 		Files:       make(map[string][]byte),
 	}
@@ -50,17 +51,20 @@ func New(dbPath string, env string) *gear.App {
 	}
 
 	app := gear.New()
+	app.Use(cors.New())
 	app.Use(secure.Default)
-	app.Use(cors.New(cors.Options{}))
+	app.Use(favicon.NewWithIco(faviconBin))
+
+	staticMiddleware := static.New(staticOpts)
 	app.Use(func(ctx *gear.Context) (err error) {
-		if ctx.Path == "/" {
+		switch {
+		case ctx.Path == "/":
 			return ctx.HTML(200, indexBody)
+		case ctx.Path == "/favicon.png" || ctx.Path == "/humans.txt" || ctx.Path == "/robots.txt" || strings.HasPrefix(ctx.Path, "/static/"):
+			return staticMiddleware(ctx)
 		}
 		return nil
 	})
-	app.Use(favicon.NewWithIco(faviconBin))
-
-	app.Use(static.New(staticOpts))
 	app.UseHandler(logger.Default())
 	app.UseHandler(newRouter(db))
 	return app

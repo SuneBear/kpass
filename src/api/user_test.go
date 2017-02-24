@@ -71,7 +71,7 @@ func TestUserAPI(t *testing.T) {
 		team := (*teams)[0]
 		assert.Equal("admin", team.UserID)
 		assert.Equal("private", team.Visibility)
-		assert.Equal([]string{"admin"}, team.Members)
+		assert.Equal("admin", team.Members[0].ID)
 	})
 }
 

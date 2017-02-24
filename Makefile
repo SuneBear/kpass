@@ -28,6 +28,10 @@ assets:
 	go-bindata -ignore=\\.DS_Store -o ./src/bindata.go -pkg src -prefix web/dist/ web/dist/...
 clean:
 	go-bindata -ignore=\\.* -o ./src/bindata.go -pkg src web/dist/...
+web:
+	cd web && rm -rf dist && npm run deploy:prod && cd -
+dev: web assets
+	go run cmd/kpass/kpass.go -dev
 
 build-linux:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GO) build -a -installsuffix cgo -o dist/kpass_linux ./cmd/kpass
@@ -35,6 +39,10 @@ build-osx:
 	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 $(GO) build -a -installsuffix cgo -o dist/kpass ./cmd/kpass
 build-win:
 	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 $(GO) build -a -installsuffix cgo -o dist/kpass.exe ./cmd/kpass
-build: assets build-osx build-linux build-win clean
+build: web assets build-osx build-linux build-win
 
-.PHONY: assets test build cover clean
+swagger:
+	swaggo -s ./src/swagger.go
+	staticgo
+
+.PHONY: web assets test build cover clean

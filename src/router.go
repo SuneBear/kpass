@@ -55,8 +55,9 @@ func newRouter(db *service.DB) (Router *gear.Router) {
 	//
 	Router.Post("/api/login", userAPI.Login)
 
-	// Return current user info
-	// Router.Get("/api/user", auth.Middleware, noOp)
+	// Return the user publicly info
+	Router.Get("/api/user/:userID", auth.Middleware, userAPI.Find)
+
 	// Update current user info
 	// Router.Put("/api/user", auth.Middleware, noOp)
 	// Return the user info, for admin

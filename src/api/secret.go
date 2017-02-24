@@ -10,6 +10,11 @@ import (
 )
 
 // Secret is API oject for secrets
+//
+// @Name Secret
+// @Description Secret API
+// @Accepts json
+// @Produces json
 type Secret struct {
 	entry  *dao.Entry
 	secret *dao.Secret
@@ -21,10 +26,10 @@ func NewSecret(db *service.DB) *Secret {
 }
 
 type tplSecretCreate struct {
-	Name string `json:"name"`
-	URL  string `json:"url"`
-	Pass string `json:"password"`
-	Note string `json:"note"`
+	Name string `json:"name" swaggo:"true,secret name,Login"`
+	URL  string `json:"url" swaggo:"false,some URL,https://github.com/login"`
+	Pass string `json:"password" swaggo:"false,some password,mYPaSsWoRd"`
+	Note string `json:"note" swaggo:"false,some note,https://github.com/login"`
 }
 
 func (t *tplSecretCreate) Validate() error {
@@ -35,6 +40,17 @@ func (t *tplSecretCreate) Validate() error {
 }
 
 // Create ...
+//
+// @Title Create
+// @Summary Create a secret in a entry
+// @Description all team members can create secret
+// @Param Authorization header string true "access_token"
+// @Param entryID path string true "entry ID"
+// @Param body body tplSecretCreate true "secret body"
+// @Success 200 schema.SecretResult
+// @Failure 400 string
+// @Failure 401 string
+// @Router POST /api/entries/{entryID}/secrets
 func (a *Secret) Create(ctx *gear.Context) error {
 	EntryID, err := util.ParseOID(ctx.Param("entryID"))
 	if err != nil {
@@ -94,6 +110,18 @@ func (t *tplSecretUpdate) Validate() error {
 }
 
 // Update ...
+//
+// @Title Update
+// @Summary Update the secret
+// @Description all team members can update the secret
+// @Param Authorization header string true "access_token"
+// @Param entryID path string true "entry ID"
+// @Param secretID path string true "secret ID"
+// @Param body body tplSecretUpdate true "secret body"
+// @Success 200 schema.SecretResult
+// @Failure 400 string
+// @Failure 401 string
+// @Router PUT /api/entries/{entryID}/secrets/{secretID}
 func (a *Secret) Update(ctx *gear.Context) error {
 	EntryID, err := util.ParseOID(ctx.Param("entryID"))
 	if err != nil {
@@ -130,6 +158,17 @@ func (a *Secret) Update(ctx *gear.Context) error {
 }
 
 // Delete ...
+//
+// @Title Delete
+// @Summary Delete the secret
+// @Description all team members can delete the secret
+// @Param Authorization header string true "access_token"
+// @Param entryID path string true "entry ID"
+// @Param secretID path string true "secret ID"
+// @Success 204
+// @Failure 400 string
+// @Failure 401 string
+// @Router DELETE /api/entries/{entryID}/secrets/{secretID}
 func (a *Secret) Delete(ctx *gear.Context) error {
 	EntryID, err := util.ParseOID(ctx.Param("entryID"))
 	if err != nil {

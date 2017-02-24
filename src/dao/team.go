@@ -29,9 +29,11 @@ func (o *Team) Create(userID, pass string, team *schema.Team) (teamResult *schem
 	team.Pass = auth.SignPass(TeamID.String(), pass)
 	team.Created = util.Time(time.Now())
 	team.Updated = team.Created
-	teamResult = team.Result(TeamID)
 	err = o.db.DB.Update(func(tx *buntdb.Tx) error {
 		_, _, e := tx.Set(schema.TeamKey(TeamID), team.String(), nil)
+		if e == nil {
+			teamResult = team.Result(TeamID, IdsToUsers(tx, team.Members))
+		}
 		return e
 	})
 	if err != nil {
@@ -45,12 +47,15 @@ func (o *Team) Update(TeamID util.OID, team *schema.Team) (teamResult *schema.Te
 	err = o.db.DB.Update(func(tx *buntdb.Tx) error {
 		team.Updated = util.Time(time.Now())
 		_, _, e := tx.Set(schema.TeamKey(TeamID), team.String(), nil)
+		if e == nil {
+			teamResult = team.Result(TeamID, IdsToUsers(tx, team.Members))
+		}
 		return e
 	})
 	if err != nil {
 		return nil, dbError(err)
 	}
-	return team.Result(TeamID), nil
+	return
 }
 
 // UpdateMembers ...
@@ -86,8 +91,10 @@ func (o *Team) UpdateMembers(userID string, TeamID util.OID, pull, push []string
 			}
 			team.AddMember(user)
 		}
-		teamResult = team.Result(TeamID)
 		_, _, e = tx.Set(schema.TeamKey(TeamID), team.String(), nil)
+		if e == nil {
+			teamResult = team.Result(TeamID, IdsToUsers(tx, team.Members))
+		}
 		return e
 	})
 	if err != nil {
@@ -131,7 +138,8 @@ func (o *Team) FindByUserID(userID string, IsDeleted bool) (teams []*schema.Team
 			}
 			if team.IsDeleted == IsDeleted {
 				TeamID := schema.TeamIDFromKey(key)
-				teams = append(teams, team.Result(TeamID))
+				teamResult := team.Result(TeamID, IdsToUsers(tx, team.Members))
+				teams = append(teams, teamResult)
 			}
 			return true
 		})
@@ -157,7 +165,8 @@ func (o *Team) FindByMemberID(memberID string) (teams []*schema.TeamResult, err 
 					}
 					if team.IsDeleted == false {
 						TeamID := schema.TeamIDFromKey(key)
-						teams = append(teams, team.Result(TeamID))
+						teamResult := team.Result(TeamID, IdsToUsers(tx, team.Members))
+						teams = append(teams, teamResult)
 					}
 				}
 			}

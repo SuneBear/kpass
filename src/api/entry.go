@@ -10,6 +10,11 @@ import (
 )
 
 // Entry is API oject for entries
+//
+// @Name Entry
+// @Description Entry API
+// @Accepts json
+// @Produces json
 type Entry struct {
 	entry  *dao.Entry
 	secret *dao.Secret
@@ -22,8 +27,8 @@ func NewEntry(db *service.DB) *Entry {
 }
 
 type tplEntryCreate struct {
-	Name     string `json:"name"`
-	Category string `json:"category"`
+	Name     string `json:"name" swaggo:"true,entry name,Github"`
+	Category string `json:"category" swaggo:"true,entry category,Logins"`
 }
 
 func (t *tplEntryCreate) Validate() error {
@@ -34,6 +39,17 @@ func (t *tplEntryCreate) Validate() error {
 }
 
 // Create ...
+//
+// @Title Create
+// @Summary Create a entry in a team
+// @Description all team members can create entry
+// @Param Authorization header string true "access_token"
+// @Param teamID path string true "team ID"
+// @Param body body tplEntryCreate true "entry body"
+// @Success 200 schema.EntrySum
+// @Failure 400 string
+// @Failure 401 string
+// @Router POST /api/teams/{teamID}/entries
 func (a *Entry) Create(ctx *gear.Context) (err error) {
 	TeamID, err := util.ParseOID(ctx.Param("teamID"))
 	if err != nil {
@@ -97,6 +113,17 @@ func (t *tplEntryUpdate) Validate() error {
 }
 
 // Update ...
+//
+// @Title Update
+// @Summary Update the entry
+// @Description all team members can update the entry
+// @Param Authorization header string true "access_token"
+// @Param entryID path string true "entry ID"
+// @Param body body tplEntryUpdate true "entry body"
+// @Success 200 schema.EntrySum
+// @Failure 400 string
+// @Failure 401 string
+// @Router PUT /api/entries/{entryID}
 func (a *Entry) Update(ctx *gear.Context) (err error) {
 	EntryID, err := util.ParseOID(ctx.Param("entryID"))
 	if err != nil {
@@ -117,6 +144,16 @@ func (a *Entry) Update(ctx *gear.Context) (err error) {
 }
 
 // Delete ...
+//
+// @Title Delete
+// @Summary Delete the entry
+// @Description all team members can delete the entry
+// @Param Authorization header string true "access_token"
+// @Param entryID path string true "entry ID"
+// @Success 204
+// @Failure 400 string
+// @Failure 401 string
+// @Router DELETE /api/entries/{entryID}
 func (a *Entry) Delete(ctx *gear.Context) (err error) {
 	EntryID, err := util.ParseOID(ctx.Param("entryID"))
 	if err != nil {
@@ -139,6 +176,16 @@ func (a *Entry) Delete(ctx *gear.Context) (err error) {
 }
 
 // Restore ...
+//
+// @Title Restore
+// @Summary Restore the deleted entry
+// @Description all team members can restore the deleted entry
+// @Param Authorization header string true "access_token"
+// @Param entryID path string true "entry ID"
+// @Success 204
+// @Failure 400 string
+// @Failure 401 string
+// @Router PUT /api/entries/{entryID}/restore
 func (a *Entry) Restore(ctx *gear.Context) (err error) {
 	EntryID, err := util.ParseOID(ctx.Param("entryID"))
 	if err != nil {
@@ -162,6 +209,17 @@ func (a *Entry) Restore(ctx *gear.Context) (err error) {
 }
 
 // Find return the entry
+//
+// @Title Find
+// @Summary Get the entry
+// @Description Get the entry with all information, include secrets, files and shares.
+// @Description all team members can get the entry
+// @Param Authorization header string true "access_token"
+// @Param entryID path string true "entry ID"
+// @Success 200 schema.EntryResult
+// @Failure 400 string
+// @Failure 401 string
+// @Router GET /api/entries/{entryID}
 func (a *Entry) Find(ctx *gear.Context) error {
 	EntryID, err := util.ParseOID(ctx.Param("entryID"))
 	if err != nil {
@@ -188,6 +246,17 @@ func (a *Entry) Find(ctx *gear.Context) error {
 }
 
 // FindByTeam return entries for current user
+//
+// @Title FindByTeam
+// @Summary Get the team's entries list
+// @Description Get the team's entries list with summary information.
+// @Description all team members can get it
+// @Param Authorization header string true "access_token"
+// @Param teamID path string true "team ID"
+// @Success 200 []schema.EntrySum
+// @Failure 400 string
+// @Failure 401 string
+// @Router GET /api/teams/{teamID}/entries
 func (a *Entry) FindByTeam(ctx *gear.Context) (err error) {
 	TeamID, err := util.ParseOID(ctx.Param("teamID"))
 	if err != nil {
