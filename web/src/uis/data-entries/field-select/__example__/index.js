@@ -8,7 +8,6 @@ import { FieldSelect } from '../index'
  *
  * import { FieldSelectExample } from 'uis/data-entries/field-select/__example__'
  * <FieldSelectExample />
- *
  */
 
 class FieldSelectExampleView extends Component {
