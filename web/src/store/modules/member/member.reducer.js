@@ -1,22 +1,15 @@
 import { createAction, handleActions } from 'redux-actions'
 import { keys as _keys } from 'lodash'
 
-// @Dev Hack: Mock data
-import { mockTeamState } from './__mock__'
-
-const initialState = mockTeamState || {
+const initialState = {
   entities: {}
 }
 
-export const readTeamsAction = createAction('READ_TEAMS')
-export const readTeamsSuccessAction = createAction('READ_TEAMS_SUCCESS')
-export const readTeamsFailureAction = createAction('READ_TEAMS_FAILURE')
+export const setMemberEntitiesAction = createAction('SET_MEMBER_ENTITIES')
 
-export const setTeamEntitiesAction = createAction('SET_TEAM_ENTITIES')
+export const memberReducer = handleActions({
 
-export const teamReducer = handleActions({
-
-  [`${setTeamEntitiesAction}`]: (state, action) => {
+  [`${setMemberEntitiesAction}`]: (state, action) => {
     if (!action.payload) {
       return state
     }

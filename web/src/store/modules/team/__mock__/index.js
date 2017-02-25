@@ -7,9 +7,10 @@ export const mockTeamState = {
     },
     b: {
       id: 'b',
+      userId: 'SuneBear',
+      members: ['SuneBear', 'Kumamon'],
       name: 'SuneBear\'s Team One',
       visibility: 'member'
     }
-  },
-  currentTeamId: null
+  }
 }

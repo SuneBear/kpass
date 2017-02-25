@@ -1,5 +1,7 @@
 import { I18n } from 'react-redux-i18n'
 import { combineEpics } from 'redux-observable'
+import { push } from 'react-router-redux'
+import { stopSubmit } from 'redux-form'
 import { normalize } from 'normalizr'
 import { Observable } from 'rxjs/Observable'
 
@@ -47,6 +49,8 @@ const signUpUserEpic = (action$) => {
           request.setToken(token)
           return Observable.of(
             signUpUserSuccessAction(),
+            stopSubmit('signUpForm'),
+            push('/'),
             readTeamsAction()
           )
         })
@@ -55,7 +59,8 @@ const signUpUserEpic = (action$) => {
             message: I18n.t('account.signUpFailed')
           })
           return Observable.of(
-            signUpUserFailureAction(error)
+            signUpUserFailureAction(error),
+            stopSubmit('signUpForm', error)
           )
         })
     })
@@ -83,6 +88,8 @@ const signInUserEpic = (action$) => {
           request.setToken(token)
           return Observable.of(
             signInUserSuccessAction(),
+            stopSubmit('signInForm'),
+            push('/'),
             readTeamsAction()
           )
         })
@@ -91,7 +98,8 @@ const signInUserEpic = (action$) => {
             message: I18n.t('account.signInFailed')
           })
           return Observable.of(
-            signInUserFailureAction(error)
+            signInUserFailureAction(error),
+            stopSubmit('signInForm', error)
           )
         })
     })
