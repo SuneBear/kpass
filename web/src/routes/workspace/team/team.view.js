@@ -14,7 +14,7 @@ export class Team extends Component {
     const { teamId } = this.props.params
 
     this.props.actions.setCurrentTeam({
-      currentTeamId: teamId
+      teamId
     })
   }
 
@@ -22,7 +22,7 @@ export class Team extends Component {
     const { teamId } = nextProps.params
 
     this.props.actions.setCurrentTeam({
-      currentTeamId: teamId
+      teamId
     })
   }
 

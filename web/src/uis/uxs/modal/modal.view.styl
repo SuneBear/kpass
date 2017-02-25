@@ -39,7 +39,7 @@
     flex: 1 0 auto
     border-radius: $radius
     background: $white
-    box-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.05)
+    box-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.06)
 
   &-header
     flex: 0 0 auto
@@ -93,11 +93,11 @@
   &-slide-leave
     animation-duration: 268ms
     animation-fill-mode: both
-    animation-timing-function: ease-out
+    animation-timing-function: cubic-bezier(0, 1, 0.39, 1)
     animation-play-state: paused
 
   &-slide-leave
-    animation-duration: 168ms
+    animation-timing-function: cubic-bezier(0.5, 0, 0.2, 1)
 
   &-slide-enter&-slide-enter-active,
   &-slide-appear&-slide-appear-active
@@ -109,8 +109,11 @@
     animation-play-state: running
 
   @keyframes slideIn
+    from
+      transform: scale(0.9)
     to
       opacity: 1
+      transform: scale(1)
 
   @keyframes slideOut
     to
@@ -140,8 +143,11 @@
     &-fade-leave
       animation-duration: 168ms
       animation-fill-mode: both
-      animation-timing-function: cubic-bezier(0.55, 0, 0.55, 0.2)
+      animation-timing-function: cubic-bezier(0, 1, 0.39, 1)
       animation-play-state: paused
+
+    &-fade-leave
+      animation-timing-function: cubic-bezier(0.55, 0, 0.55, 0.2)
 
     &-fade-enter&-fade-enter-active,
     &-fade-appear&-fade-appear-active

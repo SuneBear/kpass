@@ -5,15 +5,24 @@
   border-radius: $radius
   box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.05)
 
-  &.withTitle
+  &.withTitle:not(.withoutPadding)
     .cardBody
       padding: qu(5)
 
-  .cardTitle
-    padding: qu(5)
+  .cardHeader
+    display: flex
+    align-items: center
+    justify-content: space-between
+    padding: qu(2) qu(5)
     border-bottom: 1px solid $gray93
+
+  .cardTitle
+    padding: qu(3) 0
     font-size: 18px
     font-weight: 500
+
+  .cardHandler
+    margin-right: qu(-3)
 
   .cardBody
     null

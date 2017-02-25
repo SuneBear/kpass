@@ -1,7 +1,7 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
-import { setCurrentTeamAction } from 'modules'
+import { setCurrentTeamAction } from '../modules'
 import { Team as TeamView } from './team.view'
 
 const mapStateToProps = (state) => ({})

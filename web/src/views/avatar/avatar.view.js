@@ -10,7 +10,7 @@ export class Avatar extends Component {
   static propTypes = {
     className: PropTypes.string,
     url: PropTypes.string.isRequired,
-    size: PropTypes.string
+    size: PropTypes.oneOf(['small', 'normal', 'large'])
   }
 
   static defaultProps = {

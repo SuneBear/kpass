@@ -14,7 +14,7 @@ export class Select extends Component {
   static propTypes = {
     ...AntSelect.propTypes,
     options: PropTypes.arrayOf(
-      React.PropTypes.shape({
+      PropTypes.shape({
         title: PropTypes.string,
         value: PropTypes.string.isRequired
       })

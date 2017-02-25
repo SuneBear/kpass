@@ -2,24 +2,33 @@
 
 .workspaceLayout
   $sidebarWidth = 286px
-  $sidebarMinWidth = ($sidebarWidth * 0.7)
+  $sidebarMinWidth = ($sidebarWidth * 0.6)
   $contentWidth = $layoutMinWidth - $sidebarWidth
+
+  min-height: 100vh
+
+  .workspaceHeaderView
+    position: fixed
+    top: 0
+    width: 100%
 
   .workspaceMain
     display: flex
     align-items: flex-start
     min-width: $layoutMinWidth
     padding: qu(5)
+    padding-top: $headerHeight + qu(5)
     margin: 0 auto
     margin-bottom: qu(5)
 
     .workspaceSidebar
-      width: $sidebarWidth
+      width: 25%
+      max-width: $sidebarWidth
       min-width: $sidebarMinWidth
       margin-right: qu(5)
       transition: all 368ms
 
     .workspaceContent
       position: relative
+      width: 100%
       min-width: $contentWidth
-      flex: 1

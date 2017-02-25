@@ -21,17 +21,19 @@ export class WorkspaceHeader extends Component {
     const { currentTeam } = this.props
 
     return (
-      <Dropdown
-        className={'workspaceSwitcherDropdown'}
-        content={this.getWorkspaceSwitcher()}
-      >
-        <div className={'workspaceInfo workspaceSwitcherHandler'}>
-          <div className={'workspaceName'}>
-            {currentTeam.name}
+      <div className={'workspaceInfoWrap'}>
+        <Dropdown
+          className={'workspaceSwitcherDropdown'}
+          content={this.getWorkspaceSwitcher()}
+        >
+          <div className={'workspaceInfo workspaceSwitcherHandler'} title={currentTeam.name}>
+            <div className={'workspaceName'}>
+              {currentTeam.name}
+            </div>
+            <Icon className={'handlerIcon'} name={'chevron-down'} />
           </div>
-          <Icon className={'handlerIcon'} name={'chevron-down'} />
-        </div>
-      </Dropdown>
+        </Dropdown>
+      </div>
     )
   }
 
@@ -88,16 +90,18 @@ export class WorkspaceHeader extends Component {
     const { id, avatar } = this.props.userMe
 
     return (
-      <Dropdown
-        content={this.getUserInfoDropdownMenu()}
-        placement={'bottomRight'}
-        offset={[-8, 8]}
-      >
-        <div className={'workspaceUserInfo'}>
-          <Avatar className={'infoAvatar'} url={avatar} size={'small'} />
-          <span className={'infoUsername'}>{id}</span>
-        </div>
-      </Dropdown>
+      <div className={'workspaceUserInfoWrap'}>
+        <Dropdown
+          content={this.getUserInfoDropdownMenu()}
+          placement={'bottomRight'}
+          offset={[-8, 8]}
+        >
+          <div className={'workspaceUserInfo'}>
+            <Avatar className={'infoAvatar'} url={avatar} size={'small'} />
+            <span className={'infoUsername'}>{id}</span>
+          </div>
+        </Dropdown>
+      </div>
     )
   }
 
