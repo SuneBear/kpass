@@ -18,12 +18,13 @@ import (
 type Entry struct {
 	entry  *dao.Entry
 	secret *dao.Secret
+	file   *dao.File
 	team   *dao.Team
 }
 
 // NewEntry returns a Entry API instance
 func NewEntry(db *service.DB) *Entry {
-	return &Entry{dao.NewEntry(db), dao.NewSecret(db), dao.NewTeam(db)}
+	return &Entry{dao.NewEntry(db), dao.NewSecret(db), dao.NewFile(db), dao.NewTeam(db)}
 }
 
 type tplEntryCreate struct {
@@ -236,13 +237,21 @@ func (a *Entry) Find(ctx *gear.Context) error {
 	}
 
 	var secrets []*schema.SecretResult
+	var files []*schema.FileResult
+	var shares []*schema.ShareResult
+
 	if len(entry.Secrets) > 0 {
 		if secrets, err = a.secret.FindSecrets(key, entry.Secrets...); err != nil {
 			return ctx.Error(err)
 		}
 	}
+	if len(entry.Files) > 0 {
+		if files, err = a.file.FindFiles(key, entry.Files...); err != nil {
+			return ctx.Error(err)
+		}
+	}
 
-	return ctx.JSON(200, entry.Result(EntryID, secrets, nil))
+	return ctx.JSON(200, entry.Result(EntryID, secrets, files, shares))
 }
 
 // FindByTeam return entries for current user
@@ -273,4 +282,39 @@ func (a *Entry) FindByTeam(ctx *gear.Context) (err error) {
 		return ctx.Error(err)
 	}
 	return ctx.JSON(200, entries)
+}
+
+// DeleteFile ...
+//
+// @Title DeleteFile
+// @Summary Delete the file
+// @Description all team members can delete the file
+// @Param Authorization header string true "access_token"
+// @Param entryID path string true "entry ID"
+// @Param fileID path string true "file ID"
+// @Success 204
+// @Failure 400 string
+// @Failure 401 string
+// @Router DELETE /api/entries/{entryID}/files/{fileID}
+func (a *Entry) DeleteFile(ctx *gear.Context) error {
+	EntryID, err := util.ParseOID(ctx.Param("entryID"))
+	if err != nil {
+		return ctx.ErrorStatus(400)
+	}
+	FileID, err := util.ParseOID(ctx.Param("fileID"))
+	if err != nil {
+		return ctx.ErrorStatus(400)
+	}
+	userID, err := auth.UserIDFromCtx(ctx)
+	if err != nil {
+		return ctx.Error(err)
+	}
+
+	if err := a.entry.RemoveFileByID(EntryID, FileID, userID); err != nil {
+		return ctx.Error(err)
+	}
+	if err := a.file.Delete(FileID); err != nil {
+		return ctx.Error(err)
+	}
+	return ctx.End(204)
 }

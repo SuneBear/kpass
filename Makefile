@@ -1,6 +1,7 @@
 test:
 	APP_ENV=test go test --race ./src
 	APP_ENV=test go test --race ./src/api
+	APP_ENV=test go test --race ./src/ctl
 	APP_ENV=test go test --race ./src/auth
 	APP_ENV=test go test --race ./src/dao
 	APP_ENV=test go test --race ./src/logger
@@ -12,6 +13,7 @@ cover:
 	rm -f *.coverprofile
 	APP_ENV=test go test -coverprofile=src.coverprofile ./src
 	APP_ENV=test go test -coverprofile=api.coverprofile ./src/api
+	APP_ENV=test go test -coverprofile=api.coverprofile ./src/ctl
 	APP_ENV=test go test -coverprofile=auth.coverprofile ./src/auth
 	APP_ENV=test go test -coverprofile=dao.coverprofile ./src/dao
 	APP_ENV=test go test -coverprofile=logger.coverprofile ./src/logger

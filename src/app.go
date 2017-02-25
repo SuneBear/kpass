@@ -60,7 +60,7 @@ func New(dbPath string, env string) *gear.App {
 		switch {
 		case ctx.Path == "/":
 			return ctx.HTML(200, indexBody)
-		case ctx.Path == "/favicon.png" || ctx.Path == "/humans.txt" || ctx.Path == "/robots.txt" || strings.HasPrefix(ctx.Path, "/static/"):
+		case ctx.Path == "/logo.png" || ctx.Path == "/humans.txt" || ctx.Path == "/robots.txt" || strings.HasPrefix(ctx.Path, "/static/"):
 			return staticMiddleware(ctx)
 		}
 		return nil

@@ -66,6 +66,7 @@ func TestEntryAPI(t *testing.T) {
 		assert.Equal(0, res.Priority)
 		assert.True(strings.Contains(res.String(), `"secrets":[]`))
 		assert.True(strings.Contains(res.String(), `"shares":[]`))
+		assert.True(strings.Contains(res.String(), `"files":[]`))
 	})
 
 	var secretID util.OID

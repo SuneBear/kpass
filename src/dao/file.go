@@ -1,6 +1,8 @@
 package dao
 
 import (
+	"io"
+	"io/ioutil"
 	"time"
 
 	"github.com/seccom/kpass/src/auth"
@@ -21,9 +23,15 @@ func NewFile(db *service.DB) *File {
 }
 
 // Create ...
-func (o *File) Create(userID, name, key string, data []byte) (fileResult *schema.FileResult, err error) {
+func (o *File) Create(userID, key, name string, r io.Reader) (
+	fileResult *schema.FileResult, err error) {
 	FileID := util.NewOID()
 	signed := ""
+	var data []byte
+	if data, err = ioutil.ReadAll(r); err != nil {
+		return
+	}
+	size := len(data)
 	if key != "" {
 		key = auth.AESKey(FileID.String(), key)
 		if data, err = auth.Encrypt([]byte(key), data); err != nil {
@@ -34,7 +42,7 @@ func (o *File) Create(userID, name, key string, data []byte) (fileResult *schema
 		}
 	}
 
-	file := &schema.File{UserID: userID, Name: name, Created: util.Time(time.Now())}
+	file := &schema.File{UserID: userID, Name: name, Size: size, Created: util.Time(time.Now())}
 	file.Updated = file.Created
 	fileResult = file.Result(FileID, signed)
 	err = o.db.DB.Update(func(tx *buntdb.Tx) error {
@@ -53,7 +61,8 @@ func (o *File) Create(userID, name, key string, data []byte) (fileResult *schema
 }
 
 // FindFile ...
-func (o *File) FindFile(FileID util.OID, key string) (file *schema.File, fileBlob schema.FileBlob, err error) {
+func (o *File) FindFile(FileID util.OID, key string) (
+	file *schema.File, fileBlob schema.FileBlob, err error) {
 	err = o.db.DB.View(func(tx *buntdb.Tx) error {
 		res, e := tx.Get(schema.FileKey(FileID))
 		if e != nil {
@@ -70,7 +79,6 @@ func (o *File) FindFile(FileID util.OID, key string) (file *schema.File, fileBlo
 			return e
 		}
 		if key != "" {
-			key = auth.AESKey(FileID.String(), key)
 			data, err := auth.Decrypt([]byte(key), []byte(fileBlob))
 			if err != nil {
 				return err
@@ -89,6 +97,7 @@ func (o *File) FindFile(FileID util.OID, key string) (file *schema.File, fileBlo
 func (o *File) Delete(FileID util.OID) error {
 	err := o.db.DB.Update(func(tx *buntdb.Tx) error {
 		_, e := tx.Delete(schema.FileKey(FileID))
+		_, e = tx.Delete(schema.FileBlobKey(FileID))
 		return e
 	})
 

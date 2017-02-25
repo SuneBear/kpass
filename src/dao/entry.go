@@ -168,7 +168,6 @@ func (o *Entry) FindByTeam(TeamID util.OID, userID string, IsDeleted bool) (
 	err = o.db.DB.View(func(tx *buntdb.Tx) (e error) {
 		tx.AscendGreaterOrEqual("entry_by_team", cond, func(key, value string) bool {
 			entry, e := schema.EntryFrom(value)
-			fmt.Println(1212, key, value, entry)
 			if e != nil {
 				e = fmt.Errorf("invalid entry: %s, %s", key, value)
 				return false
@@ -188,4 +187,78 @@ func (o *Entry) FindByTeam(TeamID util.OID, userID string, IsDeleted bool) (
 		return nil, dbError(err)
 	}
 	return
+}
+
+// AddFileByID ...
+func (o *Entry) AddFileByID(EntryID, FileID util.OID, userID string) (err error) {
+	err = o.db.DB.Update(func(tx *buntdb.Tx) error {
+		entryKey := schema.EntryKey(EntryID)
+		value, e := tx.Get(entryKey)
+		if e != nil {
+			return e
+		}
+		entry, e := schema.EntryFrom(value)
+		if e != nil || entry.IsDeleted {
+			return &gear.Error{Code: 404, Msg: "entry not found"}
+		}
+
+		value, e = tx.Get(schema.TeamKey(entry.TeamID))
+		if e != nil {
+			return e
+		}
+		team, e := schema.TeamFrom(value)
+		if e != nil || team.IsDeleted {
+			return &gear.Error{Code: 404, Msg: "team not found"}
+		}
+		if !team.HasMember(userID) {
+			return &gear.Error{Code: 403, Msg: "not team member"}
+		}
+		if team.IsFrozen {
+			return &gear.Error{Code: 403, Msg: "team is frozen"}
+		}
+
+		entry.AddFile(FileID.String())
+		_, _, e = tx.Set(entryKey, entry.String(), nil)
+		return e
+	})
+
+	return dbError(err)
+}
+
+// RemoveFileByID ...
+func (o *Entry) RemoveFileByID(EntryID, FileID util.OID, userID string) (err error) {
+	err = o.db.DB.Update(func(tx *buntdb.Tx) error {
+		entryKey := schema.EntryKey(EntryID)
+		value, e := tx.Get(entryKey)
+		if e != nil {
+			return e
+		}
+		entry, e := schema.EntryFrom(value)
+		if e != nil || entry.IsDeleted {
+			return &gear.Error{Code: 404, Msg: "entry not found"}
+		}
+		if !entry.RemoveFile(FileID.String()) {
+			return &gear.Error{Code: 404, Msg: "file not found in the entry"}
+		}
+
+		value, e = tx.Get(schema.TeamKey(entry.TeamID))
+		if e != nil {
+			return e
+		}
+		team, e := schema.TeamFrom(value)
+		if e != nil || team.IsDeleted {
+			return &gear.Error{Code: 404, Msg: "team not found"}
+		}
+		if !team.HasMember(userID) {
+			return &gear.Error{Code: 403, Msg: "not team member"}
+		}
+		if team.IsFrozen {
+			return &gear.Error{Code: 403, Msg: "team is frozen"}
+		}
+
+		_, _, e = tx.Set(entryKey, entry.String(), nil)
+		return e
+	})
+
+	return dbError(err)
 }

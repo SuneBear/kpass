@@ -9,6 +9,7 @@ before_install:
   - go get github.com/jteeuwen/go-bindata/...
 script:
   - APP_ENV=test go test -coverprofile=src.coverprofile ./src
+  - APP_ENV=test go test -coverprofile=api.coverprofile ./src/ctl
   - APP_ENV=test go test -coverprofile=api.coverprofile ./src/api
   - APP_ENV=test go test -coverprofile=auth.coverprofile ./src/auth
   - APP_ENV=test go test -coverprofile=dao.coverprofile ./src/dao

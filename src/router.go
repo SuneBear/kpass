@@ -22,11 +22,14 @@ func newRouter(db *service.DB) (Router *gear.Router) {
 	teamAPI := api.NewTeam(db)
 	userAPI := api.NewUser(db)
 
-	Router.Post("/upload", auth.Middleware, fileCtl.Upload)
 	// GET /download/fileID?refType=user&refID=userID
 	// GET /download/fileID?refType=team&refID=teamID
 	// GET /download/fileID?refType=entry&refID=entryID&signed=xxxx
 	Router.Get("/download/:fileID", fileCtl.Download)
+
+	Router.Post("/upload/avatar", auth.Middleware, fileCtl.UploadAvatar)
+	Router.Post("/upload/team/:teamID/logo", auth.Middleware, fileCtl.UploadLogo)
+	Router.Post("/upload/entry/:entryID/file", auth.Middleware, fileCtl.UploadFile)
 
 	// generate a random password
 	Router.Get("/api/password", userAPI.Password)
@@ -117,6 +120,9 @@ func newRouter(db *service.DB) (Router *gear.Router) {
 	Router.Post("/api/entries/:entryID/shares", auth.Middleware, noOp)
 	// Get shares list of the entry
 	Router.Get("/api/entries/:entryID/shares", auth.Middleware, noOp)
+
+	// Delete the file
+	Router.Delete("/api/entries/:entryID/files/:fileID", auth.Middleware, entryAPI.DeleteFile)
 
 	// Get the current user's shares list
 	Router.Get("/api/shares", auth.Middleware, noOp)

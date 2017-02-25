@@ -105,8 +105,7 @@ func (o *User) Find(id string) (user *schema.User, err error) {
 		return e
 	})
 	if err != nil {
-		user = nil
-		err = dbError(err)
+		return nil, dbError(err)
 	}
 	return
 }

@@ -10,22 +10,20 @@ import (
 )
 
 // FileBlob ...
-type FileBlob []byte // binary data encoded with base64, size <= 100KB
+type FileBlob []byte // binary data encoded with base64, size <= 200KB
 
 // FileBlobFromString ...
 func FileBlobFromString(text string) (FileBlob, error) {
-	dst := make([]byte, base64.StdEncoding.DecodedLen(len(text)))
-	if _, err := base64.StdEncoding.Decode(dst, []byte(text)); err != nil {
+	data, err := base64.StdEncoding.DecodeString(text)
+	if err != nil {
 		return nil, err
 	}
-	return FileBlob(dst), nil
+	return FileBlob(data), nil
 }
 
-// MarshalText ...
+// String ...
 func (b FileBlob) String() string {
-	dst := make([]byte, base64.StdEncoding.EncodedLen(len(b)))
-	base64.StdEncoding.Encode(dst, b)
-	return string(dst)
+	return base64.StdEncoding.EncodeToString(b)
 }
 
 // Reader returns a Reader instance
@@ -35,8 +33,9 @@ func (b FileBlob) Reader() *bytes.Reader {
 
 // File represents file
 type File struct {
-	Name    string    `json:"name"`
 	UserID  string    `json:"userID"`
+	Name    string    `json:"name"`
+	Size    int       `json:"size"`
 	Created time.Time `json:"created"`
 	Updated time.Time `json:"updated"`
 }
@@ -59,9 +58,10 @@ func (f *File) String() string {
 func (f *File) Result(ID util.OID, signed string) *FileResult {
 	return &FileResult{
 		ID:      ID,
-		Signed:  signed,
 		UserID:  f.UserID,
 		Name:    f.Name,
+		Size:    f.Size,
+		Signed:  signed,
 		Created: f.Created,
 		Updated: f.Updated,
 	}
@@ -72,6 +72,7 @@ type FileResult struct {
 	ID      util.OID  `json:"id"`
 	UserID  string    `json:"userID"`
 	Name    string    `json:"name"`
+	Size    int       `json:"size"`
 	Signed  string    `json:"signed"`
 	Created time.Time `json:"created"`
 	Updated time.Time `json:"updated"`

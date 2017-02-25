@@ -74,9 +74,12 @@ func (e *Entry) RemoveFile(fileID string) bool {
 }
 
 // Result returns EntryResult intance
-func (e *Entry) Result(ID util.OID, secrets []*SecretResult, shares []*ShareResult) *EntryResult {
+func (e *Entry) Result(ID util.OID, secrets []*SecretResult, files []*FileResult, shares []*ShareResult) *EntryResult {
 	if secrets == nil {
 		secrets = []*SecretResult{}
+	}
+	if files == nil {
+		files = []*FileResult{}
 	}
 	if shares == nil {
 		shares = []*ShareResult{}
@@ -88,6 +91,7 @@ func (e *Entry) Result(ID util.OID, secrets []*SecretResult, shares []*ShareResu
 		Category: e.Category,
 		Priority: e.Priority,
 		Secrets:  secrets,
+		Files:    files,
 		Shares:   shares,
 		Created:  e.Created,
 		Updated:  e.Updated,
