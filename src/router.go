@@ -21,6 +21,7 @@ func newRouter(db *service.DB) (Router *gear.Router) {
 	secretAPI := api.NewSecret(db)
 	teamAPI := api.NewTeam(db)
 	userAPI := api.NewUser(db)
+	shareAPI := api.NewShare(db)
 
 	// GET /download/fileID?refType=user&refID=userID
 	// GET /download/fileID?refType=team&refID=teamID
@@ -35,38 +36,10 @@ func newRouter(db *service.DB) (Router *gear.Router) {
 	Router.Get("/api/password", userAPI.Password)
 
 	// Create a new user
-	// Request body:
-	//  {
-	// 		"id":"name",
-	// 		"pass":"SHA256 hashed password"
-	//  }
-	// Return: user info object
 	Router.Post("/api/join", userAPI.Join)
-	// login
-	// Request body:
-	//  {
-	// 		"grant_type":"password",
-	//  	"username": "name",
-	// 		"password":"SHA256 hashed password"
-	//  }
-	// Return: token object
-	//  {
-	// 		"access_token": "a very long JWT string",
-	// 		"token_type": "Bearer",
-	// 		"expires_in": 600,
-	//  }
-	//
 	Router.Post("/api/login", userAPI.Login)
-
 	// Return the user publicly info
 	Router.Get("/api/user/:userID", auth.Middleware, userAPI.Find)
-
-	// Update current user info
-	// Router.Put("/api/user", auth.Middleware, noOp)
-	// Return the user info, for admin
-	// Router.Get("/api/users/:id", auth.Middleware, noOp)
-	// Update the user, block or unblock, for admin
-	// Router.Put("/api/users/:id", auth.Middleware, noOp)
 
 	// Create a team
 	Router.Post("/api/teams", auth.Middleware, teamAPI.Create)
@@ -77,12 +50,6 @@ func newRouter(db *service.DB) (Router *gear.Router) {
 	// Return the team's entries list
 	Router.Get("/api/teams/:teamID/entries", auth.Middleware, entryAPI.FindByTeam)
 	// Create a new entry for team
-	// Request body:
-	//  {
-	// 		"name":"wechat",
-	// 		"category":"登录信息"
-	//  }
-	// Return: entry info object
 	Router.Post("/api/teams/:teamID/entries", auth.Middleware, entryAPI.Create)
 	// Update the team
 	Router.Put("/api/teams/:teamID", auth.Middleware, teamAPI.Update)
@@ -101,36 +68,27 @@ func newRouter(db *service.DB) (Router *gear.Router) {
 	Router.Delete("/api/entries/:entryID", auth.Middleware, entryAPI.Delete)
 	// Restore the entry
 	Router.Put("/api/entries/:entryID/restore", auth.Middleware, entryAPI.Restore)
-
 	// Add a secret to the entry
-	// Request body:
-	//  {
-	// 		"name":"kpass",
-	// 		"url":"https://wechat.com/login",
-	// 		"password":"123456",
-	// 		"note":"other info",
-	//  }
-	// Return: secret info object
 	Router.Post("/api/entries/:entryID/secrets", auth.Middleware, secretAPI.Create)
 	// Update the secret
 	Router.Put("/api/entries/:entryID/secrets/:secretID", auth.Middleware, secretAPI.Update)
 	// Delete the secret
 	Router.Delete("/api/entries/:entryID/secrets/:secretID", auth.Middleware, secretAPI.Delete)
 	// Add a share to the entry
-	Router.Post("/api/entries/:entryID/shares", auth.Middleware, noOp)
+	Router.Post("/api/entries/:entryID/shares", auth.Middleware, shareAPI.Create)
 	// Get shares list of the entry
-	Router.Get("/api/entries/:entryID/shares", auth.Middleware, noOp)
+	// Router.Get("/api/entries/:entryID/shares", auth.Middleware, shareAPI.FindByEntry)
+	// Delete the share
+	// Router.Delete("/api/entries/:entryID/shares/:shareID", auth.Middleware, entryAPI.DeleteShare)
 
 	// Delete the file
 	Router.Delete("/api/entries/:entryID/files/:fileID", auth.Middleware, entryAPI.DeleteFile)
 
-	// Get the current user's shares list
-	Router.Get("/api/shares", auth.Middleware, noOp)
+	// Get shares list of the team
+	// Router.Get("/api/teams/:teamID/shares", auth.Middleware, shareAPI.FindByTeam)
 	// Get shares list to the current user
-	Router.Get("/api/shares/me", auth.Middleware, noOp)
+	// Router.Get("/api/shares/me", auth.Middleware, shareAPI.FindByUser)
 	// Get the share
-	Router.Get("/api/shares/:shareID", auth.Middleware, noOp)
-	// Delete the share
-	Router.Delete("/api/shares/:shareID", auth.Middleware, noOp)
+	// Router.Get("/api/shares/:shareID", auth.Middleware, shareAPI.ReadShare)
 	return
 }

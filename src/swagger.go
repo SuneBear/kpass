@@ -8,6 +8,6 @@ import (
 // @Version 0.6.0
 // @Title KPass
 // @Description KPass is a web application to manage password safe.
-// @Host http://127.0.0.1:8088
+// @Host 127.0.0.1:8088
 // @BasePath /
 // @Contact admin@zensh.com

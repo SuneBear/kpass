@@ -29,7 +29,7 @@ func NewUser(db *service.DB) *User {
 
 type tplUserJoin struct {
 	ID   string `json:"id" swaggo:"true,user id,admin"`
-	Pass string `json:"pass" swaggo:"true,user password hashed by sha256,xxxxxxxxxxxxxxxx..."`
+	Pass string `json:"pass" swaggo:"true,user password hashed by sha256,15e2536def2490c115759ceabf012872fddbd7887fbe67e5074d1e66148d5d00"`
 }
 
 func (t *tplUserJoin) Validate() error {
@@ -83,7 +83,7 @@ func (a *User) Join(ctx *gear.Context) error {
 type tplUserLogin struct {
 	Type string `json:"grant_type" swaggo:"true,should always be \"password\",password"`
 	ID   string `json:"username" swaggo:"true,user id,admin"`
-	Pass string `json:"password" swaggo:"true,user password hashed by sha256,xxxxxxxxxxxxxxxx..."`
+	Pass string `json:"password" swaggo:"true,user password hashed by sha256,15e2536def2490c115759ceabf012872fddbd7887fbe67e5074d1e66148d5d00"`
 }
 
 func (t *tplUserLogin) Validate() error {
@@ -130,6 +130,7 @@ func (a *User) Login(ctx *gear.Context) (err error) {
 		Token:  token,
 		Type:   "Bearer",
 		Expire: auth.JWT().GetExpiresIn().Seconds(),
+		User:   user.Result(),
 	})
 }
 

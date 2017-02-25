@@ -40,7 +40,7 @@ func NewFile(db *service.DB) *File {
 // @Param refType query string true "refer object type: user | team | entry"
 // @Param refID query string true "refer object ID"
 // @Param signed query string false "signed string for verify, only need for entry type"
-// @Success 200 stream
+// @Success 200 []byte
 // @Failure 400 string
 // @Failure 401 string
 // @Failure 404 string
@@ -184,7 +184,7 @@ func (c *File) UploadLogo(ctx *gear.Context) (err error) {
 // @Description Upload a file to the entry.
 // @Param refType query string true "refer object type: user | team | entry"
 // @Param refID query string true "refer object ID"
-// @Success 200 stream
+// @Success 200 schema.FileResult
 // @Failure 400 string
 // @Failure 401 string
 // @Failure 404 string

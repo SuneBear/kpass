@@ -11,7 +11,12 @@ import (
 	"github.com/teambition/gear"
 )
 
-// Share is API oject for teams
+// Share is API oject for shares
+//
+// @Name Share
+// @Description Share API
+// @Accepts json
+// @Produces json
 type Share struct {
 	entry *dao.Entry
 	share *dao.Share
@@ -25,10 +30,10 @@ func NewShare(db *service.DB) *Share {
 }
 
 type tplShareCreate struct {
-	Name   string `json:"name"`
-	Pass   string `json:"pass"` // should encrypt
-	UserID string `json:"userID"`
-	Expire int    `json:"expire"` // seconds
+	Name   string `json:"name" swaggo:"true,share name,Github"`
+	Pass   string `json:"pass" swaggo:"false,team password hashed by sha256,15e2536def2490c115759ceabf012872fddbd7887fbe67e5074d1e66148d5d00"`
+	UserID string `json:"userID" swaggo:"true,user id share to,jeo"`
+	Expire int    `json:"expire" swaggo:"true,expire time in seconds,36000"`
 }
 
 func (t *tplShareCreate) Validate() error {
@@ -48,6 +53,17 @@ func (t *tplShareCreate) Validate() error {
 }
 
 // Create ...
+//
+// @Title Create
+// @Summary Create a share of the entry
+// @Description all team members can create share
+// @Param Authorization header string true "access_token"
+// @Param entryID path string true "entry ID"
+// @Param body body tplShareCreate true "share body"
+// @Success 200 schema.ShareResult
+// @Failure 400 string
+// @Failure 401 string
+// @Router POST /api/entries/{entryID}/shares
 func (a *Share) Create(ctx *gear.Context) (err error) {
 	EntryID, err := util.ParseOID(ctx.Param("entryID"))
 	if err != nil {

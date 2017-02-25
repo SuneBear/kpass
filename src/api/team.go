@@ -26,7 +26,7 @@ func NewTeam(db *service.DB) *Team {
 
 type tplTeamCreate struct {
 	Name string `json:"name" swaggo:"true,team name,Teambition"`
-	Pass string `json:"pass" swaggo:"true,team password hashed by sha256,xxxxxxxxxxxxxxxx..."`
+	Pass string `json:"pass" swaggo:"true,team password hashed by sha256,15e2536def2490c115759ceabf012872fddbd7887fbe67e5074d1e66148d5d00"`
 }
 
 func (t *tplTeamCreate) Validate() error {
@@ -282,7 +282,6 @@ func (a *Team) Restore(ctx *gear.Context) (err error) {
 // @Summary Get teams for current user
 // @Description Get teams for current user.
 // @Param Authorization header string true "access_token"
-// @Param teamID path string true "team ID"
 // @Success 200 []schema.TeamResult
 // @Failure 400 string
 // @Failure 401 string
