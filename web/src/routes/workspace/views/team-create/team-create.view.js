@@ -5,21 +5,19 @@ import cx from 'classnames'
 
 import { Button, FieldText } from 'uis'
 
-import './member-invite.view.styl'
+import './team-create.view.styl'
 
-export class MemberInvite extends Component {
+export class TeamCreate extends Component {
 
   static propTypes = {
     className: PropTypes.string,
-    team: PropTypes.object,
-    teamMembers: PropTypes.array,
     actions: PropTypes.object,
     ...formPropTypes
   }
 
   getRootClassnames () {
     return cx(
-      'memberInviteView',
+      'teamCreateView',
       this.props.className
     )
   }
@@ -30,13 +28,13 @@ export class MemberInvite extends Component {
     } = this.props
 
     // @TODO: Implementation
-    actions.updateTeamMembers({
-      username: values.username
+    actions.createTeam({
+      teamName: values.teamName
     })
   }
 
   componentDidMount () {
-    this.refs.usernameInput
+    this.refs.teamNameInput
       .getRenderedComponent().focus()
   }
 
@@ -47,10 +45,10 @@ export class MemberInvite extends Component {
       <form onSubmit={handleSubmit(this.handleSubmit)}>
         <Field
           withRef
-          ref={'usernameInput'}
-          name={'username'}
+          ref={'teamNameInput'}
+          name={'teamName'}
           component={FieldText}
-          placeholder={I18n.t('account.username')}
+          placeholder={I18n.t('team.teamName')}
         />
         <Button
           block
@@ -59,7 +57,7 @@ export class MemberInvite extends Component {
           disabled={pristine || !valid}
           loading={submitting}
         >
-          <Translate value={'teamMembers.inviteSubmit'} />
+          <Translate value={'action.create'} />
         </Button>
       </form>
     )

@@ -19,10 +19,8 @@ export class Members extends Component {
     actions: PropTypes.object
   }
 
-  refMemberInviteModal = null
-
-  saveRefMemberInviteModal = (ref) => {
-    this.refMemberInviteModal = ref
+  saveMemberInviteModalRef = (ref) => {
+    this.memberInviteModalRef = ref
   }
 
   getRootClassNames () {
@@ -83,13 +81,13 @@ export class Members extends Component {
   }
 
   handleAddMemberClick = () => {
-    this.refMemberInviteModal.open()
+    this.memberInviteModalRef.open()
   }
 
   renderMemberInviteModal () {
     return (
       <Modal
-        ref={this.saveRefMemberInviteModal}
+        ref={this.saveMemberInviteModalRef}
         title={I18n.t('teamMembers.invite')}
         size={'small'}
       >

@@ -1,9 +1,10 @@
 import React, { Component, PropTypes } from 'react'
 import { I18n } from 'react-redux-i18n'
 
-import { Icon, Dropdown, MenuSelector } from 'uis'
-import { Avatar, Logo } from 'views'
+import { Icon, Dropdown, Modal, MenuSelector } from 'uis'
 import { isPublicTeam } from 'utils'
+import { Avatar, Logo } from 'views'
+import { TeamCreate } from '../team-create'
 import { getWorkspaceBashPath } from '../../index'
 
 import './workspace-header.view.styl'
@@ -15,6 +16,26 @@ export class WorkspaceHeader extends Component {
     userMe: PropTypes.object,
     teams: PropTypes.array,
     currentTeam: PropTypes.object
+  }
+
+  saveTeamCreateModalRef = (ref) => {
+    this.teamCreateModalRef = ref
+  }
+
+  handleNewTeamClick = () => {
+    this.teamCreateModalRef.open()
+  }
+
+  renderTeamCreateModal () {
+    return (
+      <Modal
+        ref={this.saveTeamCreateModalRef}
+        title={I18n.t('team.newTeam')}
+        size={'small'}
+      >
+        <TeamCreate />
+      </Modal>
+    )
   }
 
   renderWorkspaceInfo () {
@@ -44,11 +65,6 @@ export class WorkspaceHeader extends Component {
     push(getWorkspaceBashPath(nextTeam))
   }
 
-  handleCreateTeam = () => {
-    // Not implemented
-    console.log('Create Team')
-  }
-
   getWorkspaceSwitcher () {
     const { currentTeam, teams } = this.props
 
@@ -65,7 +81,7 @@ export class WorkspaceHeader extends Component {
         className: 'workspaceSwitcherItem',
         title: I18n.t('team.newTeam'),
         iconName: 'plus',
-        onClick: this.handleCreateTeam
+        onClick: this.handleNewTeamClick
       }
     ]
 
@@ -125,6 +141,8 @@ export class WorkspaceHeader extends Component {
         {this.renderWorkspaceInfo()}
         {this.renderAppLogo()}
         {this.renderUserInfo()}
+
+        {this.renderTeamCreateModal()}
       </div>
     )
   }

@@ -32,7 +32,6 @@ export class SignIn extends Component {
       username: values.username,
       password: values.password
     })
-
   }
 
   renderSignInForm () {

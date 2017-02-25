@@ -5,6 +5,10 @@ export const enUS = {
     team: 'Team'
   },
 
+  action: {
+    create: 'Create'
+  },
+
   member: {
     add: 'Add Member'
   },
@@ -41,6 +45,7 @@ export const enUS = {
 
   team: {
     newTeam: 'New Team',
+    teamName: 'Team name',
     leave: 'Leave the team',
     leaveAndDisband: 'Leave & Disband the team'
   },

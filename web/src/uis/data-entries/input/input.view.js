@@ -20,7 +20,7 @@ export class Input extends Component {
     )
   }
 
-  focus() {
+  focus () {
     this.refs.input.focus()
   }
 

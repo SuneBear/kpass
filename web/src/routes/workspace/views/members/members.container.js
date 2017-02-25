@@ -20,7 +20,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
   actions: bindActionCreators({
     leaveTeam: leaveTeamAction,
-    removeTeamMember: removeTeamMemberAction,
+    removeTeamMember: removeTeamMemberAction
   }, dispatch)
 })
 
