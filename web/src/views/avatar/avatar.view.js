@@ -5,6 +5,8 @@ import { capitalize } from 'utils'
 
 import './avatar.view.styl'
 
+const DEFAULT_AVATAR_URL = require('./assets/default-avator@2x.png')
+
 export class Avatar extends Component {
 
   static propTypes = {
@@ -26,8 +28,10 @@ export class Avatar extends Component {
   }
 
   getAvatarUrl () {
+    const avatarUrl = this.props.url || DEFAULT_AVATAR_URL
+
     return {
-      backgroundImage: `url(${this.props.url})`
+      backgroundImage: `url(${avatarUrl})`
     }
   }
 

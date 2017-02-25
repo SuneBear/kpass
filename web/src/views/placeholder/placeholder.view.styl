@@ -1,0 +1,27 @@
+@require '../../styles/ref'
+
+.placeholder
+  &View
+    padding: qu(10) qu(5)
+    text-align: center
+    color: $gray50
+    border-radius: $radius
+
+    > *
+      text-overflow()
+
+  &Image
+    min-width: 80px
+    max-width: 120px
+    margin: 0 auto
+    margin-bottom: qu(4)
+
+  &Title
+    font-size: 18px
+    margin-bottom: qu(3)
+
+  &Description
+    null
+
+  &Handler
+    margin-top: qu(4)

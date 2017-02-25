@@ -1,8 +1,10 @@
+import { injectReducer } from 'modules'
 import { requireAuth, isPublicTeam } from 'utils'
 import { WorkspaceLayout } from './layout'
+import { workspaceReducer } from './modules'
 import { Personal } from './personal'
 import { Team } from './team'
-import { Entries } from './views'
+import { Entries, Members } from './views'
 
 export const WORKSPACE_BASE_PATH = '/workspace'
 export const PERSONAL_PATH = 'personal'
@@ -18,11 +20,16 @@ export const getWorkspaceBashPath = (team) => {
   }
 }
 
-export const redirectToPersonal = (nextState, replace) => {
+export const initWorkspaceLayout = (store) => {
+  injectReducer(store, { key: 'workspace', reducer: workspaceReducer })
+  return requireAuth(WorkspaceLayout)
+}
+
+export const redirectToPersonal = (_, replace) => {
   return replace(`${WORKSPACE_BASE_PATH}/${PERSONAL_PATH}`)
 }
 
-export const redirectToPersonalEntries = (nextState, replace) => {
+export const redirectToPersonalEntries = (_, replace) => {
   return replace(`${WORKSPACE_BASE_PATH}/${PERSONAL_PATH}/${ENTRIES_PATH}`)
 }
 
@@ -34,7 +41,7 @@ export const redirectToTeamEntries = (nextState, replace) => {
 export default (store) => ({
   path : WORKSPACE_BASE_PATH,
   indexRoute : { onEnter: redirectToPersonal },
-  component : requireAuth(WorkspaceLayout),
+  component : initWorkspaceLayout(store),
   childRoutes : [
     {
       path : PERSONAL_PATH,
@@ -60,7 +67,7 @@ export default (store) => ({
 
         {
           path : MEMBERS_PATH,
-          component : Entries
+          component : Members
         }
       ]
     }

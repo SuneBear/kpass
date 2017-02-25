@@ -11,13 +11,13 @@ export class Personal extends Component {
 
   componentDidMount () {
     this.props.actions.setCurrentTeam({
-      currentTeamId: null
+      teamId: null
     })
   }
 
   componentWillReceiveProps (nextProps) {
     this.props.actions.setCurrentTeam({
-      currentTeamId: null
+      teamId: null
     })
   }
 

@@ -18,7 +18,7 @@ export class MenuSelector extends Component {
     hasSelected: PropTypes.array,
     extraList: PropTypes.array,
     dataList: PropTypes.arrayOf(
-      React.PropTypes.shape({
+      PropTypes.shape({
         className: PropTypes.string,
         isDisabled: PropTypes.bool,
         type: PropTypes.string,

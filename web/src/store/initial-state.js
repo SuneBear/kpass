@@ -1,4 +1,16 @@
-import { dictionaries } from '../locales'
+import { cookie } from 'utils'
+import { dictionaries, languages } from '../locales'
+
+const getInitialLocale = () => {
+  let initialLocale = cookie('lang')
+  const defaultLocale = 'en-US'
+  const languageCodes = languages.map(language => language.code)
+  if (languageCodes.indexOf(initialLocale) < 0) {
+    initialLocale = defaultLocale
+  }
+  cookie('lang', initialLocale)
+  return initialLocale
+}
 
 /**
  * State Tree
@@ -6,7 +18,7 @@ import { dictionaries } from '../locales'
  */
 export const initialState = {
   i18n: {
-    locale: 'en-US',
+    locale: getInitialLocale(),
     translations: dictionaries
   }
 }

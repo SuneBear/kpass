@@ -20,6 +20,10 @@ export class Input extends Component {
     )
   }
 
+  focus () {
+    this.refs.input.focus()
+  }
+
   render () {
     const {
       ...props
@@ -27,6 +31,7 @@ export class Input extends Component {
 
     return (
       <AntInput
+        ref={'input'}
         className={this.getRootClassNames()}
         {...props}
       />

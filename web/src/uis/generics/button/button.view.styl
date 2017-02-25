@@ -18,8 +18,10 @@
   // With icon
   > .icon
     position: relative
-    top: 2px
     margin-right: qu(2)
+
+  &.isBlock > .icon
+    top: 2px
 
   // Size
   &
@@ -84,6 +86,27 @@
         border: 1px solid lighten($brand, 30%)
         background-color: lighten($brand, 30%)
         color: $white
+
+  &Text
+    color: $brand
+
+    &:focus
+      box-shadow: none !important
+
+    &:hover
+      color: darken($brand, 20%)
+
+    &:active
+      color: darken($brand, 30%)
+
+    &.isDisabled
+      &,
+      &:focus,
+      &:hover,
+      &:active
+        color: $gray65 !important
+        border-color: $white !important
+        background-color: $white !important
 
   &Danger
     background-color: $red

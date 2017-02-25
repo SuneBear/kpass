@@ -1,9 +1,24 @@
 export const enUS = {
+  /* == Global == */
   pageType: {
     secret: 'Secret',
     team: 'Team'
   },
 
+  action: {
+    create: 'Create'
+  },
+
+  member: {
+    add: 'Add Member'
+  },
+
+  role: {
+    owner: 'Owner',
+    member: 'Member'
+  },
+
+  /* == Pages == */
   account: {
     username: 'Username',
     password: 'Password',
@@ -19,15 +34,27 @@ export const enUS = {
   },
 
   entries: {
-    title: 'Entries'
+    title: 'Entries',
+    placeholderTitle: 'Start your secret life here.',
+    placeholderDescription: 'Keep the KPassword safe, keep everything safe.'
+  },
+
+  entry: {
+    new: 'New Entry'
   },
 
   team: {
-    newTeam: 'New Team'
+    newTeam: 'New Team',
+    teamName: 'Team name',
+    leave: 'Leave the team',
+    leaveAndDisband: 'Leave & Disband the team'
   },
 
   teamMembers: {
-    title: 'Members'
+    title: 'Members',
+    remove: 'Remove from team',
+    invite: 'Invite to team',
+    inviteSubmit: 'Invite'
   },
 
   zPlaceholder: 'Hello World'

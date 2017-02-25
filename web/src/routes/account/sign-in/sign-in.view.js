@@ -8,8 +8,6 @@ import { Button, FieldText } from 'uis'
 
 import './sign-in.view.styl'
 
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
-
 export class SignIn extends Component {
 
   static propTypes = {
@@ -34,9 +32,6 @@ export class SignIn extends Component {
       username: values.username,
       password: values.password
     })
-
-    return sleep(1000)
-      .then(() => {})
   }
 
   renderSignInForm () {

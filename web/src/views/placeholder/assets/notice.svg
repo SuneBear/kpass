@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="42px" height="51px" viewBox="0 0 42 51" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 41 (35326) - http://www.bohemiancoding.com/sketch -->
+    <title>ring</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Low-Fi-UX-" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Page:-Team-Members" transform="translate(-414.000000, -254.000000)">
+            <g id="ring" transform="translate(406.865234, 250.861328)">
+                <rect id="cont" opacity="0" x="0" y="0" width="56.4090909" height="56.4090909"></rect>
+                <path d="M12.8202479,23.0764463 C12.8202479,14.5799334 19.7080325,7.69214876 28.2045455,7.69214876 L28.2045455,7.69214876 C36.7010584,7.69214876 43.588843,14.5799334 43.588843,23.0764463 L43.588843,43.5898302 C43.588843,46.4214559 45.8829111,48.7169421 48.7169421,48.7169421 L48.7169421,48.7169421 L7.69214876,48.7169421 C10.5243197,48.7169421 12.8202479,46.4189542 12.8202479,43.5898302 L12.8202479,23.0764463" id="Oval-41-Copy-5" stroke="#F58E3D" stroke-width="0.66" stroke-linecap="round" stroke-linejoin="round" fill="#FDF1E5"></path>
+                <path d="M24.3584711,49.0035124 C24.3584711,51.1276406 26.0804172,52.8495868 28.2045455,52.8495868 L28.2045455,52.8495868 C30.3286737,52.8495868 32.0506198,51.1276406 32.0506198,49.0035124" id="Oval-46" stroke="#F58E3D" stroke-width="0.66" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M30.768595,7.69214876 L30.768595,6.4553719 C30.768595,5.03928642 29.6206309,3.89132231 28.2045455,3.89132231 C26.78846,3.89132231 25.6404959,5.03928642 25.6404959,6.4553719 L25.6404959,7.69214876" id="Oval-46-Copy-2" stroke="#F58E3D" stroke-width="0.66" stroke-linecap="round" stroke-linejoin="round"></path>
+            </g>
+        </g>
+    </g>
+</svg>

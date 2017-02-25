@@ -5,35 +5,16 @@ import { keys as _keys } from 'lodash'
 import { mockTeamState } from './__mock__'
 
 const initialState = mockTeamState || {
-  entities: {},
-  currentTeamId: null
+  entities: {}
 }
 
 export const readTeamsAction = createAction('READ_TEAMS')
 export const readTeamsSuccessAction = createAction('READ_TEAMS_SUCCESS')
 export const readTeamsFailureAction = createAction('READ_TEAMS_FAILURE')
 
-export const setCurrentTeamAction = createAction('SET_CURRENT_TEAM')
 export const setTeamEntitiesAction = createAction('SET_TEAM_ENTITIES')
 
 export const teamReducer = handleActions({
-
-  [`${setCurrentTeamAction}`]: (state, action) => {
-    if (!action.payload) {
-      return state
-    }
-
-    const { currentTeamId } = action.payload
-
-    if (typeof currentTeamId === undefined) {
-      return state
-    }
-
-    return {
-      ...state,
-      currentTeamId
-    }
-  },
 
   [`${setTeamEntitiesAction}`]: (state, action) => {
     if (!action.payload) {

@@ -34,6 +34,14 @@ export class FieldText extends Component {
     )
   }
 
+  saveInputRef = (ref) => {
+    this.inputRef = ref
+  }
+
+  focus () {
+    setTimeout(() => this.inputRef.focus(), 10)
+  }
+
   renderLabel () {
     const {
       label,
@@ -76,6 +84,7 @@ export class FieldText extends Component {
     return (
       <div className='inputWrap'>
         <Input
+          ref={this.saveInputRef}
           defaultValue={input.value}
           name={name}
           placeholder={placeholder}
