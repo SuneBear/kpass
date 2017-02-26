@@ -1,13 +1,8 @@
 export const mockTeamState = {
   entities: {
-    a: {
-      id: 'a',
-      name: 'Personal',
-      visibility: 'private'
-    },
     b: {
       id: 'b',
-      userId: 'SuneBear',
+      userID: 'SuneBear',
       members: ['SuneBear', 'Kumamon'],
       name: 'SuneBear\'s Team One',
       visibility: 'member'

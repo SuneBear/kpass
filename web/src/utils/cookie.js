@@ -11,8 +11,8 @@ export const cookie = (name, value, days) => {
     }
     return null
   } else {
-    // Delete: if value is a false boolean, we'll treat that as a delete
-    if (value === false) {
+    // Delete: if value is a false boolean or null, we'll treat that as a delete
+    if (value === false || value === null) {
       days = -1
     } else {
       // Escape value

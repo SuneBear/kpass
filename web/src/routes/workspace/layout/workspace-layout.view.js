@@ -8,7 +8,12 @@ import './workspace-layout.view.styl'
 export class WorkspaceLayout extends Component {
 
   static propTypes = {
-    children: PropTypes.element
+    children: PropTypes.element,
+    actions: PropTypes.object
+  }
+
+  componentWillMount () {
+    this.props.actions.readTeams()
   }
 
   render () {

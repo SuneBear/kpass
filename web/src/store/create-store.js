@@ -1,12 +1,10 @@
 import { applyMiddleware, compose, createStore as reduxCreateStore } from 'redux'
 import { createEpicMiddleware } from 'redux-observable'
-import { I18n, syncTranslationWithStore } from 'react-redux-i18n'
+import { syncTranslationWithStore } from 'react-redux-i18n'
 import { browserHistory } from 'react-router'
 import { syncReduxAndTitle } from 'redux-title'
 import { routerMiddleware, syncHistoryWithStore } from 'react-router-redux'
 
-import { subscribeHTTPError } from 'utils'
-import { toast } from 'uis'
 import { makeRootEpic, makeRootReducer } from './modules'
 
 export const createStore = (initialState = {}) => {
@@ -51,17 +49,6 @@ export const createStore = (initialState = {}) => {
   )
   const history = syncHistoryWithStore(browserHistory, store, {
     selectLocationState: (state) => state.context.routing
-  })
-
-  // @SideEffect: Handle HTTP Error
-  subscribeHTTPError((res) => {
-    const status = res.error.status
-    switch (status) {
-      case 401:
-        return toast.error({
-          message: I18n.t('account.unauthorized')
-        })
-    }
   })
 
   // @Property: Async Reducers

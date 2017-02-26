@@ -11,6 +11,6 @@ export const currentTeamSelector = createSelector(
       )
     }
 
-    return entities[currentTeamId]
+    return entities[currentTeamId] || {}
   }
 )

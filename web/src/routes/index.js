@@ -7,7 +7,11 @@ export * from './account'
 export * from './workspace'
 
 const redirectByAuth = (store) => {
-  return isAuthedUserMe(store) ? redirectToPersonal : redirectToSignIn
+  return (...arg) => {
+    return isAuthedUserMe(store)
+      ? redirectToPersonal(...arg)
+      : redirectToSignIn(...arg)
+  }
 }
 
 const notFoundRoute = (store) => ({

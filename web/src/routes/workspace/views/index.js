@@ -1,6 +1,7 @@
 export * from './entries'
 export * from './members'
 
+export * from './account-settings'
 export * from './member-invite'
 export * from './team-create'
 

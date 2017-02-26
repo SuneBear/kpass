@@ -5,9 +5,8 @@ import { stopSubmit } from 'redux-form'
 import { normalize } from 'normalizr'
 import { Observable } from 'rxjs/Observable'
 
-import { request, sha256 } from 'utils'
 import { toast } from 'uis'
-import { readTeamsAction } from '../team'
+import { request, sha256, cookie } from 'utils'
 import { userSchema } from './user.schema'
 import {
   signUpUserAction,
@@ -20,9 +19,17 @@ import {
   signInUserFailureAction,
   signInUserAbortAction,
 
-  readUserMeAction,
-  readUserMeSuccessAction,
-  readUserMeFailureAction,
+  signOutUserAction,
+  signOutUserSuccessAction,
+  signOutUserFailureAction,
+
+  readUserAction,
+  readUserSuccessAction,
+  readUserFailureAction,
+
+  updateUserAction,
+  updateUserSuccessAction,
+  updateUserFailureAction,
 
   setUserMeIdAction,
   setUserEntitiesAction
@@ -45,22 +52,31 @@ const signUpUserEpic = (action$) => {
           `${signUpUserAbortAction}`
         ))
         .concatMap((response) => {
-          const token = response.access_token
-          request.setToken(token)
           return Observable.of(
             signUpUserSuccessAction(),
             stopSubmit('signUpForm'),
-            push('/'),
-            readTeamsAction()
+            signInUserAction({
+              username,
+              password: sha256(password)
+            })
           )
         })
-        .catch((error) => {
-          toast.error({
-            message: I18n.t('account.signUpFailed')
-          })
+        .catch((errorMessage) => {
+          switch (errorMessage.error.status) {
+            case 409:
+              toast.error({
+                message: I18n.t('account.signUpUserExisted')
+              })
+              break
+            default:
+              toast.error({
+                message: I18n.t('account.signUpFailed')
+              })
+          }
+
           return Observable.of(
-            signUpUserFailureAction(error),
-            stopSubmit('signUpForm', error)
+            signUpUserFailureAction(errorMessage),
+            stopSubmit('signUpForm', errorMessage)
           )
         })
     })
@@ -86,54 +102,102 @@ const signInUserEpic = (action$) => {
         .concatMap((response) => {
           const token = response.access_token
           request.setToken(token)
+          cookie('kp_username', username)
+
           return Observable.of(
             signInUserSuccessAction(),
             stopSubmit('signInForm'),
-            push('/'),
-            readTeamsAction()
+            updateUserAction({
+              body: response.user
+            }),
+            setUserMeIdAction({
+              userMeId: response.user.id
+            }),
+            push('/')
           )
         })
-        .catch((error) => {
+        .catch((errorMessage) => {
           toast.error({
             message: I18n.t('account.signInFailed')
           })
           return Observable.of(
-            signInUserFailureAction(error),
-            stopSubmit('signInForm', error)
+            signInUserFailureAction(errorMessage),
+            stopSubmit('signInForm', errorMessage)
           )
         })
     })
 }
 
-const readUserMeEpic = (action$) => {
+const signOutUserEpic = (action$) => {
   return action$
-    .ofType(`${readUserMeAction}`)
+    .ofType(`${signOutUserAction}`)
     .switchMap(() => {
-      return request
-        .get('user')
-        .concatMap((response) => {
-          const normalizedResponse = normalize(response, userSchema)
+      cookie('kp_username', null)
+      return Observable.of(
+        signOutUserSuccessAction(),
+        setUserMeIdAction({
+          userMeId: 'Who\'s Your Daddy?'
+        }),
+        push('/')
+      )
+    })
+    .catch((errorMessage) => {
+      return Observable.of(
+        signOutUserFailureAction(errorMessage)
+      )
+    })
+}
 
+const readUserEpic = (action$) => {
+  return action$
+    .ofType(`${readUserAction}`)
+    .switchMap((action) => {
+      const { username } = action.payload
+
+      return request
+        .get(`user/${username}`)
+        .concatMap((response) => {
           return Observable.of(
-            readUserMeSuccessAction(),
-            setUserEntitiesAction({
-              entities: normalizedResponse.entities.users
-            }),
-            setUserMeIdAction({
-              userMeId: normalizedResponse.result
+            readUserSuccessAction(),
+            updateUserAction({
+              body: response
             })
           )
         })
-        .catch((error) => {
+        .catch((errorMessage) => {
           return Observable.of(
-            readUserMeFailureAction(error)
+            readUserFailureAction(errorMessage)
           )
         })
+    })
+}
+
+const updateUserEpic = (action$) => {
+  return action$
+    .ofType(`${updateUserAction}`)
+    .switchMap((action) => {
+      const { body } = action.payload
+
+      const normalizedBody = normalize(body, userSchema)
+
+      return Observable.of(
+        updateUserSuccessAction(),
+        setUserEntitiesAction({
+          entities: normalizedBody.entities.users
+        })
+      )
+    })
+    .catch((errorMessage) => {
+      return Observable.of(
+        updateUserFailureAction(errorMessage)
+      )
     })
 }
 
 export const userEpic = combineEpics(
   signUpUserEpic,
   signInUserEpic,
-  readUserMeEpic
+  signOutUserEpic,
+  readUserEpic,
+  updateUserEpic
 )

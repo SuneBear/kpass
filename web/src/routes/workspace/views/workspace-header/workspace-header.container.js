@@ -2,7 +2,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { push } from 'react-router-redux'
 
-import { userMeSelector, teamsSelector } from 'modules'
+import { userMeSelector, teamsSelector, signOutUserAction } from 'modules'
 import { currentTeamSelector } from '../../modules'
 import { WorkspaceHeader as WorkspaceHeaderView } from './workspace-header.view'
 
@@ -14,7 +14,8 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   actions: bindActionCreators({
-    push: push
+    push: push,
+    signOutUser: signOutUserAction
   }, dispatch)
 })
 

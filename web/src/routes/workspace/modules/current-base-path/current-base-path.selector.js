@@ -7,7 +7,7 @@ export const currentBasePathSelector = createSelector(
   (state) => currentTeamSelector(state),
   (currentTeam) => {
     if (!currentTeam) {
-      return null
+      return {}
     }
 
     return getWorkspaceBashPath(currentTeam)

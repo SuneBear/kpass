@@ -1,9 +1,11 @@
 import 'rxjs/add/observable/dom/ajax'
 import 'rxjs/add/observable/of'
+import 'rxjs/add/observable/throw'
 import 'rxjs/add/operator/catch'
 import 'rxjs/add/operator/map'
 import 'rxjs/add/operator/switchMap'
 import 'rxjs/add/operator/concatMap'
+import 'rxjs/add/operator/take'
 import 'rxjs/add/operator/takeUntil'
 
 import { Observable } from 'rxjs/Observable'
@@ -73,7 +75,7 @@ export class RequestClient {
       } = this.options
 
       return Observable.ajax({
-        url: APIHost + url,
+        url: `${APIHost}/${url}`,
         body,
         method,
         headers: headers,
@@ -112,6 +114,7 @@ export class RequestClient {
   setToken (token) {
     delete this.options.credentials
     this.options.headers.Authorization = `Bearer ${token}`
+    cookie('access_token', token)
   }
 
   get (url, query) {
