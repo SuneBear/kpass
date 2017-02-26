@@ -58,7 +58,6 @@ export class WorkspaceHeader extends Component {
   renderAccountSettingsModal () {
     return (
       <Modal
-        opened
         ref={this.saveAccountSettingsModalRef}
         title={I18n.t('account.settings')}
       >
