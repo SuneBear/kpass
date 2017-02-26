@@ -48,7 +48,7 @@ export class MembersList extends Component {
   isOwner (member) {
     const { team } = this.props
 
-    return team.userId === member.id
+    return team.userID === member.id
   }
 
   isMe (member) {

@@ -6,6 +6,7 @@ export * from './generics/loading'
 // Data Entries
 export * from './data-entries/input'
 export * from './data-entries/select'
+export * from './data-entries/upload'
 export * from './data-entries/field-label'
 export * from './data-entries/field-select'
 export * from './data-entries/field-text'

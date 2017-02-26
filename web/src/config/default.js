@@ -1,4 +1,6 @@
 export default {
   NAME: 'KPass',
-  API_HOST: 'http://127.0.0.1:8088/api/'
+  APP_HOST: 'http://127.0.0.1:8088',
+  FILE_HOST: 'http://127.0.0.1:8088',
+  API_HOST: 'http://127.0.0.1:8088/api'
 }

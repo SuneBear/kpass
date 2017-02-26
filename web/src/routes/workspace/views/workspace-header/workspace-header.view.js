@@ -2,9 +2,10 @@ import React, { Component, PropTypes } from 'react'
 import { I18n } from 'react-redux-i18n'
 
 import { Icon, Dropdown, Modal, MenuSelector } from 'uis'
-import { isPublicTeam } from 'utils'
+import { isPublicTeam, getFileUrl } from 'utils'
 import { Avatar, Logo } from 'views'
 import { TeamCreate } from '../team-create'
+import { AccountSettings } from '../account-settings'
 import { getWorkspaceBashPath } from '../../index'
 
 import './workspace-header.view.styl'
@@ -12,18 +13,34 @@ import './workspace-header.view.styl'
 export class WorkspaceHeader extends Component {
 
   static propTypes = {
-    actions: PropTypes.object,
     userMe: PropTypes.object,
     teams: PropTypes.array,
-    currentTeam: PropTypes.object
+    currentTeam: PropTypes.object,
+    actions: PropTypes.object
   }
 
   saveTeamCreateModalRef = (ref) => {
     this.teamCreateModalRef = ref
   }
 
+  saveAccountSettingsModalRef = (ref) => {
+    this.accountSettingsModalRef = ref
+  }
+
+  getTeamName (team) {
+    if (isPublicTeam(team)) {
+      return team.name
+    } else {
+      return I18n.t('workspace.personal')
+    }
+  }
+
   handleNewTeamClick = () => {
     this.teamCreateModalRef.open()
+  }
+
+  handleAccountSettingsClick = () => {
+    this.accountSettingsModalRef.open()
   }
 
   renderTeamCreateModal () {
@@ -34,6 +51,18 @@ export class WorkspaceHeader extends Component {
         size={'small'}
       >
         <TeamCreate />
+      </Modal>
+    )
+  }
+
+  renderAccountSettingsModal () {
+    return (
+      <Modal
+        opened
+        ref={this.saveAccountSettingsModalRef}
+        title={I18n.t('account.settings')}
+      >
+        <AccountSettings />
       </Modal>
     )
   }
@@ -49,7 +78,7 @@ export class WorkspaceHeader extends Component {
         >
           <div className={'workspaceInfo workspaceSwitcherHandler'} title={currentTeam.name}>
             <div className={'workspaceName'}>
-              {currentTeam.name}
+              {this.getTeamName(currentTeam)}
             </div>
             <Icon className={'handlerIcon'} name={'chevron-down'} />
           </div>
@@ -71,7 +100,7 @@ export class WorkspaceHeader extends Component {
     const dataList = teams.map((team) => ({
       className: 'workspaceSwitcherItem',
       value: team.id,
-      title: team.name,
+      title: this.getTeamName(team),
       iconName: isPublicTeam(team) ? 'building' : 'user',
       onClick: this.handleSwitchWorkspace
     }))
@@ -94,9 +123,15 @@ export class WorkspaceHeader extends Component {
     )
   }
 
-  renderAppLogo () {
+  handleWorkspaceLogoClick = () => {
+    const { currentTeam } = this.props
+    const { push } = this.props.actions
+    push(getWorkspaceBashPath(currentTeam))
+  }
+
+  renderWrokspaceLogo () {
     return (
-      <div className={'workspaceLogo'}>
+      <div className={'workspaceLogo'} onClick={this.handleWorkspaceLogoClick}>
         <Logo className={'defaultLogo'} height={23} />
       </div>
     )
@@ -113,7 +148,7 @@ export class WorkspaceHeader extends Component {
           offset={[-8, 8]}
         >
           <div className={'workspaceUserInfo'}>
-            <Avatar className={'infoAvatar'} url={avatar} size={'small'} />
+            <Avatar className={'infoAvatar'} url={getFileUrl(avatar)} size={'small'} />
             <span className={'infoUsername'}>{id}</span>
           </div>
         </Dropdown>
@@ -121,11 +156,15 @@ export class WorkspaceHeader extends Component {
     )
   }
 
+  handleSignOutClick = () => {
+    this.props.actions.signOutUser()
+  }
+
   getUserInfoDropdownMenu () {
     const dataList = [
-      { title: I18n.t('account.settings'), onClick: () => { console.log('settings') } },
+      { title: I18n.t('account.settings'), onClick: this.handleAccountSettingsClick },
       { type: 'divider' },
-      { title: I18n.t('account.signOut'), onClick: () => { console.log('signOut') } }
+      { title: I18n.t('account.signOut'), onClick: this.handleSignOutClick }
     ]
 
     return (
@@ -139,10 +178,11 @@ export class WorkspaceHeader extends Component {
     return (
       <div className={'workspaceHeaderView'}>
         {this.renderWorkspaceInfo()}
-        {this.renderAppLogo()}
+        {this.renderWrokspaceLogo()}
         {this.renderUserInfo()}
 
         {this.renderTeamCreateModal()}
+        {this.renderAccountSettingsModal()}
       </div>
     )
   }

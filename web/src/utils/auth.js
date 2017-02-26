@@ -1,5 +1,5 @@
 import { UserAuthWrapper } from 'redux-auth-wrapper'
-import { push } from 'react-router-redux'
+import { replace } from 'react-router-redux'
 
 import { userMeSelector } from 'modules'
 import { ACCOUNT_BASE_PATH } from 'routes/account'
@@ -21,7 +21,7 @@ export const isAuthedUserMe = (store) => {
 export const requireAuth = UserAuthWrapper({
   authSelector: state => userMeSelector(state),
   predicate: isAuthedUser,
-  redirectAction: push,
+  redirectAction: replace,
   failureRedirectPath: ACCOUNT_BASE_PATH,
   wrapperDisplayName: 'UserIsAuthenticated'
 })

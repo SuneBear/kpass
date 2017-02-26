@@ -6,7 +6,7 @@ export const currentTeamMembersSelector = createSelector(
   (state) => currentTeamSelector(state),
   (currentTeam) => {
     if (!currentTeam) {
-      return null
+      return {}
     }
 
     const mockData = [

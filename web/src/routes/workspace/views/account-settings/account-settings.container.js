@@ -1,15 +1,16 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
-import { readTeamsAction } from 'modules'
-import { WorkspaceLayout as WorkspaceLayoutView } from './workspace-layout.view'
+import { userMeSelector, updateUserAction } from 'modules'
+import { AccountSettings as AccountSettingsView } from './account-settings.view'
 
 const mapStateToProps = (state) => ({
+  userMe: userMeSelector(state)
 })
 
 const mapDispatchToProps = (dispatch) => ({
   actions: bindActionCreators({
-    readTeams: readTeamsAction
+    updateUser: updateUserAction
   }, dispatch)
 })
 
@@ -20,4 +21,4 @@ const makeContainer = (component) => {
   )(component)
 }
 
-export const WorkspaceLayout = makeContainer(WorkspaceLayoutView)
+export const AccountSettings = makeContainer(AccountSettingsView)

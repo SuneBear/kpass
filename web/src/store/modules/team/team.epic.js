@@ -3,7 +3,7 @@ import { normalize } from 'normalizr'
 import { Observable } from 'rxjs/Observable'
 
 import { request } from 'utils'
-import { teamSchema } from './team.schema'
+import { teamsSchema } from './team.schema'
 import {
   readTeamsAction,
   readTeamsSuccessAction,
@@ -19,7 +19,7 @@ const readTeamsEpic = (action$) => {
       return request
         .get('teams')
         .concatMap((response) => {
-          const normalizedResponse = normalize(response, teamSchema)
+          const normalizedResponse = normalize(response, teamsSchema)
 
           return Observable.of(
             readTeamsSuccessAction(),

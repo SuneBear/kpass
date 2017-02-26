@@ -6,13 +6,7 @@ import config from 'config'
 export class Layout extends Component {
 
   static propTypes = {
-    children: PropTypes.element,
-    userMe: PropTypes.object,
-    actions: PropTypes.object
-  }
-
-  componentDidMount () {
-    this.props.actions.readUserMe()
+    children: PropTypes.element
   }
 
   render () {

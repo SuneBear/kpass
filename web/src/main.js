@@ -1,7 +1,12 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import { I18n } from 'react-redux-i18n'
+import { Observable } from 'rxjs/Observable'
 
+import { toast } from './uis'
+import { request, subscribeHTTPError, cookie } from './utils'
 import { createStore, initialState } from './store'
+import { setUserMeIdAction, setUserEntitiesAction } from './store/modules'
 import App from './app'
 
 import './styles/main.styl'
@@ -59,5 +64,39 @@ if (__DEV__) {
 // ========================================================
 // Go!
 // ========================================================
-render()
 
+// @Launch: Auto login & render app
+const username = cookie('kp_username')
+
+if (username) {
+  request.get(`user/${username}`)
+    .take(1)
+    .catch((error) => {
+      render()
+      return Observable.throw(error)
+    })
+    .subscribe((response) => {
+      store.dispatch(setUserMeIdAction({
+        userMeId: username
+      }))
+      store.dispatch(setUserEntitiesAction({
+        entities: {
+          [`${username}`]: response
+        }
+      }))
+      render()
+    })
+} else {
+  render()
+}
+
+// @SideEffect: Handle HTTP Error
+subscribeHTTPError((res) => {
+  const status = res.error.status
+  switch (status) {
+    case 401:
+      return toast.error({
+        message: I18n.t('account.unauthorized')
+      })
+  }
+})

@@ -1,0 +1,33 @@
+@require '../../../../styles/ref'
+
+.accountSettingsView
+
+  .settingsSection
+    input
+      width: 100%
+
+    & + .settingsSection
+      margin-top: qu(7)
+
+    &Title
+      line-height: qu(8)
+      margin-bottom: qu(5)
+      border-bottom: 1px solid $gray93
+      font-weight: 500
+
+    &Item
+      display: flex
+      align-items: center
+      margin-bottom: qu(5)
+
+      &Label
+        flex: 0 0 auto
+        min-width: 80px
+        margin-right: qu(5)
+        color: $gray50
+
+      &Content
+        display: flex
+        align-items: center
+        justify-content: space-between
+        flex: 1 0 auto
