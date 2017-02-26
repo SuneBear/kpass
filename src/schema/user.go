@@ -36,7 +36,7 @@ func (u *User) String() string {
 func (u *User) Result() *UserResult {
 	return &UserResult{
 		ID:      u.ID,
-		Avatar:  u.Avatar,
+		Avatar:  DownloadURL(u.Avatar, "user", u.ID, ""),
 		Created: u.Created,
 		Updated: u.Updated,
 	}
@@ -45,7 +45,7 @@ func (u *User) Result() *UserResult {
 // UserResult represents desensitized user
 type UserResult struct {
 	ID      string    `json:"id"`
-	Avatar  util.OID  `json:"avatar"`
+	Avatar  string    `json:"avatar"`
 	Created time.Time `json:"created"`
 	Updated time.Time `json:"updated"`
 }

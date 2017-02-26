@@ -58,7 +58,7 @@ func (t *Team) RemoveMember(userID string) bool {
 func (t *Team) Result(ID util.OID, Members []*UserResult) *TeamResult {
 	return &TeamResult{
 		ID:         ID,
-		Logo:       t.Logo,
+		Logo:       DownloadURL(t.Logo, "team", ID.String(), ""),
 		UserID:     t.UserID,
 		Name:       t.Name,
 		IsFrozen:   t.IsFrozen,
@@ -72,7 +72,7 @@ func (t *Team) Result(ID util.OID, Members []*UserResult) *TeamResult {
 // TeamResult represents desensitized team
 type TeamResult struct {
 	ID         util.OID      `json:"id"`
-	Logo       util.OID      `json:"logo"`
+	Logo       string        `json:"logo"`
 	UserID     string        `json:"userID"`
 	Name       string        `json:"name"`
 	IsFrozen   bool          `json:"isFrozen"`

@@ -246,7 +246,7 @@ func (a *Entry) Find(ctx *gear.Context) error {
 		}
 	}
 	if len(entry.Files) > 0 {
-		if files, err = a.file.FindFiles(key, entry.Files...); err != nil {
+		if files, err = a.file.FindFiles(EntryID, key, entry.Files...); err != nil {
 			return ctx.Error(err)
 		}
 	}

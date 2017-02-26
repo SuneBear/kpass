@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/seccom/kpass/src/util"
@@ -54,7 +55,7 @@ func (f *File) String() string {
 	return jsonMarshal(f)
 }
 
-// Result returns FileResult intance
+// Result returns FileResult intance for entry
 func (f *File) Result(ID util.OID, signed string) *FileResult {
 	return &FileResult{
 		ID:      ID,
@@ -69,11 +70,26 @@ func (f *File) Result(ID util.OID, signed string) *FileResult {
 
 // FileResult represents file info
 type FileResult struct {
-	ID      util.OID  `json:"id"`
-	UserID  string    `json:"userID"`
-	Name    string    `json:"name"`
-	Size    int       `json:"size"`
-	Signed  string    `json:"signed"`
-	Created time.Time `json:"created"`
-	Updated time.Time `json:"updated"`
+	ID          util.OID  `json:"id"`
+	UserID      string    `json:"userID"`
+	Name        string    `json:"name"`
+	Size        int       `json:"size"`
+	Signed      string    `json:"-"`
+	DownloadURL string    `json:"DownloadURL"`
+	Created     time.Time `json:"created"`
+	Updated     time.Time `json:"updated"`
+}
+
+// SetDownloadURL ...
+func (f *FileResult) SetDownloadURL(refType, refID string) {
+	f.DownloadURL = DownloadURL(f.ID, refType, refID, f.Signed)
+}
+
+// DownloadURL ...
+func DownloadURL(FileID util.OID, refType, refID, signed string) string {
+	if !FileID.Valid() {
+		return ""
+	}
+	return fmt.Sprintf(
+		`/download/%s?refType=%s&refID=%s&signed=%s`, FileID, refType, refID, signed)
 }

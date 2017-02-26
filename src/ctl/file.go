@@ -214,6 +214,7 @@ func (c *File) UploadFile(ctx *gear.Context) (err error) {
 	if err = c.entry.AddFileByID(EntryID, file.ID, userID); err != nil {
 		return ctx.Error(err)
 	}
+	file.SetDownloadURL("entry", EntryID.String())
 	return ctx.JSON(200, file)
 }
 
@@ -239,7 +240,7 @@ func (c *File) fileFromCtx(ctx *gear.Context, userID, key string, checkImage boo
 			}
 		}
 	}
-	return nil, errors.New("invalid file")
+	return nil, &gear.Error{Code: 400, Msg: "invalid upload request"}
 }
 
 func checkFileName(filename string, checkImage bool) error {

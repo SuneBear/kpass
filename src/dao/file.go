@@ -105,8 +105,10 @@ func (o *File) Delete(FileID util.OID) error {
 }
 
 // FindFiles ...
-func (o *File) FindFiles(key string, ids ...string) (files []*schema.FileResult, err error) {
+func (o *File) FindFiles(EntryID util.OID, key string, ids ...string) (
+	files []*schema.FileResult, err error) {
 	files = make([]*schema.FileResult, 0)
+	entryID := EntryID.String()
 	err = o.db.DB.View(func(tx *buntdb.Tx) error {
 		for _, id := range ids {
 			ID, e := util.ParseOID(id)
@@ -125,7 +127,9 @@ func (o *File) FindFiles(key string, ids ...string) (files []*schema.FileResult,
 			if err != nil {
 				return err
 			}
-			files = append(files, file.Result(ID, signed))
+			fileResult := file.Result(ID, signed)
+			fileResult.SetDownloadURL("entry", entryID)
+			files = append(files, fileResult)
 		}
 		return nil
 	})
