@@ -242,18 +242,18 @@ func (a *Team) Delete(ctx *gear.Context) (err error) {
 	return ctx.End(204)
 }
 
-// Restore ...
+// Undelete ...
 //
-// @Title Restore
-// @Summary Restore the deleted team
-// @Description only the team owner can restore the deleted team
+// @Title Undelete
+// @Summary Undelete the team
+// @Description only the team owner can undelete the team
 // @Param Authorization header string true "access_token"
 // @Param teamID path string true "entry ID"
 // @Success 204
 // @Failure 400 string
 // @Failure 401 string
-// @Router PUT /api/entries/{teamID}/restore
-func (a *Team) Restore(ctx *gear.Context) (err error) {
+// @Router POST /api/teams/{teamID}:undelete
+func (a *Team) Undelete(ctx *gear.Context) (err error) {
 	TeamID, err := util.ParseOID(ctx.Param("teamID"))
 	if err != nil {
 		return ctx.ErrorStatus(400)

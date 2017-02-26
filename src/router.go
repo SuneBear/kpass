@@ -45,6 +45,8 @@ func newRouter(db *service.DB) (Router *gear.Router) {
 	Router.Post("/api/teams", auth.Middleware, teamAPI.Create)
 	// // Return current user's teams joined.
 	Router.Get("/api/teams", auth.Middleware, teamAPI.FindByMember)
+	// Undelete the entry
+	Router.Post(`/api/teams/:teamID+:undelete`, auth.Middleware, teamAPI.Undelete)
 	// Get team's token
 	Router.Post("/api/teams/:teamID/token", auth.Middleware, teamAPI.Token)
 	// Return the team's entries list
@@ -60,14 +62,14 @@ func newRouter(db *service.DB) (Router *gear.Router) {
 	// Return the team's shares list
 	Router.Get("/api/teams/:teamID/shares", auth.Middleware, noOp)
 
+	// Undelete the entry
+	Router.Post("/api/entries/:entryID+:undelete", auth.Middleware, entryAPI.Undelete)
 	// Get the full entry, with all secrets
 	Router.Get("/api/entries/:entryID", auth.Middleware, entryAPI.Find)
 	// Update the entry
 	Router.Put("/api/entries/:entryID", auth.Middleware, entryAPI.Update)
 	// Delete the entry
 	Router.Delete("/api/entries/:entryID", auth.Middleware, entryAPI.Delete)
-	// Restore the entry
-	Router.Put("/api/entries/:entryID/restore", auth.Middleware, entryAPI.Restore)
 	// Add a secret to the entry
 	Router.Post("/api/entries/:entryID/secrets", auth.Middleware, secretAPI.Create)
 	// Update the secret

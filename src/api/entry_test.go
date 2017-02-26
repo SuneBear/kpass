@@ -159,11 +159,11 @@ func TestEntryAPI(t *testing.T) {
 		assert.Equal(404, res.StatusCode)
 	})
 
-	t.Run("Restore a entry", func(t *testing.T) {
+	t.Run("Undelete the entry", func(t *testing.T) {
 		assert := assert.New(t)
 		res := new(schema.EntrySum)
 
-		_, err := request.Put(host+"/api/entries/"+entryID.String()+"/restore").
+		_, err := request.Post(host+"/api/entries/"+entryID.String()+":undelete").
 			Set(gear.HeaderAuthorization, userInfo.AccessToken).
 			JSON(res)
 		assert.Nil(err)

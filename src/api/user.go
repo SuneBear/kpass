@@ -146,7 +146,7 @@ func (a *User) Login(ctx *gear.Context) (err error) {
 // @Router GET /api/user/{userID}
 func (a *User) Find(ctx *gear.Context) (err error) {
 	userID := ctx.Param("userID")
-	if userID != "" {
+	if userID == "" {
 		return ctx.ErrorStatus(400)
 	}
 	user, err := a.user.Find(userID)

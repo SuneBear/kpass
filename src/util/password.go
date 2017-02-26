@@ -39,21 +39,10 @@ func RandPass(length int, count ...int) string {
 		buf = append(buf, simpleTables[rand.Intn(len(simpleTables))])
 	}
 
-	password := make([]byte, 0, len(buf))
+	password := make([]byte, length)
 	// shuffle
-	for len(buf) > 1 {
-		i := rand.Intn(len(buf))
-		switch i {
-		case 0:
-			password = append(password, buf[0])
-			buf = buf[1:]
-		case len(buf) - 1:
-			password = append(password, buf[i])
-			buf = buf[0:i]
-		default:
-			password = append(password, buf[i])
-			buf = append(buf[0:i], buf[i+1:]...)
-		}
+	for i, j := range rand.Perm(length) {
+		password[i] = buf[j]
 	}
-	return string(append(password, buf[0]))
+	return string(password)
 }

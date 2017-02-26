@@ -176,18 +176,18 @@ func (a *Entry) Delete(ctx *gear.Context) (err error) {
 	return ctx.End(204)
 }
 
-// Restore ...
+// Undelete ...
 //
-// @Title Restore
-// @Summary Restore the deleted entry
-// @Description all team members can restore the deleted entry
+// @Title Undelete
+// @Summary Undelete the entry
+// @Description all team members can undelete the entry
 // @Param Authorization header string true "access_token"
 // @Param entryID path string true "entry ID"
 // @Success 204
 // @Failure 400 string
 // @Failure 401 string
-// @Router PUT /api/entries/{entryID}/restore
-func (a *Entry) Restore(ctx *gear.Context) (err error) {
+// @Router POST /api/entries/{entryID}:undelete
+func (a *Entry) Undelete(ctx *gear.Context) (err error) {
 	EntryID, err := util.ParseOID(ctx.Param("entryID"))
 	if err != nil {
 		return ctx.ErrorStatus(400)
