@@ -49,7 +49,7 @@ webpackConfig.entry = {
 webpackConfig.output = {
   filename   : utils.assetsPath(`[name].[${project.compiler_hash_type}].js`),
   path       : project.paths.dist(),
-  publicPath : __DEV__ ? project.compiler_public_path : null
+  publicPath : __DEV__ ? project.compiler_public_path : '/'
 }
 
 // ------------------------------------

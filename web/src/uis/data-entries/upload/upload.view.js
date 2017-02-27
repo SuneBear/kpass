@@ -9,6 +9,7 @@ import { request } from 'utils'
 
 const UPLOAD_HOST = `${config.FILE_HOST}/upload/`
 
+// @TODO: Custom request client & handle error
 export class Upload extends Component {
 
   static propTypes = {
