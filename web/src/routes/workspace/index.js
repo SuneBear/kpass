@@ -4,13 +4,14 @@ import { WorkspaceLayout } from './layout'
 import { workspaceReducer } from './modules'
 import { Personal } from './personal'
 import { Team } from './team'
-import { Entries, Members } from './views'
+import { Entries, Members, TeamSettings } from './views'
 
 export const WORKSPACE_BASE_PATH = '/workspace'
 export const PERSONAL_PATH = 'personal'
 export const TEAM_PATH = 'team'
 export const ENTRIES_PATH = 'entries'
 export const MEMBERS_PATH = 'members'
+export const SETTINGS_PATH = 'settings'
 
 export const getWorkspaceBashPath = (team) => {
   if (isPublicTeam(team)) {
@@ -68,6 +69,11 @@ export default (store) => ({
         {
           path : MEMBERS_PATH,
           component : Members
+        },
+
+        {
+          path : SETTINGS_PATH,
+          component : TeamSettings
         }
       ]
     }

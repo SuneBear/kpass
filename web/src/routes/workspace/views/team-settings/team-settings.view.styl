@@ -1,0 +1,27 @@
+@require '../../../../styles/ref'
+
+.teamSettingsView
+
+  .settingSection
+    position: relative
+
+    & + .settingSection
+      padding-top: qu(5)
+      margin-top: qu(5)
+      border-top: 1px solid $gray93
+
+      .settingSectionHandler
+        top: qu(5)
+
+    &Title
+      font-size: 16px
+      margin-bottom: qu(2)
+
+    &Description
+      color: $gray50
+
+    &Handler
+      position: absolute
+      top: 0
+      right: 0
+

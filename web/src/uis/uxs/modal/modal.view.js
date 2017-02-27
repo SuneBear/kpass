@@ -12,7 +12,7 @@ export class Modal extends Component {
   static propTypes = {
     children: PropTypes.element,
     style: PropTypes.object,
-    size: PropTypes.oneOf(['small', 'normal', 'large']),
+    size: PropTypes.oneOf(['small', 'normal', 'middle', 'large']),
     zIndex: PropTypes.number,
     title: PropTypes.string,
     className: PropTypes.string,

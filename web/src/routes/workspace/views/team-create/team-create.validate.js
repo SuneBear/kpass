@@ -7,6 +7,6 @@ export const validateTeamName = (...args) => {
 
 export const TeamCreateValidate = (values, props) => {
   return {
-    teamName: validateTeamName(values.username)
+    teamName: validateTeamName(values.teamName)
   }
 }
