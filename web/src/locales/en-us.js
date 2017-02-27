@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 export const enUS = {
   /* == Global == */
   pageType: {
@@ -10,7 +12,8 @@ export const enUS = {
   },
 
   action: {
-    create: 'Create'
+    create: 'Create',
+    save: 'Save'
   },
 
   member: {
@@ -72,7 +75,11 @@ export const enUS = {
   },
 
   teamSettings: {
-    title: 'Settings'
+    title: 'Settings',
+    rename: 'Rename team',
+    renameDescription: 'Think of an ingenious name for the team that let members know what they can find.',
+    freeze: 'Freeze team',
+    freezeDescription: 'When the team has been frozen, all non-owners get in read-only mode that can\'t modify any entries.'
   },
 
   zPlaceholder: 'Hello World'

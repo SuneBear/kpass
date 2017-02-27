@@ -12,6 +12,7 @@ export class FieldText extends Component {
     className: PropTypes.string,
     label: PropTypes.string,
     name: PropTypes.string,
+    defaultValue: PropTypes.string,
     placeholder: PropTypes.string,
     autoFocus: PropTypes.bool,
     type: PropTypes.string,
@@ -77,6 +78,7 @@ export class FieldText extends Component {
       input,
       name,
       placeholder,
+      defaultValue,
       autoFocus,
       type
     } = this.props
@@ -85,7 +87,7 @@ export class FieldText extends Component {
       <div className='inputWrap'>
         <Input
           ref={this.saveInputRef}
-          defaultValue={input.value}
+          defaultValue={defaultValue || input.value}
           name={name}
           placeholder={placeholder}
           autoFocus={autoFocus}

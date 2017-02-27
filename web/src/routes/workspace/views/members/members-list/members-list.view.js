@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 import cx from 'classnames'
 
+import { isOwner, isMe } from 'utils'
 import { MembersListCell } from '../members-list-cell'
 
 import './members-list.view.styl'
@@ -45,26 +46,14 @@ export class MembersList extends Component {
       })
   }
 
-  isOwner (member) {
-    const { team } = this.props
-
-    return team.userID === member.id
-  }
-
-  isMe (member) {
-    const { userMe } = this.props
-
-    return userMe.id === member.id
-  }
-
   getPermissions (member) {
-    const { userMe } = this.props
+    const { team, userMe } = this.props
 
     const permissions = {
       deleteMember: false
     }
 
-    if (this.isOwner(userMe)) {
+    if (isOwner(team, userMe)) {
       permissions.deleteMember = true
     }
 
@@ -74,7 +63,9 @@ export class MembersList extends Component {
   renderCell (member) {
     const {
       onLeaveTeam,
-      onRemoveMember
+      onRemoveMember,
+      team,
+      userMe
     } = this.props
 
     return (
@@ -83,8 +74,8 @@ export class MembersList extends Component {
         member={member}
         onLeaveTeam={onLeaveTeam}
         onRemoveMember={onRemoveMember}
-        isMe={this.isMe(member)}
-        isOwner={this.isOwner(member)}
+        isOwner={isOwner(team, member)}
+        isMe={isMe(member, userMe)}
         permissions={this.getPermissions(member)}
        />
     )

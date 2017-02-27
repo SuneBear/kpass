@@ -53,13 +53,13 @@ export class AccountSettings extends Component {
           <Translate value={'member.avatar'} />
         </div>
         <div className={'settingsSectionItemContent'}>
-          <Avatar url={getFileUrl(userMe.avatar)} size={'large'} />
+          <Avatar url={getFileUrl(userMe.avatar)} size={'larger'} />
           <Upload
             url={'avatar'}
             accept={'image/*'}
             onChange={this.handleUploadAvatarChange}
           >
-            <Button type={'text'}>
+            <Button ghost size={'small'}>
               <Translate value={'accountSettings.uploadAvatar'} />
             </Button>
           </Upload>

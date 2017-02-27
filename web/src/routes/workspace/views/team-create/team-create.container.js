@@ -2,9 +2,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { reduxForm } from 'redux-form'
 
-import {
-  createTeamAction
-} from 'modules'
+import { createTeamAction } from 'modules'
 
 import { TeamCreate as TeamCreateView } from './team-create.view'
 import { teamCreateValidate } from './team-create.validate'
