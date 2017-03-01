@@ -199,14 +199,15 @@ func (c *File) UploadFile(ctx *gear.Context) (err error) {
 	if err != nil {
 		return ctx.Error(err)
 	}
-	userID, err := auth.UserIDFromCtx(ctx)
+	key, err := auth.KeyFromCtx(ctx)
 	if err != nil {
 		return ctx.Error(err)
 	}
-	key, err := auth.KeyFromCtx(ctx, entry.TeamID, "team")
-	if err != nil {
+	userID, _ := auth.UserIDFromCtx(ctx)
+	if key, err = c.file.GetTeamKey(entry.TeamID, userID, key); err != nil {
 		return ctx.Error(err)
 	}
+
 	file, err := c.fileFromCtx(ctx, userID, key, false)
 	if err != nil {
 		return ctx.Error(err)

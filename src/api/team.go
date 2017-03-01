@@ -17,24 +17,21 @@ import (
 // @Produces json
 type Team struct {
 	team *dao.Team
+	file *dao.File
 }
 
 // NewTeam returns a Team API instance
 func NewTeam(db *service.DB) *Team {
-	return &Team{dao.NewTeam(db)}
+	return &Team{dao.NewTeam(db), dao.NewFile(db)}
 }
 
 type tplTeamCreate struct {
 	Name string `json:"name" swaggo:"true,team name,Teambition"`
-	Pass string `json:"pass" swaggo:"true,team password hashed by sha256,15e2536def2490c115759ceabf012872fddbd7887fbe67e5074d1e66148d5d00"`
 }
 
 func (t *tplTeamCreate) Validate() error {
 	if t.Name == "" {
 		return &gear.Error{Code: 400, Msg: "invalid team name"}
-	}
-	if !util.IsHashString(t.Pass) {
-		return &gear.Error{Code: 400, Msg: "invalid team pass, pass should be hashed by sha256"}
 	}
 	return nil
 }
@@ -56,8 +53,13 @@ func (a *Team) Create(ctx *gear.Context) error {
 		return ctx.Error(err)
 	}
 
+	key, err := auth.KeyFromCtx(ctx)
+	if err != nil {
+		return ctx.Error(err)
+	}
 	userID, _ := auth.UserIDFromCtx(ctx)
-	res, err := a.team.Create(userID, body.Pass, &schema.Team{
+	teamPass := util.RandPass(20, 3, 5)
+	res, err := a.team.Create(userID, teamPass, &schema.Team{
 		Name:       body.Name,
 		UserID:     userID,
 		Visibility: "member",
@@ -65,6 +67,10 @@ func (a *Team) Create(ctx *gear.Context) error {
 	})
 
 	if err != nil {
+		return ctx.Error(err)
+	}
+
+	if err = a.file.SaveTeamPass(res.ID, userID, key, teamPass); err != nil {
 		return ctx.Error(err)
 	}
 	return ctx.JSON(200, res)
@@ -296,61 +302,4 @@ func (a *Team) FindByMember(ctx *gear.Context) (err error) {
 		return ctx.Error(err)
 	}
 	return ctx.JSON(200, teams)
-}
-
-type tplTeamToken struct {
-	Type string `json:"grant_type" swaggo:"true,should always be \"password\",password"`
-	Pass string `json:"password" swaggo:"true,team password hashed by sha256,xxxxxxxxxxxxxxxx..."`
-}
-
-func (t *tplTeamToken) Validate() error {
-	if t.Type != "password" {
-		return &gear.Error{Code: 400, Msg: "invalid_grant"}
-	}
-	if !util.IsHashString(t.Pass) {
-		return &gear.Error{Code: 400, Msg: "invalid pass, pass should be hashed by sha256"}
-	}
-	return nil
-}
-
-// Token ...
-//
-// @Title Token
-// @Summary Verify for the team
-// @Description Verify the team pass and get the new access_token
-// @Param Authorization header string true "access_token"
-// @Param teamID path string true "team ID"
-// @Param body body tplTeamToken true "team auth info"
-// @Success 200 AuthResult
-// @Failure 400 string
-// @Failure 401 string
-// @Router POST /api/teams/{teamID}/token
-func (a *Team) Token(ctx *gear.Context) (err error) {
-	TeamID, err := util.ParseOID(ctx.Param("teamID"))
-	if err != nil {
-		return ctx.ErrorStatus(400)
-	}
-
-	userID, _ := auth.UserIDFromCtx(ctx)
-	body := new(tplTeamToken)
-	if err = ctx.ParseBody(body); err != nil {
-		return
-	}
-
-	team, err := a.team.CheckToken(TeamID, userID, body.Pass)
-	if err != nil {
-		return ctx.Error(err)
-	}
-
-	token, err := auth.AddTeamKey(ctx, TeamID, body.Pass, team.Pass)
-	if err != nil {
-		return ctx.Error(err)
-	}
-	ctx.Set(gear.HeaderPragma, "no-cache")
-	ctx.Set(gear.HeaderCacheControl, "no-store")
-	return ctx.JSON(200, &AuthResult{
-		Token:  token,
-		Type:   "Bearer",
-		Expire: auth.JWT().GetExpiresIn().Seconds(),
-	})
 }

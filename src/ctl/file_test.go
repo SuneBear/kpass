@@ -56,15 +56,6 @@ func NewUser(host string) *UserInfo {
 	}
 
 	info.TeamID = (*teams)[0].ID.String()
-	res, err = request.Post(fmt.Sprintf(`%s/api/teams/%s/token`, host, info.TeamID)).
-		Set(gear.HeaderAuthorization, info.AccessToken).
-		Set(gear.HeaderContentType, gear.MIMEApplicationJSON).
-		Send(map[string]interface{}{"password": info.Pass, "grant_type": "password"}).
-		JSON()
-	if err != nil {
-		panic(err)
-	}
-	info.AccessToken = "Bearer " + (*res.(*map[string]interface{}))["access_token"].(string)
 	return info
 }
 
@@ -91,7 +82,8 @@ func TestFileController(t *testing.T) {
 		res, err := request.Get(host + user.Avatar).End()
 		assert.Nil(err)
 		assert.Equal("image/png", res.Header.Get(gear.HeaderContentType))
-		assert.Equal("inline; filename=my avatar.png", res.Header.Get(gear.HeaderContentDisposition))
+		assert.Equal(`inline; filename="my avatar.png"; filename*=UTF-8''my%20avatar.png`,
+			res.Header.Get(gear.HeaderContentDisposition))
 
 		avatar, err := ioutil.ReadFile("../../web/public/logo.png")
 		assert.Nil(err)
@@ -115,7 +107,7 @@ func TestFileController(t *testing.T) {
 		res, err := request.Get(host + team.Logo).End()
 		assert.Nil(err)
 		assert.Equal("image/png", res.Header.Get(gear.HeaderContentType))
-		assert.Equal("inline; filename=logo.png", res.Header.Get(gear.HeaderContentDisposition))
+		assert.Equal(`inline; filename="logo.png"`, res.Header.Get(gear.HeaderContentDisposition))
 
 		avatar, err := ioutil.ReadFile("../../web/public/logo.png")
 		assert.Nil(err)
@@ -156,7 +148,7 @@ func TestFileController(t *testing.T) {
 		res3, err := request.Get(host + file.DownloadURL).End()
 		assert.Nil(err)
 		assert.Equal("text/plain; charset=utf-8", res3.Header.Get(gear.HeaderContentType))
-		assert.Equal("attachment; filename=humans.txt", res3.Header.Get(gear.HeaderContentDisposition))
+		assert.Equal(`attachment; filename="humans.txt"`, res3.Header.Get(gear.HeaderContentDisposition))
 
 		txt, err := ioutil.ReadFile("../../web/public/humans.txt")
 		assert.Nil(err)
@@ -178,7 +170,7 @@ func TestFileController(t *testing.T) {
 		res5, err := request.Get(host + file.DownloadURL).End()
 		assert.Nil(err)
 		assert.Equal("text/plain; charset=utf-8", res5.Header.Get(gear.HeaderContentType))
-		assert.Equal("attachment; filename=humans.txt", res5.Header.Get(gear.HeaderContentDisposition))
+		assert.Equal(`attachment; filename="humans.txt"`, res5.Header.Get(gear.HeaderContentDisposition))
 
 		txt3, err := res5.Content()
 		assert.Nil(err)

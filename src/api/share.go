@@ -82,7 +82,7 @@ func (a *Share) Create(ctx *gear.Context) (err error) {
 	if err != nil {
 		return ctx.Error(err)
 	}
-	key, err := auth.KeyFromCtx(ctx, entry.TeamID, "team")
+	key, err := auth.KeyFromCtx(ctx)
 	if err != nil {
 		return ctx.Error(err)
 	}
@@ -116,53 +116,4 @@ func (a *Share) Delete(ctx *gear.Context) (err error) {
 		return ctx.Error(err)
 	}
 	return ctx.End(204)
-}
-
-type tplShareToken struct {
-	Type string `json:"grant_type"`
-	Pass string `json:"password"` // should encrypt
-}
-
-func (t *tplShareToken) Validate() error {
-	if t.Type != "password" {
-		return &gear.Error{Code: 400, Msg: "invalid_grant"}
-	}
-	if !util.IsHashString(t.Pass) {
-		return &gear.Error{Code: 400, Msg: "invalid pass, pass should be hashed by sha256"}
-	}
-	return nil
-}
-
-// Token ...
-func (a *Share) Token(ctx *gear.Context) (err error) {
-	ShareID, err := util.ParseOID(ctx.Param("shareID"))
-	if err != nil {
-		return ctx.ErrorStatus(400)
-	}
-
-	userID, _ := auth.UserIDFromCtx(ctx)
-	body := new(tplShareToken)
-	if err = ctx.ParseBody(body); err != nil {
-		return
-	}
-
-	share, err := a.share.Find(ShareID)
-	if err != nil {
-		return ctx.Error(err)
-	}
-	if share.UserID != userID {
-		return ctx.ErrorStatus(403)
-	}
-
-	token, err := auth.AddShareKey(ctx, ShareID, body.Pass, share.Token)
-	if err != nil {
-		return ctx.Error(&gear.Error{Code: 401, Msg: err.Error()})
-	}
-	ctx.Set(gear.HeaderPragma, "no-cache")
-	ctx.Set(gear.HeaderCacheControl, "no-store")
-	return ctx.JSON(200, map[string]interface{}{
-		"access_token": token,
-		"token_type":   "Bearer",
-		"expires_in":   auth.JWT().GetExpiresIn().Seconds(),
-	})
 }

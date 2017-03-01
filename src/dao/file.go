@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"time"
@@ -58,6 +59,47 @@ func (o *File) Create(userID, key, name string, r io.Reader) (
 		return nil, dbError(err)
 	}
 	return
+}
+
+// SaveTeamPass ...
+func (o *File) SaveTeamPass(TeamID util.OID, userID, key, teamPass string) error {
+	value, err := auth.EncryptText(key, teamPass)
+	fmt.Println(19999, value, err)
+	if err != nil {
+		return dbError(err)
+	}
+	err = o.db.DB.Update(func(tx *buntdb.Tx) error {
+		_, _, e := tx.Set(schema.TeamKeyBlobKey(TeamID, userID), value, nil)
+		fmt.Println(1000, value, teamPass, e)
+		return e
+	})
+	return dbError(err)
+}
+
+// GetTeamKey ...
+func (o *File) GetTeamKey(TeamID util.OID, userID, key string) (string, error) {
+	teamKey := ""
+	err := o.db.DB.View(func(tx *buntdb.Tx) error {
+		teamPass := ""
+		val, e := tx.Get(schema.TeamKeyBlobKey(TeamID, userID))
+		fmt.Println(1111, val, e)
+		if e == nil {
+			teamPass, e = auth.DecryptText(key, val)
+		}
+		if e == nil {
+			if val, e = tx.Get(schema.TeamKey(TeamID)); e == nil {
+				var team *schema.Team
+				if team, e = schema.TeamFrom(val); e == nil {
+					teamKey = auth.AESKey(teamPass, team.Pass)
+				}
+			}
+		}
+		return e
+	})
+	if err != nil {
+		return "", dbError(err)
+	}
+	return teamKey, nil
 }
 
 // FindFile ...

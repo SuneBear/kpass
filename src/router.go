@@ -47,8 +47,6 @@ func newRouter(db *service.DB) (Router *gear.Router) {
 	Router.Get("/api/teams", auth.Middleware, teamAPI.FindByMember)
 	// Undelete the entry
 	Router.Post(`/api/teams/:teamID+:undelete`, auth.Middleware, teamAPI.Undelete)
-	// Get team's token
-	Router.Post("/api/teams/:teamID/token", auth.Middleware, teamAPI.Token)
 	// Return the team's entries list
 	Router.Get("/api/teams/:teamID/entries", auth.Middleware, entryAPI.FindByTeam)
 	// Create a new entry for team

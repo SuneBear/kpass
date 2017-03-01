@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"encoding/hex"
 	"time"
 
 	josejwt "github.com/SermoDigital/jose/jwt"
@@ -41,6 +42,11 @@ func JWT() *jwt.JWT {
 func Init(salt []byte, expiresIn time.Duration) {
 	std.SetCrypto(crypto.New(salt))
 	std.JWT().SetExpiresIn(expiresIn)
+}
+
+// HmacSum ...
+func HmacSum(str string) string {
+	return hex.EncodeToString(std.Crypto().HmacSum([]byte(str)))
 }
 
 // AESKey ...
@@ -89,70 +95,28 @@ func Verify(token string) (josejwt.Claims, error) {
 }
 
 // NewToken ...
-func NewToken(userID string) (string, error) {
-	return Sign(map[string]interface{}{"id": userID})
-}
-
-// AddTeamKey ...
-func AddTeamKey(ctx *gear.Context, TeamID util.OID, pass, checkPass string) (token string, err error) {
-	var claims josejwt.Claims
-	if claims, err = FromCtx(ctx); err != nil {
-		return
-	}
-
+func NewToken(userID, pass, checkPass string) (string, error) {
 	key := AESKey(pass, checkPass)
-	userID := claims.Get("id").(string)
-	if key, err = EncryptText(userID, key); err != nil {
-		return
+	key, err := EncryptText(HmacSum(userID), key)
+	if err != nil {
+		return "", err
 	}
-	claims.Set("team"+TeamID.String(), key)
-	return Sign(claims)
-}
-
-// AddShareKey ...
-func AddShareKey(ctx *gear.Context, ShareID util.OID, pass, key string) (token string, err error) {
-	var claims josejwt.Claims
-	if claims, err = FromCtx(ctx); err != nil {
-		return
-	}
-
-	userID := claims.Get("id").(string)
-	if key, err = DecryptText(SignPass(userID, pass), key); err != nil {
-		return
-	}
-	if key, err = EncryptText(userID, key); err != nil {
-		return
-	}
-	claims.Set("share"+ShareID.String(), key)
-	return Sign(claims)
-}
-
-// FromCtx ...
-func FromCtx(ctx *gear.Context) (josejwt.Claims, error) {
-	return std.FromCtx(ctx)
+	return Sign(map[string]interface{}{"id": userID, "key": key})
 }
 
 // KeyFromCtx ...
-func KeyFromCtx(ctx *gear.Context, ID util.OID, keyType string) (key string, err error) {
+func KeyFromCtx(ctx *gear.Context) (key string, err error) {
 	var claims josejwt.Claims
 	if claims, err = FromCtx(ctx); err != nil {
 		return
 	}
 
-	id := ID.String()
 	userID := claims.Get("id").(string)
-	switch keyType {
-	case "team", "share":
-		// return the team's key or share's key
-		if k := claims.Get(keyType + id); k != nil {
-			return DecryptText(userID, k.(string))
-		}
+	key = claims.Get("key").(string)
+	if key, err = DecryptText(HmacSum(userID), key); err != nil {
+		err = &gear.Error{Code: 403, Msg: err.Error()}
 	}
-
-	return "", &gear.Error{
-		Code: 403,
-		Msg:  "forbidden: " + id,
-	}
+	return
 }
 
 // UserIDFromCtx ...
@@ -162,6 +126,11 @@ func UserIDFromCtx(ctx *gear.Context) (userID string, err error) {
 		return
 	}
 	return claims.Get("id").(string), nil
+}
+
+// FromCtx ...
+func FromCtx(ctx *gear.Context) (josejwt.Claims, error) {
+	return std.FromCtx(ctx)
 }
 
 // SignedFileKey ...

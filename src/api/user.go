@@ -20,11 +20,12 @@ import (
 type User struct {
 	team *dao.Team
 	user *dao.User
+	file *dao.File
 }
 
 // NewUser returns a User API instance
 func NewUser(db *service.DB) *User {
-	return &User{dao.NewTeam(db), dao.NewUser(db)}
+	return &User{dao.NewTeam(db), dao.NewUser(db), dao.NewFile(db)}
 }
 
 type tplUserJoin struct {
@@ -65,8 +66,11 @@ func (a *User) Join(ctx *gear.Context) error {
 	if err != nil {
 		return ctx.Error(err)
 	}
+
+	key := auth.AESKey(body.Pass, user.Pass)
+	teamPass := util.RandPass(20, 3, 5)
 	// create a private team for the user.
-	_, err = a.team.Create(body.ID, body.Pass, &schema.Team{
+	team, err := a.team.Create(body.ID, teamPass, &schema.Team{
 		Name:       body.ID,
 		UserID:     body.ID,
 		Visibility: "private",
@@ -76,6 +80,9 @@ func (a *User) Join(ctx *gear.Context) error {
 		return ctx.Error(err)
 	}
 
+	if err = a.file.SaveTeamPass(team.ID, user.ID, key, teamPass); err != nil {
+		return ctx.Error(err)
+	}
 	return ctx.JSON(200, user.Result())
 }
 
@@ -120,7 +127,7 @@ func (a *User) Login(ctx *gear.Context) (err error) {
 		return
 	}
 
-	token, err := auth.NewToken(user.ID)
+	token, err := auth.NewToken(user.ID, body.Pass, user.Pass)
 	if err != nil {
 		return ctx.Error(err)
 	}

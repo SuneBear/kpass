@@ -18,11 +18,12 @@ import (
 type Secret struct {
 	entry  *dao.Entry
 	secret *dao.Secret
+	file   *dao.File
 }
 
 // NewSecret returns a Secret API instance
 func NewSecret(db *service.DB) *Secret {
-	return &Secret{dao.NewEntry(db), dao.NewSecret(db)}
+	return &Secret{dao.NewEntry(db), dao.NewSecret(db), dao.NewFile(db)}
 }
 
 type tplSecretCreate struct {
@@ -66,14 +67,15 @@ func (a *Secret) Create(ctx *gear.Context) error {
 	if err != nil {
 		return ctx.Error(err)
 	}
-	userID, err := auth.UserIDFromCtx(ctx)
+	key, err := auth.KeyFromCtx(ctx)
 	if err != nil {
 		return ctx.Error(err)
 	}
-	key, err := auth.KeyFromCtx(ctx, entry.TeamID, "team")
-	if err != nil {
+	userID, _ := auth.UserIDFromCtx(ctx)
+	if key, err = a.file.GetTeamKey(entry.TeamID, userID, key); err != nil {
 		return ctx.Error(err)
 	}
+
 	secretResult, err := a.secret.Create(EntryID, userID, key, &schema.Secret{
 		Name: body.Name,
 		URL:  body.URL,
@@ -141,12 +143,12 @@ func (a *Secret) Update(ctx *gear.Context) error {
 	if err != nil {
 		return ctx.Error(err)
 	}
-	userID, err := auth.UserIDFromCtx(ctx)
+	key, err := auth.KeyFromCtx(ctx)
 	if err != nil {
 		return ctx.Error(err)
 	}
-	key, err := auth.KeyFromCtx(ctx, entry.TeamID, "team")
-	if err != nil {
+	userID, _ := auth.UserIDFromCtx(ctx)
+	if key, err = a.file.GetTeamKey(entry.TeamID, userID, key); err != nil {
 		return ctx.Error(err)
 	}
 

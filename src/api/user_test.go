@@ -5,8 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"fmt"
-
 	"github.com/DavidCai1993/request"
 	"github.com/seccom/kpass/src"
 	"github.com/seccom/kpass/src/auth"
@@ -115,14 +113,5 @@ func NewUser(host string) *UserInfo {
 	}
 
 	info.TeamID = (*teams)[0].ID.String()
-	res, err = request.Post(fmt.Sprintf(`%s/api/teams/%s/token`, host, info.TeamID)).
-		Set(gear.HeaderAuthorization, info.AccessToken).
-		Set(gear.HeaderContentType, gear.MIMEApplicationJSON).
-		Send(map[string]interface{}{"password": info.Pass, "grant_type": "password"}).
-		JSON()
-	if err != nil {
-		panic(err)
-	}
-	info.AccessToken = "Bearer " + (*res.(*map[string]interface{}))["access_token"].(string)
 	return info
 }

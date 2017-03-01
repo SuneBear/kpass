@@ -231,8 +231,12 @@ func (a *Entry) Find(ctx *gear.Context) error {
 	if err != nil {
 		return ctx.Error(err)
 	}
-	key, err := auth.KeyFromCtx(ctx, entry.TeamID, "team")
+	key, err := auth.KeyFromCtx(ctx)
 	if err != nil {
+		return ctx.Error(err)
+	}
+	userID, _ := auth.UserIDFromCtx(ctx)
+	if key, err = a.file.GetTeamKey(entry.TeamID, userID, key); err != nil {
 		return ctx.Error(err)
 	}
 

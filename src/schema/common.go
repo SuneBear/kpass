@@ -103,6 +103,11 @@ func FileBlobKey(ID util.OID) string {
 	return keyPrefixFileBlob + ID.String()
 }
 
+// TeamKeyBlobKey returns team key blob' key
+func TeamKeyBlobKey(TeamID util.OID, userID string) string {
+	return keyPrefixFileBlob + TeamID.String() + userID
+}
+
 func jsonMarshal(v interface{}) (str string) {
 	if res, err := json.Marshal(v); err == nil {
 		str = string(res)
