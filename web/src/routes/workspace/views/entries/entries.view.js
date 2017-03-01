@@ -2,8 +2,9 @@ import React, { Component, PropTypes } from 'react'
 import { I18n, Translate } from 'react-redux-i18n'
 import cx from 'classnames'
 
-import { Button } from 'uis'
+import { Button, Modal } from 'uis'
 import { Card, Placeholder } from 'views'
+import { EntryMake } from '../entry-make'
 
 import './entries.view.styl'
 
@@ -21,8 +22,12 @@ export class Entries extends Component {
     )
   }
 
-  handleNewEntryClick () {
+  handleNewEntryClick = () => {
+    this.newEntryModalRef.open()
+  }
 
+  saveNewEntryModalRef = (ref) => {
+    this.newEntryModalRef = ref
   }
 
   getNewEntryHandler (type, isGhost) {
@@ -31,10 +36,22 @@ export class Entries extends Component {
         type={type}
         ghost={isGhost}
         icon={'circle-plus'}
-        onClick={this.handleAddMemberClick}
+        onClick={this.handleNewEntryClick}
       >
         <Translate value={'entry.new'} />
       </Button>
+    )
+  }
+
+  renderNewEntryModal () {
+    return (
+      <Modal
+        ref={this.saveNewEntryModalRef}
+        title={I18n.t('entry.new')}
+        size={'small'}
+      >
+        <EntryMake />
+      </Modal>
     )
   }
 
@@ -62,9 +79,9 @@ export class Entries extends Component {
       return null
     }
 
-    return (
-      <div>Workspace Entries</div>
-    )
+    return entries.map((entry) => (
+      <div>{entry.name}</div>
+    ))
   }
 
   render () {
@@ -76,6 +93,8 @@ export class Entries extends Component {
       >
         {this.renderPlaceholder()}
         {this.renderEntries()}
+
+        {this.renderNewEntryModal()}
       </Card>
     )
   }

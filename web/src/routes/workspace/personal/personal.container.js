@@ -1,10 +1,12 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
-import { setCurrentTeamAction } from '../modules'
+import { privateTeamIdSelector, setCurrentTeamAction } from '../modules'
 import { Personal as PersonalView } from './personal.view'
 
-const mapStateToProps = (state) => ({})
+const mapStateToProps = (state) => ({
+  privateTeamId: privateTeamIdSelector(state)
+})
 
 const mapDispatchToProps = (dispatch) => ({
   actions: bindActionCreators({

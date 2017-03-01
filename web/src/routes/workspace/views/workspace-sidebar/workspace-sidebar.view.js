@@ -4,7 +4,6 @@ import { Translate } from 'react-redux-i18n'
 import cx from 'classnames'
 
 import { Icon } from 'uis'
-import { isPublicTeam, isOwner } from 'utils'
 import { ENTRIES_PATH, MEMBERS_PATH, SETTINGS_PATH } from '../../index'
 
 import './workspace-sidebar.view.styl'
@@ -13,9 +12,8 @@ export class WorkspaceSidebar extends Component {
 
   static propTypes = {
     className: PropTypes.string,
-    team: PropTypes.object,
-    userMe: PropTypes.object,
-    basePath: PropTypes.string
+    basePath: PropTypes.string,
+    permissions: PropTypes.object
   }
 
   getRootClassnames () {
@@ -48,9 +46,9 @@ export class WorkspaceSidebar extends Component {
   }
 
   renderTeamSettingsNav () {
-    const { team, userMe, basePath } = this.props
+    const { basePath, permissions } = this.props
 
-    if (!isOwner(team, userMe)) {
+    if (!permissions.updateTeamSetting) {
       return null
     }
 
@@ -67,9 +65,9 @@ export class WorkspaceSidebar extends Component {
   }
 
   renderTeamNav () {
-    const { team, basePath } = this.props
+    const { basePath, permissions } = this.props
 
-    if (!isPublicTeam(team)) {
+    if (!permissions.readTeamMember) {
       return null
     }
 

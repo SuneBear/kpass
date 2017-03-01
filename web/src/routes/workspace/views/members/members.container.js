@@ -5,6 +5,7 @@ import { userMeSelector } from 'modules'
 import {
   currentTeamSelector,
   currentTeamMembersSelector,
+  currentUserPermissionsSelector,
   leaveTeamAction,
   removeTeamMemberAction
 } from '../../modules'
@@ -14,7 +15,8 @@ import { Members as MembersView } from './members.view'
 const mapStateToProps = (state) => ({
   userMe: userMeSelector(state),
   team: currentTeamSelector(state),
-  teamMembers: currentTeamMembersSelector(state)
+  teamMembers: currentTeamMembersSelector(state),
+  permissions: currentUserPermissionsSelector(state)
 })
 
 const mapDispatchToProps = (dispatch) => ({

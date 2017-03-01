@@ -5,19 +5,24 @@ import './personal.view.styl'
 export class Personal extends Component {
 
   static propTypes = {
-    actions: PropTypes.object,
-    children: PropTypes.element
+    children: PropTypes.element,
+    privateTeamId: PropTypes.string,
+    actions: PropTypes.object
   }
 
-  componentDidMount () {
+  componentWillUpdate (nextProps) {
+    const { privateTeamId } = nextProps
+
     this.props.actions.setCurrentTeam({
-      teamId: null
+      teamId: privateTeamId
     })
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentDidMount () {
+    const { privateTeamId } = this.props
+
     this.props.actions.setCurrentTeam({
-      teamId: null
+      teamId: privateTeamId
     })
   }
 

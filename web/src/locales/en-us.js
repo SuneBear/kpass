@@ -57,7 +57,9 @@ export const enUS = {
   },
 
   entry: {
-    new: 'New Entry'
+    new: 'New Entry',
+    entryName: 'Entry name',
+    entryCategory: 'Entry category'
   },
 
   team: {

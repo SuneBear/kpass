@@ -5,8 +5,7 @@
   min-width: qu(19)
   padding: qu(3)
   font-size: 14px
-  line-height: 14px
-  color: $black
+  color: inherit
   vertical-align: top
   background-color: transparent
   border: 1px solid $gray85
@@ -17,6 +16,8 @@
   &[disabled]
     background-color: $gray97
     color: $gray50
+    // @Compatibility: http://stackoverflow.com/questions/262158/disabled-input-text-color
+    -webkit-text-fill-color: $gray50
     cursor: not-allowed
 
   &:focus

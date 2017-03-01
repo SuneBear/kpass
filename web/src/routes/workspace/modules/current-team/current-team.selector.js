@@ -1,14 +1,24 @@
 import { createSelector } from 'reselect'
 
+export const privateTeamIdSelector = createSelector(
+  (state) => state.team.entities,
+  (entities) => {
+    const entitiesKeys = Object.keys(entities)
+    const privateTeamId = entitiesKeys.find(
+      teamId => entities[teamId].visibility === 'private'
+    )
+
+    return privateTeamId
+  }
+)
+
 export const currentTeamSelector = createSelector(
   (state) => state.team.entities,
   (state) => state.workspace.currentTeam.teamId,
-  (entities, currentTeamId) => {
+  (state) => privateTeamIdSelector(state),
+  (entities, currentTeamId, privateTeamId) => {
     if (!currentTeamId) {
-      const entitiesKeys = Object.keys(entities)
-      currentTeamId = entitiesKeys.filter(
-        teamId => entities[teamId].visibility === 'private'
-      )
+      currentTeamId = privateTeamId
     }
 
     return entities[currentTeamId] || {}

@@ -16,6 +16,7 @@ export class Members extends Component {
     userMe: PropTypes.object,
     team: PropTypes.object,
     teamMembers: PropTypes.array,
+    permissions: PropTypes.object,
     actions: PropTypes.object
   }
 
@@ -47,6 +48,12 @@ export class Members extends Component {
   }
 
   getAddMemberHandler () {
+    const { permissions } = this.props
+
+    if (!permissions.createTeamMember) {
+      return null
+    }
+
     return (
       <Button
         type={'text'}
@@ -100,7 +107,8 @@ export class Members extends Component {
     const {
       userMe,
       team,
-      teamMembers
+      teamMembers,
+      permissions
     } = this.props
 
     return (
@@ -115,6 +123,7 @@ export class Members extends Component {
           userMe={userMe}
           team={team}
           members={teamMembers}
+          permissions={permissions}
           onLeaveTeam={this.handleLeaveTeam}
           onRemoveMember={this.handleRemoveMember}
         />

@@ -16,7 +16,8 @@ export class Avatar extends Component {
   }
 
   static defaultProps = {
-    size: 'normal'
+    size: 'normal',
+    url: DEFAULT_AVATAR_URL
   }
 
   getRootClassnames () {
@@ -28,7 +29,7 @@ export class Avatar extends Component {
   }
 
   getAvatarUrl () {
-    const avatarUrl = this.props.url || DEFAULT_AVATAR_URL
+    const avatarUrl = this.props.url
 
     return {
       backgroundImage: `url(${avatarUrl})`

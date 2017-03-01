@@ -4,7 +4,7 @@
   position: relative
   display: flex
   align-items: center
-  padding: 8px 36px 8px 16px
+  padding: 8px 40px 8px 16px
   cursor: pointer
 
   &:hover
@@ -39,12 +39,19 @@
   .selectedLabel
     position: absolute
 
+  .avatar
+    margin-right: qu(4)
+
+  .colorLabel
+    width: 8px
+    height: 8px
+    margin-left: qu(1)
+    margin-right: qu(4) + qu(1)
+    border-radius: 50%
+
   .icon
     margin-right: qu(4)
     color: $gray50
-
-  .avatar
-    margin-right: qu(4)
 
   .selectedLabel
     right: 0
