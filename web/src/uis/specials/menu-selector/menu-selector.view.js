@@ -26,6 +26,8 @@ export class MenuSelector extends Component {
         title: PropTypes.string,
         description: PropTypes.string,
         avatarUrl: PropTypes.string,
+        color: PropTypes.string,
+        iconName: PropTypes.string,
         onClick: PropTypes.func
       })
     ).isRequired,

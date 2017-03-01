@@ -13,6 +13,7 @@ export class MembersList extends Component {
     userMe: PropTypes.object,
     team: PropTypes.object,
     members: PropTypes.array,
+    permissions: PropTypes.object,
     onLeaveTeam: PropTypes.func,
     onRemoveMember: PropTypes.func
   }
@@ -46,26 +47,13 @@ export class MembersList extends Component {
       })
   }
 
-  getPermissions (member) {
-    const { team, userMe } = this.props
-
-    const permissions = {
-      deleteMember: false
-    }
-
-    if (isOwner(team, userMe)) {
-      permissions.deleteMember = true
-    }
-
-    return permissions
-  }
-
   renderCell (member) {
     const {
-      onLeaveTeam,
-      onRemoveMember,
       team,
-      userMe
+      userMe,
+      permissions,
+      onLeaveTeam,
+      onRemoveMember
     } = this.props
 
     return (
@@ -76,7 +64,7 @@ export class MembersList extends Component {
         onRemoveMember={onRemoveMember}
         isOwner={isOwner(team, member)}
         isMe={isMe(member, userMe)}
-        permissions={this.getPermissions(member)}
+        permissions={permissions}
        />
     )
   }

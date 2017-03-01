@@ -18,8 +18,9 @@ export class MenuSelectorItem extends Component {
     isSelected: PropTypes.bool,
     title: PropTypes.string,
     description: PropTypes.string,
-    iconName: PropTypes.string,
-    avatarUrl: PropTypes.string
+    avatarUrl: PropTypes.string,
+    color: PropTypes.string,
+    iconName: PropTypes.string
   }
 
   static defaultProps = {
@@ -45,6 +46,22 @@ export class MenuSelectorItem extends Component {
 
     return (
       <Avatar url={avatarUrl} />
+    )
+  }
+
+  renderColorLabel () {
+    const { color } = this.props
+
+    if (!color) {
+      return null
+    }
+
+    const style = {
+      backgroundColor: color
+    }
+
+    return (
+      <div className={'colorLabel'} style={style} />
     )
   }
 
@@ -113,6 +130,7 @@ export class MenuSelectorItem extends Component {
         onClick={handleClick}
       >
         {this.renderAvatar()}
+        {this.renderColorLabel()}
         {this.renderIcon()}
         {this.renderMainInfo()}
         {this.renderSelectedLabel()}

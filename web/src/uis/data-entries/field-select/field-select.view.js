@@ -12,6 +12,7 @@ export class FieldSelect extends Component {
     className: PropTypes.string,
     label: PropTypes.string,
     name: PropTypes.string,
+    defaultValue: PropTypes.string,
     placeholder: PropTypes.string,
     options: PropTypes.array,
 
@@ -61,6 +62,7 @@ export class FieldSelect extends Component {
     const {
       input,
       name,
+      defaultValue,
       placeholder,
       options
     } = this.props
@@ -68,7 +70,7 @@ export class FieldSelect extends Component {
     return (
       <div className='selectWrap'>
         <Select
-          defaultValue={input.value}
+          defaultValue={defaultValue || input.value}
           name={name}
           placeholder={placeholder}
           options={options}

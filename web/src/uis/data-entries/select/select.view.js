@@ -49,15 +49,31 @@ export class Select extends Component {
       return null
     }
 
-    return options.map((option) => {
-      const value = option.value
-      const text = option.title || value
+    return options.map((optionObject) => {
+      const { title, value, color } = optionObject
+      const text = title || value
       return (
         <Option value={value}>
-          {text}<Icon className={'selectedLabel'} name={'tick'} />
+          {this.renderItemColorLabel(color)}
+          {text}
+          <Icon className={'selectedLabel'} name={'tick'} />
         </Option>
       )
     })
+  }
+
+  renderItemColorLabel (color) {
+    if (!color) {
+      return null
+    }
+
+    const style = {
+      backgroundColor: color
+    }
+
+    return (
+      <div className={'colorLabel'} style={style} />
+    )
   }
 
   getDropdownClassNames () {

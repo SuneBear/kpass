@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux'
 
 import { contextReducer as context } from './context'
+import { entryReducer as entry } from './entry'
 import { formReducer as form } from './form'
 import { i18nReducer as i18n } from './i18n'
 import { memberReducer as member } from './member'
@@ -10,6 +11,7 @@ import { userReducer as user } from './user'
 export const makeRootReducer = (asyncReducers) => {
   return combineReducers({
     context,
+    entry,
     form,
     i18n,
     member,

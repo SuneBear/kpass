@@ -1,13 +1,11 @@
 import { connect } from 'react-redux'
 
-import { userMeSelector } from 'modules'
-import { currentTeamSelector, currentBasePathSelector } from '../../modules'
+import { currentBasePathSelector, currentUserPermissionsSelector } from '../../modules'
 import { WorkspaceSidebar as WorkspaceSidebarView } from './workspace-sidebar.view'
 
 const mapStateToProps = (state) => ({
-  team: currentTeamSelector(state),
-  userMe: userMeSelector(state),
-  basePath: currentBasePathSelector(state)
+  basePath: currentBasePathSelector(state),
+  permissions: currentUserPermissionsSelector(state)
 })
 
 const mapDispatchToProps = (dispatch) => ({})
