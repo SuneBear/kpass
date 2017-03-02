@@ -1,7 +1,6 @@
 package model
 
 import (
-	"fmt"
 	"io"
 	"io/ioutil"
 	"time"
@@ -65,13 +64,11 @@ func (m *File) Create(userID, key, name string, r io.Reader) (
 // SaveTeamPass ...
 func (m *File) SaveTeamPass(TeamID util.OID, userID, key, teamPass string) error {
 	value, err := auth.EncryptText(key, teamPass)
-	fmt.Println(19999, value, err)
 	if err != nil {
 		return dbError(err)
 	}
 	err = m.db.DB.Update(func(tx *buntdb.Tx) error {
 		_, _, e := tx.Set(schema.TeamKeyBlobKey(TeamID, userID), value, nil)
-		fmt.Println(1000, value, teamPass, e)
 		return e
 	})
 	return dbError(err)
@@ -83,7 +80,6 @@ func (m *File) GetTeamKey(TeamID util.OID, userID, key string) (string, error) {
 	err := m.db.DB.View(func(tx *buntdb.Tx) error {
 		teamPass := ""
 		val, e := tx.Get(schema.TeamKeyBlobKey(TeamID, userID))
-		fmt.Println(1111, val, e)
 		if e == nil {
 			teamPass, e = auth.DecryptText(key, val)
 		}
