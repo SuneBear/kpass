@@ -4,9 +4,8 @@ import (
 	"time"
 
 	"github.com/seccom/kpass/src/auth"
-	"github.com/seccom/kpass/src/dao"
+	"github.com/seccom/kpass/src/model"
 	"github.com/seccom/kpass/src/schema"
-	"github.com/seccom/kpass/src/service"
 	"github.com/seccom/kpass/src/util"
 	"github.com/teambition/gear"
 )
@@ -18,15 +17,24 @@ import (
 // @Accepts json
 // @Produces json
 type Share struct {
-	entry *dao.Entry
-	share *dao.Share
-	team  *dao.Team
-	user  *dao.User
+	entry *model.Entry
+	share *model.Share
+	team  *model.Team
+	user  *model.User
 }
 
-// NewShare returns a Share API instance
-func NewShare(db *service.DB) *Share {
-	return &Share{dao.NewEntry(db), dao.NewShare(db), dao.NewTeam(db), dao.NewUser(db)}
+// Init ...
+func (a *Share) Init(
+	entry *model.Entry,
+	share *model.Share,
+	team *model.Team,
+	user *model.User,
+) *Share {
+	a.entry = entry
+	a.share = share
+	a.team = team
+	a.user = user
+	return a
 }
 
 type tplShareCreate struct {

@@ -1,4 +1,4 @@
-package dao
+package model
 
 import (
 	"fmt"
@@ -18,13 +18,14 @@ type File struct {
 	db *service.DB
 }
 
-// NewFile return a File intance
-func NewFile(db *service.DB) *File {
-	return &File{db}
+// Init ...
+func (m *File) Init(db *service.DB) *File {
+	m.db = db
+	return m
 }
 
 // Create ...
-func (o *File) Create(userID, key, name string, r io.Reader) (
+func (m *File) Create(userID, key, name string, r io.Reader) (
 	fileResult *schema.FileResult, err error) {
 	FileID := util.NewOID()
 	signed := ""
@@ -46,7 +47,7 @@ func (o *File) Create(userID, key, name string, r io.Reader) (
 	file := &schema.File{UserID: userID, Name: name, Size: size, Created: util.Time(time.Now())}
 	file.Updated = file.Created
 	fileResult = file.Result(FileID, signed)
-	err = o.db.DB.Update(func(tx *buntdb.Tx) error {
+	err = m.db.DB.Update(func(tx *buntdb.Tx) error {
 		_, _, e := tx.Set(schema.FileKey(FileID), file.String(), nil)
 		if e == nil {
 			blob := schema.FileBlob(data)
@@ -62,13 +63,13 @@ func (o *File) Create(userID, key, name string, r io.Reader) (
 }
 
 // SaveTeamPass ...
-func (o *File) SaveTeamPass(TeamID util.OID, userID, key, teamPass string) error {
+func (m *File) SaveTeamPass(TeamID util.OID, userID, key, teamPass string) error {
 	value, err := auth.EncryptText(key, teamPass)
 	fmt.Println(19999, value, err)
 	if err != nil {
 		return dbError(err)
 	}
-	err = o.db.DB.Update(func(tx *buntdb.Tx) error {
+	err = m.db.DB.Update(func(tx *buntdb.Tx) error {
 		_, _, e := tx.Set(schema.TeamKeyBlobKey(TeamID, userID), value, nil)
 		fmt.Println(1000, value, teamPass, e)
 		return e
@@ -77,9 +78,9 @@ func (o *File) SaveTeamPass(TeamID util.OID, userID, key, teamPass string) error
 }
 
 // GetTeamKey ...
-func (o *File) GetTeamKey(TeamID util.OID, userID, key string) (string, error) {
+func (m *File) GetTeamKey(TeamID util.OID, userID, key string) (string, error) {
 	teamKey := ""
-	err := o.db.DB.View(func(tx *buntdb.Tx) error {
+	err := m.db.DB.View(func(tx *buntdb.Tx) error {
 		teamPass := ""
 		val, e := tx.Get(schema.TeamKeyBlobKey(TeamID, userID))
 		fmt.Println(1111, val, e)
@@ -103,9 +104,9 @@ func (o *File) GetTeamKey(TeamID util.OID, userID, key string) (string, error) {
 }
 
 // FindFile ...
-func (o *File) FindFile(FileID util.OID, key string) (
+func (m *File) FindFile(FileID util.OID, key string) (
 	file *schema.File, fileBlob schema.FileBlob, err error) {
-	err = o.db.DB.View(func(tx *buntdb.Tx) error {
+	err = m.db.DB.View(func(tx *buntdb.Tx) error {
 		res, e := tx.Get(schema.FileKey(FileID))
 		if e != nil {
 			return e
@@ -136,8 +137,8 @@ func (o *File) FindFile(FileID util.OID, key string) (
 }
 
 // Delete ...
-func (o *File) Delete(FileID util.OID) error {
-	err := o.db.DB.Update(func(tx *buntdb.Tx) error {
+func (m *File) Delete(FileID util.OID) error {
+	err := m.db.DB.Update(func(tx *buntdb.Tx) error {
 		_, e := tx.Delete(schema.FileKey(FileID))
 		_, e = tx.Delete(schema.FileBlobKey(FileID))
 		return e
@@ -147,11 +148,11 @@ func (o *File) Delete(FileID util.OID) error {
 }
 
 // FindFiles ...
-func (o *File) FindFiles(EntryID util.OID, key string, ids ...string) (
+func (m *File) FindFiles(EntryID util.OID, key string, ids ...string) (
 	files []*schema.FileResult, err error) {
 	files = make([]*schema.FileResult, 0)
 	entryID := EntryID.String()
-	err = o.db.DB.View(func(tx *buntdb.Tx) error {
+	err = m.db.DB.View(func(tx *buntdb.Tx) error {
 		for _, id := range ids {
 			ID, e := util.ParseOID(id)
 			if e != nil {

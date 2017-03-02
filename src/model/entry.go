@@ -1,4 +1,4 @@
-package dao
+package model
 
 import (
 	"fmt"
@@ -16,18 +16,19 @@ type Entry struct {
 	db *service.DB
 }
 
-// NewEntry return a Entry intance
-func NewEntry(db *service.DB) *Entry {
-	return &Entry{db}
+// Init ...
+func (m *Entry) Init(db *service.DB) *Entry {
+	m.db = db
+	return m
 }
 
 // Create ...
-func (o *Entry) Create(userID string, entry *schema.Entry) (entrySum *schema.EntrySum, err error) {
+func (m *Entry) Create(userID string, entry *schema.Entry) (entrySum *schema.EntrySum, err error) {
 	EntryID := util.NewOID()
 	entry.Created = util.Time(time.Now())
 	entry.Updated = entry.Created
 	entrySum = entry.Summary(EntryID)
-	err = o.db.DB.Update(func(tx *buntdb.Tx) error {
+	err = m.db.DB.Update(func(tx *buntdb.Tx) error {
 		value, e := tx.Get(schema.TeamKey(entry.TeamID))
 		if e != nil {
 			return e
@@ -52,9 +53,9 @@ func (o *Entry) Create(userID string, entry *schema.Entry) (entrySum *schema.Ent
 }
 
 // Update ...
-func (o *Entry) Update(userID string, EntryID util.OID, changes map[string]interface{}) (
+func (m *Entry) Update(userID string, EntryID util.OID, changes map[string]interface{}) (
 	entrySum *schema.EntrySum, err error) {
-	err = o.db.DB.Update(func(tx *buntdb.Tx) error {
+	err = m.db.DB.Update(func(tx *buntdb.Tx) error {
 		// transaction: one or more user(team members) may update the entry.
 		value, e := tx.Get(schema.EntryKey(EntryID))
 		if e != nil {
@@ -116,9 +117,9 @@ func (o *Entry) Update(userID string, EntryID util.OID, changes map[string]inter
 }
 
 // UpdateDeleted ...
-func (o *Entry) UpdateDeleted(userID string, EntryID util.OID, isDeleted bool) (
+func (m *Entry) UpdateDeleted(userID string, EntryID util.OID, isDeleted bool) (
 	entrySum *schema.EntrySum, err error) {
-	err = o.db.DB.Update(func(tx *buntdb.Tx) error {
+	err = m.db.DB.Update(func(tx *buntdb.Tx) error {
 		// transaction: one or more user(team members) may update the entry.
 		value, e := tx.Get(schema.EntryKey(EntryID))
 		if e != nil {
@@ -142,8 +143,8 @@ func (o *Entry) UpdateDeleted(userID string, EntryID util.OID, isDeleted bool) (
 }
 
 // Find ...
-func (o *Entry) Find(EntryID util.OID, IsDeleted bool) (entry *schema.Entry, err error) {
-	err = o.db.DB.View(func(tx *buntdb.Tx) (e error) {
+func (m *Entry) Find(EntryID util.OID, IsDeleted bool) (entry *schema.Entry, err error) {
+	err = m.db.DB.View(func(tx *buntdb.Tx) (e error) {
 		var res string
 		if res, e = tx.Get(schema.EntryKey(EntryID)); e == nil {
 			if entry, e = schema.EntryFrom(res); e == nil {
@@ -161,11 +162,11 @@ func (o *Entry) Find(EntryID util.OID, IsDeleted bool) (entry *schema.Entry, err
 }
 
 // FindByTeam ...
-func (o *Entry) FindByTeam(TeamID util.OID, userID string, IsDeleted bool) (
+func (m *Entry) FindByTeam(TeamID util.OID, userID string, IsDeleted bool) (
 	entries []*schema.EntrySum, err error) {
 	entries = make([]*schema.EntrySum, 0)
 	cond := fmt.Sprintf(`{"teamID":"%s"}`, TeamID.String())
-	err = o.db.DB.View(func(tx *buntdb.Tx) (e error) {
+	err = m.db.DB.View(func(tx *buntdb.Tx) (e error) {
 		tx.AscendGreaterOrEqual("entry_by_team", cond, func(key, value string) bool {
 			entry, e := schema.EntryFrom(value)
 			if e != nil {
@@ -190,8 +191,8 @@ func (o *Entry) FindByTeam(TeamID util.OID, userID string, IsDeleted bool) (
 }
 
 // AddFileByID ...
-func (o *Entry) AddFileByID(EntryID, FileID util.OID, userID string) (err error) {
-	err = o.db.DB.Update(func(tx *buntdb.Tx) error {
+func (m *Entry) AddFileByID(EntryID, FileID util.OID, userID string) (err error) {
+	err = m.db.DB.Update(func(tx *buntdb.Tx) error {
 		entryKey := schema.EntryKey(EntryID)
 		value, e := tx.Get(entryKey)
 		if e != nil {
@@ -226,8 +227,8 @@ func (o *Entry) AddFileByID(EntryID, FileID util.OID, userID string) (err error)
 }
 
 // RemoveFileByID ...
-func (o *Entry) RemoveFileByID(EntryID, FileID util.OID, userID string) (err error) {
-	err = o.db.DB.Update(func(tx *buntdb.Tx) error {
+func (m *Entry) RemoveFileByID(EntryID, FileID util.OID, userID string) (err error) {
+	err = m.db.DB.Update(func(tx *buntdb.Tx) error {
 		entryKey := schema.EntryKey(EntryID)
 		value, e := tx.Get(entryKey)
 		if e != nil {

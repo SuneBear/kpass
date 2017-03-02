@@ -2,9 +2,8 @@ package api
 
 import (
 	"github.com/seccom/kpass/src/auth"
-	"github.com/seccom/kpass/src/dao"
+	"github.com/seccom/kpass/src/model"
 	"github.com/seccom/kpass/src/schema"
-	"github.com/seccom/kpass/src/service"
 	"github.com/seccom/kpass/src/util"
 	"github.com/teambition/gear"
 )
@@ -16,14 +15,21 @@ import (
 // @Accepts json
 // @Produces json
 type Secret struct {
-	entry  *dao.Entry
-	secret *dao.Secret
-	file   *dao.File
+	entry  *model.Entry
+	file   *model.File
+	secret *model.Secret
 }
 
-// NewSecret returns a Secret API instance
-func NewSecret(db *service.DB) *Secret {
-	return &Secret{dao.NewEntry(db), dao.NewSecret(db), dao.NewFile(db)}
+// Init ...
+func (a *Secret) Init(
+	entry *model.Entry,
+	file *model.File,
+	secret *model.Secret,
+) *Secret {
+	a.entry = entry
+	a.file = file
+	a.secret = secret
+	return a
 }
 
 type tplSecretCreate struct {

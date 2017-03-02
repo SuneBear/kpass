@@ -2,9 +2,8 @@ package api
 
 import (
 	"github.com/seccom/kpass/src/auth"
-	"github.com/seccom/kpass/src/dao"
+	"github.com/seccom/kpass/src/model"
 	"github.com/seccom/kpass/src/schema"
-	"github.com/seccom/kpass/src/service"
 	"github.com/seccom/kpass/src/util"
 	"github.com/teambition/gear"
 )
@@ -16,13 +15,18 @@ import (
 // @Accepts json
 // @Produces json
 type Team struct {
-	team *dao.Team
-	file *dao.File
+	file *model.File
+	team *model.Team
 }
 
-// NewTeam returns a Team API instance
-func NewTeam(db *service.DB) *Team {
-	return &Team{dao.NewTeam(db), dao.NewFile(db)}
+// Init ...
+func (a *Team) Init(
+	file *model.File,
+	team *model.Team,
+) *Team {
+	a.file = file
+	a.team = team
+	return a
 }
 
 type tplTeamCreate struct {

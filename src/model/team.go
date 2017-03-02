@@ -1,4 +1,4 @@
-package dao
+package model
 
 import (
 	"fmt"
@@ -18,18 +18,19 @@ type Team struct {
 	db *service.DB
 }
 
-// NewTeam return a Team intance
-func NewTeam(db *service.DB) *Team {
-	return &Team{db}
+// Init ...
+func (m *Team) Init(db *service.DB) *Team {
+	m.db = db
+	return m
 }
 
 // Create ...
-func (o *Team) Create(userID, pass string, team *schema.Team) (teamResult *schema.TeamResult, err error) {
+func (m *Team) Create(userID, pass string, team *schema.Team) (teamResult *schema.TeamResult, err error) {
 	TeamID := util.NewOID()
 	team.Pass = auth.SignPass(TeamID.String(), pass)
 	team.Created = util.Time(time.Now())
 	team.Updated = team.Created
-	err = o.db.DB.Update(func(tx *buntdb.Tx) error {
+	err = m.db.DB.Update(func(tx *buntdb.Tx) error {
 		_, _, e := tx.Set(schema.TeamKey(TeamID), team.String(), nil)
 		if e == nil {
 			teamResult = team.Result(TeamID, IdsToUsers(tx, team.Members))
@@ -43,8 +44,8 @@ func (o *Team) Create(userID, pass string, team *schema.Team) (teamResult *schem
 }
 
 // Update ...
-func (o *Team) Update(TeamID util.OID, team *schema.Team) (teamResult *schema.TeamResult, err error) {
-	err = o.db.DB.Update(func(tx *buntdb.Tx) error {
+func (m *Team) Update(TeamID util.OID, team *schema.Team) (teamResult *schema.TeamResult, err error) {
+	err = m.db.DB.Update(func(tx *buntdb.Tx) error {
 		team.Updated = util.Time(time.Now())
 		_, _, e := tx.Set(schema.TeamKey(TeamID), team.String(), nil)
 		if e == nil {
@@ -59,9 +60,9 @@ func (o *Team) Update(TeamID util.OID, team *schema.Team) (teamResult *schema.Te
 }
 
 // UpdateMembers ...
-func (o *Team) UpdateMembers(userID string, TeamID util.OID, pull, push []string) (
+func (m *Team) UpdateMembers(userID string, TeamID util.OID, pull, push []string) (
 	teamResult *schema.TeamResult, err error) {
-	err = o.db.DB.Update(func(tx *buntdb.Tx) error {
+	err = m.db.DB.Update(func(tx *buntdb.Tx) error {
 		value, e := tx.Get(schema.TeamKey(TeamID))
 		if e != nil {
 			return e
@@ -104,8 +105,8 @@ func (o *Team) UpdateMembers(userID string, TeamID util.OID, pull, push []string
 }
 
 // Find ...
-func (o *Team) Find(TeamID util.OID, IsDeleted bool) (team *schema.Team, err error) {
-	err = o.db.DB.View(func(tx *buntdb.Tx) (e error) {
+func (m *Team) Find(TeamID util.OID, IsDeleted bool) (team *schema.Team, err error) {
+	err = m.db.DB.View(func(tx *buntdb.Tx) (e error) {
 		var res string
 		if res, e = tx.Get(schema.TeamKey(TeamID)); e == nil {
 			if team, e = schema.TeamFrom(res); e == nil {
@@ -123,10 +124,10 @@ func (o *Team) Find(TeamID util.OID, IsDeleted bool) (team *schema.Team, err err
 }
 
 // FindByUserID ...
-func (o *Team) FindByUserID(userID string, IsDeleted bool) (teams []*schema.TeamResult, err error) {
+func (m *Team) FindByUserID(userID string, IsDeleted bool) (teams []*schema.TeamResult, err error) {
 	teams = make([]*schema.TeamResult, 0)
 	cond := fmt.Sprintf(`{"userID":"%s"}`, userID)
-	err = o.db.DB.View(func(tx *buntdb.Tx) (e error) {
+	err = m.db.DB.View(func(tx *buntdb.Tx) (e error) {
 		tx.AscendGreaterOrEqual("team_by_user", cond, func(key, value string) bool {
 			team, e := schema.TeamFrom(value)
 			if e != nil {
@@ -152,9 +153,9 @@ func (o *Team) FindByUserID(userID string, IsDeleted bool) (teams []*schema.Team
 }
 
 // FindByMemberID ...
-func (o *Team) FindByMemberID(memberID string) (teams []*schema.TeamResult, err error) {
+func (m *Team) FindByMemberID(memberID string) (teams []*schema.TeamResult, err error) {
 	teams = make([]*schema.TeamResult, 0)
-	err = o.db.DB.View(func(tx *buntdb.Tx) (e error) {
+	err = m.db.DB.View(func(tx *buntdb.Tx) (e error) {
 		tx.Ascend("team_by_user", func(key, value string) bool {
 			for _, r := range gjson.Get(value, "members").Array() {
 				if r.String() == memberID {
@@ -181,8 +182,8 @@ func (o *Team) FindByMemberID(memberID string) (teams []*schema.TeamResult, err 
 }
 
 // CheckUser check user' read right
-func (o *Team) CheckUser(TeamID util.OID, userID string) error {
-	err := o.db.DB.View(func(tx *buntdb.Tx) error {
+func (m *Team) CheckUser(TeamID util.OID, userID string) error {
+	err := m.db.DB.View(func(tx *buntdb.Tx) error {
 		value, e := tx.Get(schema.TeamKey(TeamID))
 		if e != nil {
 			return e
@@ -205,8 +206,8 @@ func (o *Team) CheckUser(TeamID util.OID, userID string) error {
 }
 
 // CheckToken ...
-func (o *Team) CheckToken(TeamID util.OID, userID, pass string) (team *schema.Team, err error) {
-	err = o.db.DB.Update(func(tx *buntdb.Tx) error {
+func (m *Team) CheckToken(TeamID util.OID, userID, pass string) (team *schema.Team, err error) {
+	err = m.db.DB.Update(func(tx *buntdb.Tx) error {
 		userKey := schema.UserKey(userID)
 		value, e := tx.Get(userKey)
 		if e != nil {

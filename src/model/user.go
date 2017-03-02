@@ -1,4 +1,4 @@
-package dao
+package model
 
 import (
 	"fmt"
@@ -17,17 +17,18 @@ type User struct {
 	db *service.DB
 }
 
-// NewUser return a User intance
-func NewUser(db *service.DB) *User {
-	return &User{db}
+// Init ...
+func (m *User) Init(db *service.DB) *User {
+	m.db = db
+	return m
 }
 
 // CheckID ...
-func (o *User) CheckID(id string) error {
+func (m *User) CheckID(id string) error {
 	if len(id) < 3 {
 		return &gear.Error{Code: 400, Msg: fmt.Sprintf(`invalid user id "%s"`, id)}
 	}
-	err := o.db.DB.View(func(tx *buntdb.Tx) error {
+	err := m.db.DB.View(func(tx *buntdb.Tx) error {
 		if _, e := tx.Get(schema.UserKey(id)); e == nil {
 			return &gear.Error{Code: 409, Msg: fmt.Sprintf(`user "%s" exists`, id)}
 		}
@@ -37,8 +38,8 @@ func (o *User) CheckID(id string) error {
 }
 
 // CheckLogin ...
-func (o *User) CheckLogin(id, pass string) (user *schema.User, err error) {
-	err = o.db.DB.Update(func(tx *buntdb.Tx) error {
+func (m *User) CheckLogin(id, pass string) (user *schema.User, err error) {
+	err = m.db.DB.Update(func(tx *buntdb.Tx) error {
 		userKey := schema.UserKey(id)
 		value, e := tx.Get(userKey)
 		if e != nil {
@@ -71,8 +72,8 @@ func (o *User) CheckLogin(id, pass string) (user *schema.User, err error) {
 }
 
 // Create ...
-func (o *User) Create(userID, pass string) (user *schema.User, err error) {
-	err = o.db.DB.Update(func(tx *buntdb.Tx) error {
+func (m *User) Create(userID, pass string) (user *schema.User, err error) {
+	err = m.db.DB.Update(func(tx *buntdb.Tx) error {
 		userKey := schema.UserKey(userID)
 		_, e := tx.Get(userKey)
 		if e == nil {
@@ -96,8 +97,8 @@ func (o *User) Create(userID, pass string) (user *schema.User, err error) {
 }
 
 // Find ...
-func (o *User) Find(id string) (user *schema.User, err error) {
-	err = o.db.DB.View(func(tx *buntdb.Tx) error {
+func (m *User) Find(id string) (user *schema.User, err error) {
+	err = m.db.DB.View(func(tx *buntdb.Tx) error {
 		res, e := tx.Get(schema.UserKey(id))
 		if e == nil {
 			user, e = schema.UserFrom(res)
@@ -111,8 +112,8 @@ func (o *User) Find(id string) (user *schema.User, err error) {
 }
 
 // Update ...
-func (o *User) Update(user *schema.User) error {
-	err := o.db.DB.Update(func(tx *buntdb.Tx) error {
+func (m *User) Update(user *schema.User) error {
+	err := m.db.DB.Update(func(tx *buntdb.Tx) error {
 		user.Updated = util.Time(time.Now())
 		_, _, e := tx.Set(schema.UserKey(user.ID), user.String(), nil)
 		return e
@@ -121,8 +122,8 @@ func (o *User) Update(user *schema.User) error {
 }
 
 // FindUsers ...
-func (o *User) FindUsers(ids ...string) (users []*schema.UserResult, err error) {
-	err = o.db.DB.View(func(tx *buntdb.Tx) error {
+func (m *User) FindUsers(ids ...string) (users []*schema.UserResult, err error) {
+	err = m.db.DB.View(func(tx *buntdb.Tx) error {
 		users = IdsToUsers(tx, ids)
 		return nil
 	})

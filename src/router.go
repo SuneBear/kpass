@@ -4,6 +4,7 @@ import (
 	"github.com/seccom/kpass/src/api"
 	"github.com/seccom/kpass/src/auth"
 	"github.com/seccom/kpass/src/ctl"
+	"github.com/seccom/kpass/src/model"
 	"github.com/seccom/kpass/src/service"
 	"github.com/teambition/gear"
 )
@@ -15,13 +16,20 @@ func noOp(ctx *gear.Context) error {
 func newRouter(db *service.DB) (Router *gear.Router) {
 	Router = gear.NewRouter()
 
-	fileCtl := ctl.NewFile(db)
+	entryModel := new(model.Entry).Init(db)
+	fileModel := new(model.File).Init(db)
+	secretModel := new(model.Secret).Init(db)
+	shareModel := new(model.Share).Init(db)
+	teamModel := new(model.Team).Init(db)
+	userModel := new(model.User).Init(db)
 
-	entryAPI := api.NewEntry(db)
-	secretAPI := api.NewSecret(db)
-	teamAPI := api.NewTeam(db)
-	userAPI := api.NewUser(db)
-	shareAPI := api.NewShare(db)
+	entryAPI := new(api.Entry).Init(entryModel, fileModel, secretModel, teamModel)
+	secretAPI := new(api.Secret).Init(entryModel, fileModel, secretModel)
+	teamAPI := new(api.Team).Init(fileModel, teamModel)
+	userAPI := new(api.User).Init(fileModel, teamModel, userModel)
+	shareAPI := new(api.Share).Init(entryModel, shareModel, teamModel, userModel)
+
+	fileCtl := new(ctl.File).Init(entryModel, fileModel, teamModel, userModel)
 
 	// GET /download/fileID?refType=user&refID=userID
 	// GET /download/fileID?refType=team&refID=teamID

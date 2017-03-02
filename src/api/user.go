@@ -4,9 +4,8 @@ import (
 	"strconv"
 
 	"github.com/seccom/kpass/src/auth"
-	"github.com/seccom/kpass/src/dao"
+	"github.com/seccom/kpass/src/model"
 	"github.com/seccom/kpass/src/schema"
-	"github.com/seccom/kpass/src/service"
 	"github.com/seccom/kpass/src/util"
 	"github.com/teambition/gear"
 )
@@ -18,14 +17,21 @@ import (
 // @Accepts json
 // @Produces json
 type User struct {
-	team *dao.Team
-	user *dao.User
-	file *dao.File
+	file *model.File
+	team *model.Team
+	user *model.User
 }
 
-// NewUser returns a User API instance
-func NewUser(db *service.DB) *User {
-	return &User{dao.NewTeam(db), dao.NewUser(db), dao.NewFile(db)}
+// Init ...
+func (a *User) Init(
+	file *model.File,
+	team *model.Team,
+	user *model.User,
+) *User {
+	a.file = file
+	a.team = team
+	a.user = user
+	return a
 }
 
 type tplUserJoin struct {

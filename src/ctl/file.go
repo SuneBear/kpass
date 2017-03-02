@@ -6,9 +6,8 @@ import (
 	"strings"
 
 	"github.com/seccom/kpass/src/auth"
-	"github.com/seccom/kpass/src/dao"
+	"github.com/seccom/kpass/src/model"
 	"github.com/seccom/kpass/src/schema"
-	"github.com/seccom/kpass/src/service"
 	"github.com/seccom/kpass/src/util"
 	"github.com/teambition/gear"
 )
@@ -20,15 +19,24 @@ import (
 // @Accepts json
 // @Produces json
 type File struct {
-	file  *dao.File
-	entry *dao.Entry
-	team  *dao.Team
-	user  *dao.User
+	entry *model.Entry
+	file  *model.File
+	team  *model.Team
+	user  *model.User
 }
 
-// NewFile ...
-func NewFile(db *service.DB) *File {
-	return &File{dao.NewFile(db), dao.NewEntry(db), dao.NewTeam(db), dao.NewUser(db)}
+// Init ...
+func (c *File) Init(
+	entry *model.Entry,
+	file *model.File,
+	team *model.Team,
+	user *model.User,
+) *File {
+	c.entry = entry
+	c.file = file
+	c.team = team
+	c.user = user
+	return c
 }
 
 // Download ...

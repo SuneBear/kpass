@@ -1,4 +1,4 @@
-package dao
+package model
 
 import (
 	"time"
@@ -16,19 +16,20 @@ type Secret struct {
 	db *service.DB
 }
 
-// NewSecret return a Secret intance
-func NewSecret(db *service.DB) *Secret {
-	return &Secret{db}
+// Init ...
+func (m *Secret) Init(db *service.DB) *Secret {
+	m.db = db
+	return m
 }
 
 // Create ...
-func (o *Secret) Create(EntryID util.OID, userID, key string, secret *schema.Secret) (
+func (m *Secret) Create(EntryID util.OID, userID, key string, secret *schema.Secret) (
 	secretResult *schema.SecretResult, err error) {
 	SecretID := util.NewOID()
 	secret.Created = util.Time(time.Now())
 	secret.Updated = secret.Created
 
-	err = o.db.DB.Update(func(tx *buntdb.Tx) error {
+	err = m.db.DB.Update(func(tx *buntdb.Tx) error {
 		entryKey := schema.EntryKey(EntryID)
 		value, e := tx.Get(entryKey)
 		if e != nil {
@@ -71,9 +72,9 @@ func (o *Secret) Create(EntryID util.OID, userID, key string, secret *schema.Sec
 }
 
 // Update ...
-func (o *Secret) Update(EntryID, SecretID util.OID, userID, key string, changes map[string]interface{}) (
+func (m *Secret) Update(EntryID, SecretID util.OID, userID, key string, changes map[string]interface{}) (
 	secretResult *schema.SecretResult, err error) {
-	err = o.db.DB.Update(func(tx *buntdb.Tx) error {
+	err = m.db.DB.Update(func(tx *buntdb.Tx) error {
 		// transaction: one or more user(team members) may update the secret.
 		value, e := tx.Get(schema.EntryKey(EntryID))
 		if e != nil {
@@ -157,8 +158,8 @@ func (o *Secret) Update(EntryID, SecretID util.OID, userID, key string, changes 
 }
 
 // Delete ...
-func (o *Secret) Delete(EntryID, SecretID util.OID, userID string) error {
-	err := o.db.DB.Update(func(tx *buntdb.Tx) error {
+func (m *Secret) Delete(EntryID, SecretID util.OID, userID string) error {
+	err := m.db.DB.Update(func(tx *buntdb.Tx) error {
 		entryKey := schema.EntryKey(EntryID)
 		value, e := tx.Get(entryKey)
 		if e != nil {
@@ -196,8 +197,8 @@ func (o *Secret) Delete(EntryID, SecretID util.OID, userID string) error {
 }
 
 // Find ...
-// func (o *Secret) Find(key string, SecretID util.OID) (secret *schema.Secret, err error) {
-// 	err = o.db.DB.View(func(tx *buntdb.Tx) error {
+// func (m *Secret) Find(key string, SecretID util.OID) (secret *schema.Secret, err error) {
+// 	err = m.db.DB.View(func(tx *buntdb.Tx) error {
 // 		res, e := tx.Get(schema.SecretKey(SecretID))
 // 		if e != nil {
 // 			return e
@@ -216,9 +217,9 @@ func (o *Secret) Delete(EntryID, SecretID util.OID, userID string) error {
 // }
 
 // FindSecrets ...
-func (o *Secret) FindSecrets(key string, ids ...string) (secrets []*schema.SecretResult, err error) {
+func (m *Secret) FindSecrets(key string, ids ...string) (secrets []*schema.SecretResult, err error) {
 	secrets = make([]*schema.SecretResult, 0)
-	err = o.db.DB.View(func(tx *buntdb.Tx) error {
+	err = m.db.DB.View(func(tx *buntdb.Tx) error {
 		for _, id := range ids {
 			ID, e := util.ParseOID(id)
 			if e != nil {
