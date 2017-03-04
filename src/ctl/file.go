@@ -24,9 +24,9 @@ type File struct {
 }
 
 // Init ...
-func (a *File) Init(blls *bll.All) *File {
-	a.models = blls.Models
-	return a
+func (c *File) Init(blls *bll.All) *File {
+	c.models = blls.Models
+	return c
 }
 
 // Download ...
@@ -202,7 +202,7 @@ func (c *File) UploadFile(ctx *gear.Context) (err error) {
 		return ctx.Error(err)
 	}
 	userID, _ := auth.UserIDFromCtx(ctx)
-	if key, err = c.models.File.GetTeamKey(entry.TeamID, userID, key); err != nil {
+	if key, err = c.models.Team.GetKey(entry.TeamID, userID, key); err != nil {
 		return ctx.Error(err)
 	}
 

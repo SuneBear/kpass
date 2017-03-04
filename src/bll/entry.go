@@ -16,7 +16,7 @@ func (b *Entry) Find(userID, key string, EntryID util.OID) (*schema.EntryResult,
 	if err != nil {
 		return nil, err
 	}
-	if key, err = b.Models.File.GetTeamKey(entry.TeamID, userID, key); err != nil {
+	if key, err = b.Models.Team.GetKey(entry.TeamID, userID, key); err != nil {
 		return nil, err
 	}
 

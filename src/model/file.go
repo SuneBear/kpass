@@ -61,44 +61,6 @@ func (m *File) Create(userID, key, name string, r io.Reader) (
 	return
 }
 
-// SaveTeamPass ...
-func (m *File) SaveTeamPass(TeamID util.OID, userID, key, teamPass string) error {
-	value, err := auth.EncryptText(key, teamPass)
-	if err != nil {
-		return dbError(err)
-	}
-	err = m.db.DB.Update(func(tx *buntdb.Tx) error {
-		_, _, e := tx.Set(schema.TeamKeyBlobKey(TeamID, userID), value, nil)
-		return e
-	})
-	return dbError(err)
-}
-
-// GetTeamKey ...
-func (m *File) GetTeamKey(TeamID util.OID, userID, key string) (string, error) {
-	teamKey := ""
-	err := m.db.DB.View(func(tx *buntdb.Tx) error {
-		teamPass := ""
-		val, e := tx.Get(schema.TeamKeyBlobKey(TeamID, userID))
-		if e == nil {
-			teamPass, e = auth.DecryptText(key, val)
-		}
-		if e == nil {
-			if val, e = tx.Get(schema.TeamKey(TeamID)); e == nil {
-				var team *schema.Team
-				if team, e = schema.TeamFrom(val); e == nil {
-					teamKey = auth.AESKey(teamPass, team.Pass)
-				}
-			}
-		}
-		return e
-	})
-	if err != nil {
-		return "", dbError(err)
-	}
-	return teamKey, nil
-}
-
 // FindFile ...
 func (m *File) FindFile(FileID util.OID, key string) (
 	file *schema.File, fileBlob schema.FileBlob, err error) {

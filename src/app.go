@@ -27,7 +27,7 @@ func New(dbPath string, env string) *gear.App {
 	if err != nil {
 		panic(err)
 	}
-	auth.Init(db.Salt, 10*time.Minute)
+	auth.Init(db.Salt, 20*time.Minute)
 
 	indexBody := "<h1>Kpass</h1>"
 	faviconBin := []byte{}

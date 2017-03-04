@@ -59,8 +59,8 @@ func (m *Team) Update(TeamID util.OID, team *schema.Team) (teamResult *schema.Te
 	return
 }
 
-// UpdateMembers ...
-func (m *Team) UpdateMembers(userID string, TeamID util.OID, pull, push []string) (
+// AddMember ...
+func (m *Team) AddMember(ownerID, userID string, TeamID util.OID) (
 	teamResult *schema.TeamResult, err error) {
 	err = m.db.DB.Update(func(tx *buntdb.Tx) error {
 		value, e := tx.Get(schema.TeamKey(TeamID))
@@ -74,23 +74,15 @@ func (m *Team) UpdateMembers(userID string, TeamID util.OID, pull, push []string
 		if team.IsDeleted {
 			return &gear.Error{Code: 404, Msg: "team not found"}
 		}
-		if team.UserID != userID {
+		if team.UserID != ownerID {
 			return &gear.Error{Code: 403, Msg: "not team owner"}
 		}
 		if team.Visibility == "private" {
 			return &gear.Error{Code: 403, Msg: "can't change member in private team"}
 		}
-		for _, user := range pull {
-			if !team.RemoveMember(user) {
-				return &gear.Error{Code: 400, Msg: "invalid team member to remove"}
-			}
-		}
-		for _, user := range push {
-			if _, e := tx.Get(schema.UserKey(user)); e != nil {
-				// user not exists
-				return &gear.Error{Code: 400, Msg: e.Error()}
-			}
-			team.AddMember(user)
+
+		if !team.AddMember(userID) {
+			return &gear.Error{Code: 409, Msg: "already team member"}
 		}
 		_, _, e = tx.Set(schema.TeamKey(TeamID), team.String(), nil)
 		if e == nil {
@@ -102,6 +94,35 @@ func (m *Team) UpdateMembers(userID string, TeamID util.OID, pull, push []string
 		return nil, dbError(err)
 	}
 	return
+}
+
+// RemoveMember ...
+func (m *Team) RemoveMember(ownerID, userID string, TeamID util.OID) error {
+	err := m.db.DB.Update(func(tx *buntdb.Tx) error {
+		value, e := tx.Get(schema.TeamKey(TeamID))
+		if e != nil {
+			return e
+		}
+		team, e := schema.TeamFrom(value)
+		if e != nil {
+			return e
+		}
+		if team.IsDeleted {
+			return &gear.Error{Code: 404, Msg: "team not found"}
+		}
+		if team.UserID != ownerID {
+			return &gear.Error{Code: 403, Msg: "not team owner"}
+		}
+		if team.Visibility == "private" {
+			return &gear.Error{Code: 403, Msg: "can't change member in private team"}
+		}
+		if !team.RemoveMember(userID) {
+			return &gear.Error{Code: 400, Msg: "invalid team member to remove"}
+		}
+		_, _, e = tx.Set(schema.TeamKey(TeamID), team.String(), nil)
+		return e
+	})
+	return dbError(err)
 }
 
 // Find ...
@@ -205,50 +226,56 @@ func (m *Team) CheckUser(TeamID util.OID, userID string) error {
 	return dbError(err)
 }
 
-// CheckToken ...
-func (m *Team) CheckToken(TeamID util.OID, userID, pass string) (team *schema.Team, err error) {
-	err = m.db.DB.Update(func(tx *buntdb.Tx) error {
-		userKey := schema.UserKey(userID)
-		value, e := tx.Get(userKey)
-		if e != nil {
-			return e
-		}
-		user, e := schema.UserFrom(value)
-		if e != nil {
-			return e
-		}
-		if user.IsBlocked || user.Attempt > 5 {
-			return &gear.Error{Code: 403, Msg: "too many login attempts"}
-		}
-		value, e = tx.Get(schema.TeamKey(TeamID))
-		if e != nil {
-			return e
-		}
-		team, e = schema.TeamFrom(value)
-		if e != nil {
-			return e
-		}
-		if team.IsDeleted {
-			return buntdb.ErrNotFound
-		}
-		if !team.HasMember(userID) {
-			return &gear.Error{Code: 403, Msg: "not team member"}
-		}
-		if !auth.VerifyPass(TeamID.String(), pass, team.Pass) {
-			user.Attempt++
-			tx.Set(userKey, user.String(), nil)
-			tx.Commit()
-			return &gear.Error{Code: 400, Msg: "team password error"}
-		}
-		if user.Attempt > 0 {
-			user.Attempt = 0
-			tx.Set(userKey, user.String(), nil)
-		}
-		return nil
-	})
-
+// SavePass ...
+func (m *Team) SavePass(TeamID util.OID, userID, key, teamPass string) error {
+	value, err := auth.EncryptText(key, teamPass)
 	if err != nil {
-		return nil, dbError(err)
+		return dbError(err)
 	}
-	return
+	err = m.db.DB.Update(func(tx *buntdb.Tx) error {
+		_, _, e := tx.Set(schema.TeamPassKey(TeamID, userID), value, nil)
+		return e
+	})
+	return dbError(err)
+}
+
+// GetPass ...
+func (m *Team) GetPass(TeamID util.OID, userID, key string) (string, error) {
+	teamPass := ""
+	err := m.db.DB.View(func(tx *buntdb.Tx) error {
+		val, e := tx.Get(schema.TeamPassKey(TeamID, userID))
+		if e == nil {
+			teamPass, e = auth.DecryptText(key, val)
+		}
+		return e
+	})
+	if err != nil {
+		return "", dbError(err)
+	}
+	return teamPass, nil
+}
+
+// GetKey ...
+func (m *Team) GetKey(TeamID util.OID, userID, key string) (string, error) {
+	teamKey := ""
+	err := m.db.DB.View(func(tx *buntdb.Tx) error {
+		teamPass := ""
+		val, e := tx.Get(schema.TeamPassKey(TeamID, userID))
+		if e == nil {
+			teamPass, e = auth.DecryptText(key, val)
+		}
+		if e == nil {
+			if val, e = tx.Get(schema.TeamKey(TeamID)); e == nil {
+				var team *schema.Team
+				if team, e = schema.TeamFrom(val); e == nil {
+					teamKey = auth.AESKey(teamPass, team.Pass)
+				}
+			}
+		}
+		return e
+	})
+	if err != nil {
+		return "", dbError(err)
+	}
+	return teamKey, nil
 }

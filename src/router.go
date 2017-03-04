@@ -48,16 +48,20 @@ func newRouter(db *service.DB) (Router *gear.Router) {
 	Router.Post("/api/teams", auth.Middleware, teamAPI.Create)
 	// // Return current user's teams joined.
 	Router.Get("/api/teams", auth.Middleware, teamAPI.FindByMember)
-	// Undelete the entry
+	// Join a team by invite code
+	Router.Post("/api/teams/join", auth.Middleware, teamAPI.Join)
+	// Undelete the team
 	Router.Post(`/api/teams/:teamID+:undelete`, auth.Middleware, teamAPI.Undelete)
 	// Return the team's entries list
 	Router.Get("/api/teams/:teamID/entries", auth.Middleware, entryAPI.FindByTeam)
 	// Create a new entry for team
 	Router.Post("/api/teams/:teamID/entries", auth.Middleware, entryAPI.Create)
+	// Invite a user to the team
+	Router.Post("/api/teams/:teamID/invite", auth.Middleware, teamAPI.Invite)
 	// Update the team
 	Router.Put("/api/teams/:teamID", auth.Middleware, teamAPI.Update)
-	// change the team's members
-	Router.Put("/api/teams/:teamID/members", auth.Middleware, teamAPI.Members)
+	// remove the team's member
+	Router.Delete("/api/teams/:teamID/members/:userID", auth.Middleware, teamAPI.RemoveMember)
 	// Delete the team
 	Router.Delete("/api/teams/:teamID", auth.Middleware, teamAPI.Delete)
 	// Return the team's shares list

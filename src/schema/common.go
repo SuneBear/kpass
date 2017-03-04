@@ -16,6 +16,7 @@ const (
 	keyPrefixShare    = "SH:"
 	keyPrefixFile     = "F:"
 	keyPrefixFileBlob = "FB:"
+	keyPrefixTeamPass = "TP:"
 )
 
 // InitIndex ...
@@ -103,9 +104,9 @@ func FileBlobKey(ID util.OID) string {
 	return keyPrefixFileBlob + ID.String()
 }
 
-// TeamKeyBlobKey returns team key blob' key
-func TeamKeyBlobKey(TeamID util.OID, userID string) string {
-	return keyPrefixFileBlob + TeamID.String() + userID
+// TeamPassKey returns team key blob' key
+func TeamPassKey(TeamID util.OID, userID string) string {
+	return keyPrefixTeamPass + TeamID.String() + userID
 }
 
 func jsonMarshal(v interface{}) (str string) {

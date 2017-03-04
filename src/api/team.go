@@ -155,51 +155,33 @@ func (a *Team) Update(ctx *gear.Context) (err error) {
 	return ctx.JSON(200, res)
 }
 
-type tplTeamMembers struct {
-	Push []string `json:"$push" swaggo:"false,add some team members,[\"joe\"]"`
-	Pull []string `json:"$pull" swaggo:"false,remove some team members,[]"`
-}
-
-// Validate ...
-func (t *tplTeamMembers) Validate() error {
-	if len(t.Push) == 0 && len(t.Pull) == 0 {
-		return &gear.Error{Code: 400, Msg: "no content"}
-	}
-	if len(t.Push) > 100 || len(t.Pull) > 100 {
-		return &gear.Error{Code: 400, Msg: "too many members"}
-	}
-	return nil
-}
-
-// Members ...
+// RemoveMember ...
 //
-// @Title Members
-// @Summary Add or remove team members
-// @Description only the team owner can update the team members
+// @Title RemoveMember
+// @Summary remove a team member
+// @Description only the team owner can remove the team member
 // @Param Authorization header string true "access_token"
 // @Param teamID path string true "team ID"
-// @Param body body tplTeamMembers true "team members"
-// @Success 200 schema.TeamResult
+// @Param userID path string true "team member ID"
+// @Success 204
 // @Failure 400 string
 // @Failure 401 string
-// @Router PUT /api/teams/{teamID}/members
-func (a *Team) Members(ctx *gear.Context) (err error) {
+// @Router DELETE /api/teams/{teamID}/members/{userID}
+func (a *Team) RemoveMember(ctx *gear.Context) (err error) {
 	TeamID, err := util.ParseOID(ctx.Param("teamID"))
 	if err != nil {
 		return ctx.ErrorStatus(400)
 	}
-
-	userID, _ := auth.UserIDFromCtx(ctx)
-	body := new(tplTeamMembers)
-	if err = ctx.ParseBody(body); err != nil {
-		return ctx.Error(err)
+	userID := ctx.Param("userID")
+	if userID == "" {
+		return ctx.ErrorStatus(400)
 	}
 
-	res, err := a.models.Team.UpdateMembers(userID, TeamID, body.Pull, body.Push)
-	if err != nil {
+	ownerID, _ := auth.UserIDFromCtx(ctx)
+	if err = a.models.Team.RemoveMember(ownerID, userID, TeamID); err != nil {
 		return ctx.Error(err)
 	}
-	return ctx.JSON(200, res)
+	return ctx.End(204)
 }
 
 // Delete ...
@@ -292,4 +274,92 @@ func (a *Team) FindByMember(ctx *gear.Context) (err error) {
 		return ctx.Error(err)
 	}
 	return ctx.JSON(200, teams)
+}
+
+type tplTeamInvite struct {
+	UserID string `json:"userID" swaggo:"true,user to invite,jeo"`
+}
+
+func (t *tplTeamInvite) Validate() error {
+	if t.UserID == "" {
+		return &gear.Error{Code: 400, Msg: "invalid user id"}
+	}
+	return nil
+}
+
+// tplTeamInviteCode ...
+type tplTeamInviteCode struct {
+	Code string `json:"code"`
+}
+
+func (t *tplTeamInviteCode) Validate() error {
+	if t.Code == "" {
+		return &gear.Error{Code: 400, Msg: "invalid invite code"}
+	}
+	return nil
+}
+
+// Invite a user to the team
+//
+// @Title Invite
+// @Summary Invite a user to the team
+// @Description Invite a user to the team
+// @Param Authorization header string true "access_token"
+// @Param teamID path string true "team ID"
+// @Param body body tplTeamInvite true "user to invite"
+// @Success 200 tplTeamInviteCode
+// @Failure 400 string
+// @Failure 401 string
+// @Router POST /api/teams/{teamID}/invite
+func (a *Team) Invite(ctx *gear.Context) (err error) {
+	TeamID, err := util.ParseOID(ctx.Param("teamID"))
+	if err != nil {
+		return ctx.ErrorStatus(400)
+	}
+
+	body := new(tplTeamInvite)
+	if err = ctx.ParseBody(body); err != nil {
+		return ctx.Error(err)
+	}
+
+	key, err := auth.KeyFromCtx(ctx)
+	if err != nil {
+		return ctx.Error(err)
+	}
+	userID, _ := auth.UserIDFromCtx(ctx)
+
+	code, err := a.teamBll.Invite(userID, key, body.UserID, TeamID)
+	if err != nil {
+		return ctx.Error(err)
+	}
+	return ctx.JSON(200, &tplTeamInviteCode{code})
+}
+
+// Join join a team by invite code
+//
+// @Title Join
+// @Summary Join a team
+// @Description Join a team by invite code
+// @Param Authorization header string true "access_token"
+// @Param body body tplTeamInviteCode true "invite code"
+// @Success 200 schema.TeamResult
+// @Failure 400 string
+// @Failure 401 string
+// @Router POST /api/teams/join
+func (a *Team) Join(ctx *gear.Context) (err error) {
+	body := new(tplTeamInviteCode)
+	if err = ctx.ParseBody(body); err != nil {
+		return ctx.Error(err)
+	}
+
+	key, err := auth.KeyFromCtx(ctx)
+	if err != nil {
+		return ctx.Error(err)
+	}
+	userID, _ := auth.UserIDFromCtx(ctx)
+	res, err := a.teamBll.Join(userID, key, body.Code)
+	if err != nil {
+		return ctx.Error(err)
+	}
+	return ctx.JSON(200, res)
 }
