@@ -1,5 +1,5 @@
-import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 
 import { userMeSelector, updateUserAction } from 'modules'
 import { AccountSettings as AccountSettingsView } from './account-settings.view'

@@ -1,20 +1,20 @@
-import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 import { reduxForm } from 'redux-form'
 
 import {
-  currentEntrySelector,
   currentTeamSelector,
-  updateCurrentEntryAction,
-  createCurrentTeamEntryAction
+  currentEntrySelector,
+  createCurrentTeamEntryAction,
+  updateCurrentEntryAction
 } from '../../modules'
 
 import { EntryMake as EntryMakeView } from './entry-make.view'
 import { entryMakeValidate } from './entry-make.validate'
 
 const mapStateToProps = (state) => ({
-  entry: currentEntrySelector(state),
-  team: currentTeamSelector(state)
+  team: currentTeamSelector(state),
+  entry: currentEntrySelector(state)
 })
 
 const mapDispatchToProps = (dispatch) => ({

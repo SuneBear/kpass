@@ -1,13 +1,10 @@
 import React, { Component, PropTypes } from 'react'
 import { I18n, Translate } from 'react-redux-i18n'
-import { Field, propTypes as formPropTypes } from 'redux-form'
 import cx from 'classnames'
 
-import {
-  Button, Toggle, Modal,
-  FieldText
-} from 'uis'
+import { Button, Toggle, Modal } from 'uis'
 import { Card } from 'views'
+import { TeamRename } from '../team-rename'
 
 import './team-settings.view.styl'
 
@@ -15,9 +12,8 @@ export class TeamSettings extends Component {
 
   static propTypes = {
     className: PropTypes.string,
-    currentTeam: PropTypes.object,
-    actions: PropTypes.object,
-    ...formPropTypes
+    team: PropTypes.object,
+    actions: PropTypes.object
   }
 
   getRootClassnames () {
@@ -35,17 +31,6 @@ export class TeamSettings extends Component {
     this.teamRenameModalRef.open()
   }
 
-  handleTeamRenameSubmit = (values) => {
-    const {
-      actions
-    } = this.props
-
-    // @TODO: Implementation
-    actions.updateCurrentTeam({
-      name: values.teamName
-    })
-  }
-
   handleFreezeToggleChange = (checked) => {
     const {
       actions
@@ -57,47 +42,19 @@ export class TeamSettings extends Component {
     })
   }
 
-  renderTeamRenameForm () {
-    const {
-      handleSubmit,
-      pristine,
-      valid,
-      submitting,
-
-      currentTeam
-    } = this.props
-
-    return (
-      <form
-        onSubmit={handleSubmit(this.handleTeamRenameSubmit)}
-      >
-        <Field
-          name={'teamName'}
-          component={FieldText}
-          placeholder={I18n.t('team.teamName')}
-          defaultValue={currentTeam.name}
-        />
-        <Button
-          block
-          type={'primary'}
-          htmlType={'submit'}
-          disabled={pristine || !valid}
-          loading={submitting}
-        >
-          <Translate value={'action.save'} />
-        </Button>
-      </form>
-    )
-  }
-
   renderTeamRenameModal () {
+    const { team } = this.props
+
     return (
       <Modal
         ref={this.saveTeamRenameModalRef}
         title={I18n.t('teamSettings.rename')}
         size={'small'}
       >
-        {this.renderTeamRenameForm()}
+        <TeamRename
+          team={team}
+          initialValues={team}
+        />
       </Modal>
     )
   }
@@ -125,7 +82,7 @@ export class TeamSettings extends Component {
   }
 
   renderFreezeToggleSection () {
-    const { currentTeam } = this.props
+    const { team } = this.props
 
     return (
       <div className={'settingSection'}>
@@ -137,7 +94,7 @@ export class TeamSettings extends Component {
         </div>
         <div className={'settingSectionHandler'}>
           <Toggle
-            checked={currentTeam.isFrozen}
+            checked={team.isFrozen}
             onChange={this.handleFreezeToggleChange}
           />
         </div>

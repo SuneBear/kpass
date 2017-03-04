@@ -4,6 +4,7 @@ import { Field, propTypes as formPropTypes } from 'redux-form'
 import cx from 'classnames'
 
 import { Button, FieldText, FieldSelect } from 'uis'
+import { createEmptyPromise } from 'utils'
 
 import { getEntryCategoryOptions } from '../../shared'
 
@@ -38,37 +39,40 @@ export class EntryMake extends Component {
       actions
     } = this.props
 
+    const formPromise = createEmptyPromise()
+
     if (currentAction === 'create') {
-      // @TODO: Implementation
       actions.createEntry({
         teamId: team.id,
-        ...values
+        body: values,
+        formPromise
       })
     } else {
       // @TODO: Implementation
       actions.updateEntry({
         teamId: team.id,
-        ...values
+        body: values,
+        formPromise
       })
     }
+
+    return formPromise
   }
 
   renderEntryMakeForm () {
     const { handleSubmit, pristine, valid, submitting } = this.props
-    const { entry } = this.props
 
     return (
       <form onSubmit={handleSubmit(this.handleSubmit)}>
         <Field
-          name={'entryName'}
+          name={'name'}
           component={FieldText}
           placeholder={I18n.t('entry.entryName')}
         />
         <Field
-          name={'entryCategory'}
+          name={'category'}
           component={FieldSelect}
           label={I18n.t('entry.entryCategory')}
-          defaultValue={entry.category || 'Login'}
           options={getEntryCategoryOptions()}
         />
         <Button

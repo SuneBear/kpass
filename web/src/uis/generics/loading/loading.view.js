@@ -51,7 +51,7 @@ export class Loading extends Component {
     }
 
     return (
-      <div className='endEointWrapper'>
+      <div className='endPointWrapper'>
         <span className='endPoint' />
       </div>
     )

@@ -5,10 +5,9 @@ import { Field, propTypes as formPropTypes } from 'redux-form'
 import cx from 'classnames'
 
 import { Button, FieldText } from 'uis'
+import { createEmptyPromise } from 'utils'
 
 import './sign-up.view.styl'
-
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 export class SignUp extends Component {
 
@@ -30,13 +29,15 @@ export class SignUp extends Component {
       actions
     } = this.props
 
+    const formPromise = createEmptyPromise()
+
     actions.signUpUser({
       username: values.username,
-      password: values.password
+      password: values.password,
+      formPromise
     })
 
-    return sleep(1000)
-      .then(() => {})
+    return formPromise
   }
 
   renderSignUpForm () {

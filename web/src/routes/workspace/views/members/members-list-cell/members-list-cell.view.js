@@ -14,9 +14,9 @@ export class MembersListCell extends Component {
     member: PropTypes.object,
     isMe: PropTypes.bool,
     isOwner: PropTypes.bool,
+    userPermissions: PropTypes.object,
     onLeaveTeam: PropTypes.func,
-    onRemoveMember: PropTypes.func,
-    permissions: PropTypes.object
+    onRemoveMember: PropTypes.func
   }
 
   getRootClassnames () {
@@ -66,7 +66,7 @@ export class MembersListCell extends Component {
   }
 
   renderHandler () {
-    const { isOwner, isMe, permissions } = this.props
+    const { isOwner, isMe, userPermissions } = this.props
 
     let handler = null
     if (isMe) {
@@ -84,7 +84,7 @@ export class MembersListCell extends Component {
           {handlerText}
         </Button>
       )
-    } else if (permissions.deleteTeamMember) {
+    } else if (userPermissions.deleteTeamMember) {
       handler = (
         <Button
           ghost

@@ -1,5 +1,5 @@
-import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 
 import { userMeSelector } from 'modules'
 import {
@@ -16,7 +16,7 @@ const mapStateToProps = (state) => ({
   userMe: userMeSelector(state),
   team: currentTeamSelector(state),
   teamMembers: currentTeamMembersSelector(state),
-  permissions: currentUserPermissionsSelector(state)
+  userPermissions: currentUserPermissionsSelector(state)
 })
 
 const mapDispatchToProps = (dispatch) => ({

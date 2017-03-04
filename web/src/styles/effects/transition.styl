@@ -4,24 +4,23 @@
 
 // Switch　Card
 // TODO: Duration & Margin Tuning
-.switch-transition
+.switch-card-transition
   &-enter,
   &-leave-active
     opacity: 0.01
+    transform: translate3d(0, 30px, 0) scale(0.99)
     transition-timing-function: ease-in-out
     transition-property: opacity, transform
 
   &-enter
-    transform: translate3d(0, 40px, 0)
-
     &-active
-      transition-duration: 368ms
+      opacity: 1
+      transform: translate3d(0, 0, 0) scale(1)
+      transition-duration: 268ms
       transition-delay: 150ms
 
   &-leave-active
     z-index: $zIndexLayer
-    transition-duration: 468ms
-    transform: translate3d(0, -60px, 0)
 
 .expand-width-transition
   transition-property: width

@@ -4,6 +4,8 @@ const initialState = {
   teamId: null
 }
 
+export const mountCurrentTeamAction = createAction('MOUNT_CURRENT_TEAM')
+export const unmountCurrentTeamAction = createAction('UNMOUNT_CURRENT_TEAM')
 export const setCurrentTeamAction = createAction('SET_CURRENT_TEAM')
 
 export const currentTeamReducer = handleActions({

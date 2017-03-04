@@ -5,7 +5,7 @@ import { WorkspaceSidebar as WorkspaceSidebarView } from './workspace-sidebar.vi
 
 const mapStateToProps = (state) => ({
   basePath: currentBasePathSelector(state),
-  permissions: currentUserPermissionsSelector(state)
+  userPermissions: currentUserPermissionsSelector(state)
 })
 
 const mapDispatchToProps = (dispatch) => ({})

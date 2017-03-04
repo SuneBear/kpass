@@ -63,7 +63,7 @@ export const enUS = {
   },
 
   team: {
-    newTeam: 'New Team',
+    new: 'New Team',
     teamName: 'Team name',
     leave: 'Leave the team',
     leaveAndDisband: 'Leave & Disband the team'

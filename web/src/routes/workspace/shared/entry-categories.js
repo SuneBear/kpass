@@ -5,7 +5,7 @@ export const getEntryCategories = () => ([
   },
 
   {
-    name: 'Wi-Fi',
+    name: 'Network',
     color: '#797EC9'
   },
 

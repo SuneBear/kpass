@@ -1,14 +1,21 @@
-import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 
-import { setCurrentTeamAction } from '../modules'
+import {
+  currentTeamSelector,
+  mountCurrentTeamAction,
+  unmountCurrentTeamAction
+} from '../modules'
 import { Team as TeamView } from './team.view'
 
-const mapStateToProps = (state) => ({})
+const mapStateToProps = (state) => ({
+  currentTeam: currentTeamSelector(state)
+})
 
 const mapDispatchToProps = (dispatch) => ({
   actions: bindActionCreators({
-    setCurrentTeam: setCurrentTeamAction
+    mountCurrentTeam: mountCurrentTeamAction,
+    unmountCurrentTeam: unmountCurrentTeamAction
   }, dispatch)
 })
 

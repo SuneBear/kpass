@@ -83,11 +83,15 @@ export class FieldText extends Component {
       type
     } = this.props
 
+    if (!input.value) {
+      input.value = defaultValue
+    }
+
     return (
       <div className='inputWrap'>
         <Input
           ref={this.saveInputRef}
-          defaultValue={defaultValue || input.value}
+          defaultValue={input.value}
           name={name}
           placeholder={placeholder}
           autoFocus={autoFocus}

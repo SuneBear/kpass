@@ -67,11 +67,15 @@ export class FieldSelect extends Component {
       options
     } = this.props
 
+    if (!input.value) {
+      input.value = defaultValue
+    }
+
     return (
       <div className='selectWrap'>
         <Select
-          defaultValue={defaultValue || input.value}
           name={name}
+          defaultValue={input.value}
           placeholder={placeholder}
           options={options}
           onChange={this.handleChange}

@@ -13,7 +13,7 @@ export class MembersList extends Component {
     userMe: PropTypes.object,
     team: PropTypes.object,
     members: PropTypes.array,
-    permissions: PropTypes.object,
+    userPermissions: PropTypes.object,
     onLeaveTeam: PropTypes.func,
     onRemoveMember: PropTypes.func
   }
@@ -49,9 +49,9 @@ export class MembersList extends Component {
 
   renderCell (member) {
     const {
-      team,
       userMe,
-      permissions,
+      team,
+      userPermissions,
       onLeaveTeam,
       onRemoveMember
     } = this.props
@@ -60,11 +60,11 @@ export class MembersList extends Component {
       <MembersListCell
         key={member.id}
         member={member}
-        onLeaveTeam={onLeaveTeam}
-        onRemoveMember={onRemoveMember}
         isOwner={isOwner(team, member)}
         isMe={isMe(member, userMe)}
-        permissions={permissions}
+        userPermissions={userPermissions}
+        onLeaveTeam={onLeaveTeam}
+        onRemoveMember={onRemoveMember}
        />
     )
   }

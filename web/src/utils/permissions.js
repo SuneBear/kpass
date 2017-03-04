@@ -27,13 +27,17 @@ export const isMe = (member, userMe) => {
   return member.id === userMe.id
 }
 
-// @TODO: Optimize getMemberPermissions, relate to roles
-export const getMemberPermissions = (team, member) => {
+export const isCreator = (memberId, userMe) => {
+  return memberId === userMe.id
+}
+
+// @TODO: Optimize getUserPermissions, relate to roles
+export const getUserPermissions = (user, team) => {
   /* == Conditionals == */
   const $alwaysTrue = true
 
-  const $isMember = isMember(member)
-  const $isOwner = isOwner(team, member)
+  const $isMember = isMember(user)
+  const $isOwner = isOwner(team, user)
 
   const $isPublicTeam = isPublicTeam(team)
   const $isFrozenTeam = isFrozenTeam(team)
@@ -45,7 +49,9 @@ export const getMemberPermissions = (team, member) => {
     roleWeight: -1000
   }
 
-  const memberPermissions = Object.assign({}, basePermissions, {
+  const memberPermissions = {
+    ...basePermissions,
+
     roleWeight: 0,
 
     // Entry
@@ -54,9 +60,11 @@ export const getMemberPermissions = (team, member) => {
     // Team Member
     createTeamMember: $alwaysTrue,
     readTeamMember: $isPublicTeam
-  })
+  }
 
-  const ownerPermissions = Object.assign({}, memberPermissions, {
+  const ownerPermissions = {
+    ...memberPermissions,
+
     roleWeight: 1000,
 
     // Team Member
@@ -64,7 +72,7 @@ export const getMemberPermissions = (team, member) => {
 
     // Team Setting
     updateTeamSetting: $alwaysTrue
-  })
+  }
 
   /* == Return == */
   if ($isOwner) {
@@ -74,4 +82,26 @@ export const getMemberPermissions = (team, member) => {
   } else {
     return basePermissions
   }
+}
+
+export const getCreatorPermissions = (memberId, userMe, team) => {
+  const $alwaysTrue = true
+  const $isCreator = $alwaysTrue // @REPLACE: isCreator(memberId, userMe)
+  const $isOwner = isOwner(team, userMe)
+  const $isFrozenTeam = isFrozenTeam(team)
+  const $isNonFrozenTeamAndCreator = !$isFrozenTeam && $isCreator
+
+  const permissionKeys = [
+    // Entry
+    'updateEntry',
+    'deleteEntry'
+  ]
+
+  const permissions = {}
+  permissionKeys.map((key) => {
+    const permission = $isNonFrozenTeamAndCreator || $isOwner
+    permissions[key] = permission
+  })
+
+  return permissions
 }
