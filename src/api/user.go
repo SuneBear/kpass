@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/seccom/kpass/src/auth"
+	"github.com/seccom/kpass/src/bll"
 	"github.com/seccom/kpass/src/model"
 	"github.com/seccom/kpass/src/schema"
 	"github.com/seccom/kpass/src/util"
@@ -17,20 +18,14 @@ import (
 // @Accepts json
 // @Produces json
 type User struct {
-	file *model.File
-	team *model.Team
-	user *model.User
+	models  *model.All
+	teamBll *bll.Team
 }
 
 // Init ...
-func (a *User) Init(
-	file *model.File,
-	team *model.Team,
-	user *model.User,
-) *User {
-	a.file = file
-	a.team = team
-	a.user = user
+func (a *User) Init(blls *bll.All) *User {
+	a.models = blls.Models
+	a.teamBll = blls.Team
 	return a
 }
 
@@ -64,29 +59,17 @@ func (a *User) Join(ctx *gear.Context) error {
 	if err := ctx.ParseBody(body); err != nil {
 		return ctx.Error(err)
 	}
-	if err := a.user.CheckID(body.ID); err != nil {
+	if err := a.models.User.CheckID(body.ID); err != nil {
 		return ctx.Error(err)
 	}
 
-	user, err := a.user.Create(body.ID, body.Pass)
+	user, err := a.models.User.Create(body.ID, body.Pass)
 	if err != nil {
 		return ctx.Error(err)
 	}
 
 	key := auth.AESKey(body.Pass, user.Pass)
-	teamPass := util.RandPass(20, 3, 5)
-	// create a private team for the user.
-	team, err := a.team.Create(body.ID, teamPass, &schema.Team{
-		Name:       body.ID,
-		UserID:     body.ID,
-		Visibility: "private",
-		Members:    []string{body.ID},
-	})
-	if err != nil {
-		return ctx.Error(err)
-	}
-
-	if err = a.file.SaveTeamPass(team.ID, user.ID, key, teamPass); err != nil {
+	if _, err = a.teamBll.Create(user.ID, "MY", key, "private"); err != nil {
 		return ctx.Error(err)
 	}
 	return ctx.JSON(200, user.Result())
@@ -112,6 +95,14 @@ func (t *tplUserLogin) Validate() error {
 	return nil
 }
 
+// AuthResult ...
+type AuthResult struct {
+	Token  string             `json:"access_token" swaggo:"true,access_token,tokenxxxxxxxx...."`
+	Type   string             `json:"token_type" swaggo:"true,will always be \"Bearer\",Bearer"`
+	Expire float64            `json:"expires_in" swaggo:"true,expires time duration in seconds,3600"`
+	User   *schema.UserResult `json:"user,omitempty" swaggo:"false,user info"`
+}
+
 // Login ...
 //
 // @Title Login
@@ -129,7 +120,7 @@ func (a *User) Login(ctx *gear.Context) (err error) {
 	}
 
 	var user *schema.User
-	if user, err = a.user.CheckLogin(body.ID, body.Pass); err != nil {
+	if user, err = a.models.User.CheckLogin(body.ID, body.Pass); err != nil {
 		return
 	}
 
@@ -162,7 +153,7 @@ func (a *User) Find(ctx *gear.Context) (err error) {
 	if userID == "" {
 		return ctx.ErrorStatus(400)
 	}
-	user, err := a.user.Find(userID)
+	user, err := a.models.User.Find(userID)
 	if err != nil {
 		return ctx.Error(err)
 	}

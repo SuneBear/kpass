@@ -2,6 +2,7 @@ package model
 
 import (
 	"github.com/seccom/kpass/src/schema"
+	"github.com/seccom/kpass/src/service"
 	"github.com/teambition/gear"
 	"github.com/tidwall/buntdb"
 )
@@ -29,4 +30,25 @@ func IdsToUsers(tx *buntdb.Tx, ids []string) (users []*schema.UserResult) {
 		}
 	}
 	return
+}
+
+// All ....
+type All struct {
+	Entry  *Entry
+	File   *File
+	Secret *Secret
+	Share  *Share
+	Team   *Team
+	User   *User
+}
+
+// Init ...
+func (a *All) Init(db *service.DB) *All {
+	a.Entry = new(Entry).Init(db)
+	a.File = new(File).Init(db)
+	a.Secret = new(Secret).Init(db)
+	a.Share = new(Share).Init(db)
+	a.Team = new(Team).Init(db)
+	a.User = new(User).Init(db)
+	return a
 }

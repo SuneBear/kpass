@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/seccom/kpass/src/auth"
+	"github.com/seccom/kpass/src/bll"
 	"github.com/seccom/kpass/src/model"
 	"github.com/seccom/kpass/src/schema"
 	"github.com/seccom/kpass/src/util"
@@ -15,23 +16,14 @@ import (
 // @Accepts json
 // @Produces json
 type Entry struct {
-	entry  *model.Entry
-	file   *model.File
-	secret *model.Secret
-	team   *model.Team
+	models   *model.All
+	entryBll *bll.Entry
 }
 
 // Init ...
-func (a *Entry) Init(
-	entry *model.Entry,
-	file *model.File,
-	secret *model.Secret,
-	team *model.Team,
-) *Entry {
-	a.file = file
-	a.entry = entry
-	a.secret = secret
-	a.team = team
+func (a *Entry) Init(blls *bll.All) *Entry {
+	a.models = blls.Models
+	a.entryBll = blls.Entry
 	return a
 }
 
@@ -74,7 +66,7 @@ func (a *Entry) Create(ctx *gear.Context) (err error) {
 		return ctx.Error(err)
 	}
 
-	entry, err := a.entry.Create(userID, &schema.Entry{
+	entry, err := a.models.Entry.Create(userID, &schema.Entry{
 		TeamID:   TeamID,
 		Name:     body.Name,
 		Category: body.Category,
@@ -145,7 +137,7 @@ func (a *Entry) Update(ctx *gear.Context) (err error) {
 		return ctx.Error(err)
 	}
 
-	entrySum, err := a.entry.Update(userID, EntryID, *body)
+	entrySum, err := a.models.Entry.Update(userID, EntryID, *body)
 	if err != nil {
 		return ctx.Error(err)
 	}
@@ -170,15 +162,7 @@ func (a *Entry) Delete(ctx *gear.Context) (err error) {
 	}
 
 	userID, _ := auth.UserIDFromCtx(ctx)
-	entry, err := a.entry.Find(EntryID, false)
-	if err != nil {
-		return ctx.Error(err)
-	}
-	if err = a.team.CheckUser(entry.TeamID, userID); err != nil {
-		return ctx.Error(err)
-	}
-
-	if _, err = a.entry.UpdateDeleted(userID, EntryID, true); err != nil {
+	if _, err = a.entryBll.Delete(userID, EntryID, true); err != nil {
 		return ctx.Error(err)
 	}
 	return ctx.End(204)
@@ -202,15 +186,7 @@ func (a *Entry) Undelete(ctx *gear.Context) (err error) {
 	}
 
 	userID, _ := auth.UserIDFromCtx(ctx)
-	entry, err := a.entry.Find(EntryID, true)
-	if err != nil {
-		return ctx.Error(err)
-	}
-	if err = a.team.CheckUser(entry.TeamID, userID); err != nil {
-		return ctx.Error(err)
-	}
-
-	entrySum, err := a.entry.UpdateDeleted(userID, EntryID, false)
+	entrySum, err := a.entryBll.Delete(userID, EntryID, false)
 	if err != nil {
 		return ctx.Error(err)
 	}
@@ -234,36 +210,17 @@ func (a *Entry) Find(ctx *gear.Context) error {
 	if err != nil {
 		return ctx.ErrorStatus(400)
 	}
-
-	entry, err := a.entry.Find(EntryID, false)
-	if err != nil {
-		return ctx.Error(err)
-	}
 	key, err := auth.KeyFromCtx(ctx)
 	if err != nil {
 		return ctx.Error(err)
 	}
 	userID, _ := auth.UserIDFromCtx(ctx)
-	if key, err = a.file.GetTeamKey(entry.TeamID, userID, key); err != nil {
+	res, err := a.entryBll.Find(userID, key, EntryID)
+	if err != nil {
 		return ctx.Error(err)
 	}
 
-	var secrets []*schema.SecretResult
-	var files []*schema.FileResult
-	var shares []*schema.ShareResult
-
-	if len(entry.Secrets) > 0 {
-		if secrets, err = a.secret.FindSecrets(key, entry.Secrets...); err != nil {
-			return ctx.Error(err)
-		}
-	}
-	if len(entry.Files) > 0 {
-		if files, err = a.file.FindFiles(EntryID, key, entry.Files...); err != nil {
-			return ctx.Error(err)
-		}
-	}
-
-	return ctx.JSON(200, entry.Result(EntryID, secrets, files, shares))
+	return ctx.JSON(200, res)
 }
 
 // FindByTeam return entries for current user
@@ -285,15 +242,11 @@ func (a *Entry) FindByTeam(ctx *gear.Context) (err error) {
 	}
 
 	userID, _ := auth.UserIDFromCtx(ctx)
-	if err = a.team.CheckUser(TeamID, userID); err != nil {
-		return ctx.Error(err)
-	}
-
-	entries, err := a.entry.FindByTeam(TeamID, userID, false)
+	res, err := a.entryBll.FindByTeam(userID, TeamID)
 	if err != nil {
 		return ctx.Error(err)
 	}
-	return ctx.JSON(200, entries)
+	return ctx.JSON(200, res)
 }
 
 // DeleteFile ...
@@ -321,11 +274,7 @@ func (a *Entry) DeleteFile(ctx *gear.Context) error {
 	if err != nil {
 		return ctx.Error(err)
 	}
-
-	if err := a.entry.RemoveFileByID(EntryID, FileID, userID); err != nil {
-		return ctx.Error(err)
-	}
-	if err := a.file.Delete(FileID); err != nil {
+	if err = a.entryBll.DeleteFile(userID, EntryID, FileID); err != nil {
 		return ctx.Error(err)
 	}
 	return ctx.End(204)

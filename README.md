@@ -31,8 +31,7 @@ It will run with default options, create a `kpass.kdb` file and open a browser.
 Start a development mode with memory database:
 
 ```sh
-make assets
-go run cmd/kpass/kpass.go -dev
+make dev
 ```
 
 It creates some demo data. You can find the encrypted secret in the `kpass.kdb`.

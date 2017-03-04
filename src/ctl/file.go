@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/seccom/kpass/src/auth"
+	"github.com/seccom/kpass/src/bll"
 	"github.com/seccom/kpass/src/model"
 	"github.com/seccom/kpass/src/schema"
 	"github.com/seccom/kpass/src/util"
@@ -19,24 +20,13 @@ import (
 // @Accepts json
 // @Produces json
 type File struct {
-	entry *model.Entry
-	file  *model.File
-	team  *model.Team
-	user  *model.User
+	models *model.All
 }
 
 // Init ...
-func (c *File) Init(
-	entry *model.Entry,
-	file *model.File,
-	team *model.Team,
-	user *model.User,
-) *File {
-	c.entry = entry
-	c.file = file
-	c.team = team
-	c.user = user
-	return c
+func (a *File) Init(blls *bll.All) *File {
+	a.models = blls.Models
+	return a
 }
 
 // Download ...
@@ -66,7 +56,7 @@ func (c *File) Download(ctx *gear.Context) error {
 		if userID == "" {
 			return ctx.ErrorStatus(400)
 		}
-		user, err := c.user.Find(userID)
+		user, err := c.models.User.Find(userID)
 		if err != nil {
 			return ctx.ErrorStatus(404)
 		}
@@ -78,7 +68,7 @@ func (c *File) Download(ctx *gear.Context) error {
 		if err != nil {
 			return ctx.ErrorStatus(400)
 		}
-		team, err := c.team.Find(TeamID, false)
+		team, err := c.models.Team.Find(TeamID, false)
 		if err != nil {
 			return ctx.ErrorStatus(404)
 		}
@@ -96,7 +86,7 @@ func (c *File) Download(ctx *gear.Context) error {
 		if err != nil {
 			return ctx.ErrorStatus(401)
 		}
-		entry, err := c.entry.Find(EntryID, false)
+		entry, err := c.models.Entry.Find(EntryID, false)
 		if err != nil {
 			return ctx.ErrorStatus(404)
 		}
@@ -107,7 +97,7 @@ func (c *File) Download(ctx *gear.Context) error {
 		return ctx.ErrorStatus(400)
 	}
 
-	file, blob, err := c.file.FindFile(FileID, key)
+	file, blob, err := c.models.File.FindFile(FileID, key)
 	if err != nil {
 		return ctx.Error(err)
 	}
@@ -130,7 +120,7 @@ func (c *File) UploadAvatar(ctx *gear.Context) error {
 	if err != nil {
 		return ctx.Error(err)
 	}
-	user, err := c.user.Find(userID)
+	user, err := c.models.User.Find(userID)
 	if err != nil {
 		return ctx.Error(err)
 	}
@@ -139,7 +129,7 @@ func (c *File) UploadAvatar(ctx *gear.Context) error {
 		return ctx.Error(err)
 	}
 	user.Avatar = file.ID
-	if err = c.user.Update(user); err != nil {
+	if err = c.models.User.Update(user); err != nil {
 		return ctx.Error(err)
 	}
 	return ctx.JSON(200, user.Result())
@@ -165,7 +155,7 @@ func (c *File) UploadLogo(ctx *gear.Context) (err error) {
 	if err != nil {
 		return ctx.Error(err)
 	}
-	team, err := c.team.Find(TeamID, false)
+	team, err := c.models.Team.Find(TeamID, false)
 	if err != nil {
 		return ctx.Error(err)
 	}
@@ -178,7 +168,7 @@ func (c *File) UploadLogo(ctx *gear.Context) (err error) {
 		return ctx.Error(err)
 	}
 	team.Logo = file.ID
-	teamResult, err := c.team.Update(TeamID, team)
+	teamResult, err := c.models.Team.Update(TeamID, team)
 	if err != nil {
 		return ctx.Error(err)
 	}
@@ -203,7 +193,7 @@ func (c *File) UploadFile(ctx *gear.Context) (err error) {
 		return ctx.ErrorStatus(400)
 	}
 
-	entry, err := c.entry.Find(EntryID, false)
+	entry, err := c.models.Entry.Find(EntryID, false)
 	if err != nil {
 		return ctx.Error(err)
 	}
@@ -212,7 +202,7 @@ func (c *File) UploadFile(ctx *gear.Context) (err error) {
 		return ctx.Error(err)
 	}
 	userID, _ := auth.UserIDFromCtx(ctx)
-	if key, err = c.file.GetTeamKey(entry.TeamID, userID, key); err != nil {
+	if key, err = c.models.File.GetTeamKey(entry.TeamID, userID, key); err != nil {
 		return ctx.Error(err)
 	}
 
@@ -220,7 +210,7 @@ func (c *File) UploadFile(ctx *gear.Context) (err error) {
 	if err != nil {
 		return ctx.Error(err)
 	}
-	if err = c.entry.AddFileByID(EntryID, file.ID, userID); err != nil {
+	if err = c.models.Entry.AddFileByID(EntryID, file.ID, userID); err != nil {
 		return ctx.Error(err)
 	}
 	file.SetDownloadURL("entry", EntryID.String())
@@ -245,7 +235,7 @@ func (c *File) fileFromCtx(ctx *gear.Context, userID, key string, checkImage boo
 				if err != nil {
 					return nil, err
 				}
-				return c.file.Create(userID, key, fileHeader.Filename, file)
+				return c.models.File.Create(userID, key, fileHeader.Filename, file)
 			}
 		}
 	}

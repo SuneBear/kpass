@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/seccom/kpass/src/auth"
+	"github.com/seccom/kpass/src/bll"
 	"github.com/seccom/kpass/src/model"
 	"github.com/seccom/kpass/src/schema"
 	"github.com/seccom/kpass/src/util"
@@ -15,20 +16,14 @@ import (
 // @Accepts json
 // @Produces json
 type Secret struct {
-	entry  *model.Entry
-	file   *model.File
-	secret *model.Secret
+	models    *model.All
+	secretBll *bll.Secret
 }
 
 // Init ...
-func (a *Secret) Init(
-	entry *model.Entry,
-	file *model.File,
-	secret *model.Secret,
-) *Secret {
-	a.entry = entry
-	a.file = file
-	a.secret = secret
+func (a *Secret) Init(blls *bll.All) *Secret {
+	a.models = blls.Models
+	a.secretBll = blls.Secret
 	return a
 }
 
@@ -69,20 +64,13 @@ func (a *Secret) Create(ctx *gear.Context) error {
 		return ctx.Error(err)
 	}
 
-	entry, err := a.entry.Find(EntryID, false)
-	if err != nil {
-		return ctx.Error(err)
-	}
 	key, err := auth.KeyFromCtx(ctx)
 	if err != nil {
 		return ctx.Error(err)
 	}
 	userID, _ := auth.UserIDFromCtx(ctx)
-	if key, err = a.file.GetTeamKey(entry.TeamID, userID, key); err != nil {
-		return ctx.Error(err)
-	}
 
-	secretResult, err := a.secret.Create(EntryID, userID, key, &schema.Secret{
+	secretResult, err := a.secretBll.Create(userID, key, EntryID, &schema.Secret{
 		Name: body.Name,
 		URL:  body.URL,
 		Pass: body.Pass,
@@ -145,20 +133,12 @@ func (a *Secret) Update(ctx *gear.Context) error {
 		return ctx.Error(err)
 	}
 
-	entry, err := a.entry.Find(EntryID, false)
-	if err != nil {
-		return ctx.Error(err)
-	}
 	key, err := auth.KeyFromCtx(ctx)
 	if err != nil {
 		return ctx.Error(err)
 	}
 	userID, _ := auth.UserIDFromCtx(ctx)
-	if key, err = a.file.GetTeamKey(entry.TeamID, userID, key); err != nil {
-		return ctx.Error(err)
-	}
-
-	res, err := a.secret.Update(EntryID, SecretID, userID, key, *body)
+	res, err := a.secretBll.Update(userID, key, EntryID, SecretID, *body)
 	if err != nil {
 		return ctx.Error(err)
 	}
@@ -191,7 +171,7 @@ func (a *Secret) Delete(ctx *gear.Context) error {
 		return ctx.Error(err)
 	}
 
-	if err := a.secret.Delete(EntryID, SecretID, userID); err != nil {
+	if err := a.models.Secret.Delete(EntryID, SecretID, userID); err != nil {
 		return ctx.Error(err)
 	}
 	return ctx.End(204)

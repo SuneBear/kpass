@@ -2,8 +2,8 @@ package api
 
 import (
 	"github.com/seccom/kpass/src/auth"
+	"github.com/seccom/kpass/src/bll"
 	"github.com/seccom/kpass/src/model"
-	"github.com/seccom/kpass/src/schema"
 	"github.com/seccom/kpass/src/util"
 	"github.com/teambition/gear"
 )
@@ -15,17 +15,14 @@ import (
 // @Accepts json
 // @Produces json
 type Team struct {
-	file *model.File
-	team *model.Team
+	models  *model.All
+	teamBll *bll.Team
 }
 
 // Init ...
-func (a *Team) Init(
-	file *model.File,
-	team *model.Team,
-) *Team {
-	a.file = file
-	a.team = team
+func (a *Team) Init(blls *bll.All) *Team {
+	a.models = blls.Models
+	a.teamBll = blls.Team
 	return a
 }
 
@@ -62,19 +59,8 @@ func (a *Team) Create(ctx *gear.Context) error {
 		return ctx.Error(err)
 	}
 	userID, _ := auth.UserIDFromCtx(ctx)
-	teamPass := util.RandPass(20, 3, 5)
-	res, err := a.team.Create(userID, teamPass, &schema.Team{
-		Name:       body.Name,
-		UserID:     userID,
-		Visibility: "member",
-		Members:    []string{userID},
-	})
-
+	res, err := a.teamBll.Create(userID, body.Name, key, "member")
 	if err != nil {
-		return ctx.Error(err)
-	}
-
-	if err = a.file.SaveTeamPass(res.ID, userID, key, teamPass); err != nil {
 		return ctx.Error(err)
 	}
 	return ctx.JSON(200, res)
@@ -134,7 +120,7 @@ func (a *Team) Update(ctx *gear.Context) (err error) {
 		return ctx.Error(err)
 	}
 
-	team, err := a.team.Find(TeamID, false)
+	team, err := a.models.Team.Find(TeamID, false)
 	if err != nil {
 		return ctx.Error(err)
 	}
@@ -162,7 +148,7 @@ func (a *Team) Update(ctx *gear.Context) (err error) {
 		return ctx.End(204)
 	}
 
-	res, err := a.team.Update(TeamID, team)
+	res, err := a.models.Team.Update(TeamID, team)
 	if err != nil {
 		return ctx.Error(err)
 	}
@@ -209,7 +195,7 @@ func (a *Team) Members(ctx *gear.Context) (err error) {
 		return ctx.Error(err)
 	}
 
-	res, err := a.team.UpdateMembers(userID, TeamID, body.Pull, body.Push)
+	res, err := a.models.Team.UpdateMembers(userID, TeamID, body.Pull, body.Push)
 	if err != nil {
 		return ctx.Error(err)
 	}
@@ -234,7 +220,7 @@ func (a *Team) Delete(ctx *gear.Context) (err error) {
 	}
 
 	userID, _ := auth.UserIDFromCtx(ctx)
-	team, err := a.team.Find(TeamID, false)
+	team, err := a.models.Team.Find(TeamID, false)
 	if err != nil {
 		return ctx.Error(err)
 	}
@@ -246,7 +232,7 @@ func (a *Team) Delete(ctx *gear.Context) (err error) {
 	}
 
 	team.IsDeleted = true
-	if _, err = a.team.Update(TeamID, team); err != nil {
+	if _, err = a.models.Team.Update(TeamID, team); err != nil {
 		return ctx.Error(err)
 	}
 	return ctx.End(204)
@@ -270,7 +256,7 @@ func (a *Team) Undelete(ctx *gear.Context) (err error) {
 	}
 
 	userID, _ := auth.UserIDFromCtx(ctx)
-	team, err := a.team.Find(TeamID, true)
+	team, err := a.models.Team.Find(TeamID, true)
 	if err != nil {
 		return ctx.Error(err)
 	}
@@ -279,7 +265,7 @@ func (a *Team) Undelete(ctx *gear.Context) (err error) {
 	}
 
 	team.IsDeleted = false
-	res, err := a.team.Update(TeamID, team)
+	res, err := a.models.Team.Update(TeamID, team)
 	if err != nil {
 		return ctx.Error(err)
 	}
@@ -301,7 +287,7 @@ func (a *Team) FindByMember(ctx *gear.Context) (err error) {
 	if err != nil {
 		return ctx.Error(err)
 	}
-	teams, err := a.team.FindByMemberID(userID)
+	teams, err := a.models.Team.FindByMemberID(userID)
 	if err != nil {
 		return ctx.Error(err)
 	}

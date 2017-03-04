@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/seccom/kpass/src/auth"
+	"github.com/seccom/kpass/src/bll"
 	"github.com/seccom/kpass/src/model"
 	"github.com/seccom/kpass/src/schema"
 	"github.com/seccom/kpass/src/util"
@@ -17,23 +18,12 @@ import (
 // @Accepts json
 // @Produces json
 type Share struct {
-	entry *model.Entry
-	share *model.Share
-	team  *model.Team
-	user  *model.User
+	models *model.All
 }
 
 // Init ...
-func (a *Share) Init(
-	entry *model.Entry,
-	share *model.Share,
-	team *model.Team,
-	user *model.User,
-) *Share {
-	a.entry = entry
-	a.share = share
-	a.team = team
-	a.user = user
+func (a *Share) Init(blls *bll.All) *Share {
+	a.models = blls.Models
 	return a
 }
 
@@ -82,11 +72,11 @@ func (a *Share) Create(ctx *gear.Context) (err error) {
 	if err := ctx.ParseBody(body); err != nil {
 		return ctx.Error(err)
 	}
-	if err = a.user.CheckID(body.UserID); err != nil {
+	if err = a.models.User.CheckID(body.UserID); err != nil {
 		return ctx.Error(err)
 	}
 
-	entry, err := a.entry.Find(EntryID, false)
+	entry, err := a.models.Entry.Find(EntryID, false)
 	if err != nil {
 		return ctx.Error(err)
 	}
@@ -95,12 +85,12 @@ func (a *Share) Create(ctx *gear.Context) (err error) {
 		return ctx.Error(err)
 	}
 	userID, _ := auth.UserIDFromCtx(ctx)
-	if err = a.team.CheckUser(entry.TeamID, userID); err != nil {
+	if err = a.models.Team.CheckUser(entry.TeamID, userID); err != nil {
 		return ctx.Error(err)
 	}
 
 	expire := time.Duration(body.Expire) * time.Second
-	shareResult, err := a.share.Create(EntryID, key, body.Pass, expire, &schema.Share{
+	shareResult, err := a.models.Share.Create(EntryID, key, body.Pass, expire, &schema.Share{
 		EntryID: EntryID,
 		TeamID:  entry.TeamID,
 		Name:    body.Name,
@@ -120,7 +110,7 @@ func (a *Share) Delete(ctx *gear.Context) (err error) {
 	}
 
 	userID, _ := auth.UserIDFromCtx(ctx)
-	if err := a.share.Delete(ShareID, userID); err != nil {
+	if err := a.models.Share.Delete(ShareID, userID); err != nil {
 		return ctx.Error(err)
 	}
 	return ctx.End(204)
