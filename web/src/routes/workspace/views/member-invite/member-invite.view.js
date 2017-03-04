@@ -4,6 +4,7 @@ import { Field, propTypes as formPropTypes } from 'redux-form'
 import cx from 'classnames'
 
 import { Button, FieldText } from 'uis'
+import { createEmptyPromise } from 'utils'
 
 import './member-invite.view.styl'
 
@@ -29,10 +30,15 @@ export class MemberInvite extends Component {
       actions
     } = this.props
 
+    const formPromise = createEmptyPromise()
+
     // @TODO: Implementation
     actions.updateTeamMembers({
-      username: values.username
+      username: values.username,
+      formPromise
     })
+
+    return formPromise
   }
 
   componentDidMount () {

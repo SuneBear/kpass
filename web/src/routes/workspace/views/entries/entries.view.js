@@ -4,6 +4,7 @@ import cx from 'classnames'
 
 import { Button, Modal } from 'uis'
 import { Card, Placeholder } from 'views'
+import { EntriesList } from './entries-list'
 import { EntryMake } from '../entry-make'
 
 import './entries.view.styl'
@@ -12,7 +13,26 @@ export class Entries extends Component {
 
   static propTypes = {
     className: PropTypes.string,
-    entries: PropTypes.array
+    userMe: PropTypes.object,
+    team: PropTypes.object,
+    entries: PropTypes.array,
+    userPermissions: PropTypes.object,
+    actions: PropTypes.object
+  }
+
+  componentWillReceiveProps (nextProps) {
+    const { team, actions } = this.props
+
+    if (
+      !nextProps.team.id ||
+      nextProps.team.id === team.id
+    ) {
+      return
+    }
+
+    actions.readCurrentTeamEntries({
+      teamId: nextProps.team.id
+    })
   }
 
   getRootClassNames () {
@@ -22,15 +42,51 @@ export class Entries extends Component {
     )
   }
 
-  handleNewEntryClick = () => {
-    this.newEntryModalRef.open()
+  getCardTitle () {
+    const count = this.getEntriesCount()
+
+    if (!count) {
+      return I18n.t('entries.title')
+    }
+
+    return (
+      I18n.t('entries.title') +
+      ' · ' +
+      count
+    )
+  }
+
+  getEntriesCount () {
+    const {
+      entries
+    } = this.props
+
+    if (!entries) {
+      return null
+    }
+
+    return entries.length
   }
 
   saveNewEntryModalRef = (ref) => {
     this.newEntryModalRef = ref
   }
 
+  handleNewEntryClick = () => {
+    this.newEntryModalRef.open()
+  }
+
+  handleNewEntrySubmitSuccess = () => {
+    this.newEntryModalRef.close()
+  }
+
   getNewEntryHandler (type, isGhost) {
+    const { userPermissions } = this.props
+
+    if (!userPermissions.createEntry) {
+      return null
+    }
+
     return (
       <Button
         type={type}
@@ -44,13 +100,20 @@ export class Entries extends Component {
   }
 
   renderNewEntryModal () {
+    const initialvalues = {
+      category: 'Login'
+    }
+
     return (
       <Modal
         ref={this.saveNewEntryModalRef}
         title={I18n.t('entry.new')}
         size={'small'}
       >
-        <EntryMake />
+        <EntryMake
+          initialValues={initialvalues}
+          onSubmitSuccess={this.handleNewEntrySubmitSuccess}
+        />
       </Modal>
     )
   }
@@ -73,22 +136,25 @@ export class Entries extends Component {
   }
 
   renderEntries () {
-    const { entries } = this.props
+    const { userMe, entries } = this.props
 
     if (!entries) {
       return null
     }
 
-    return entries.map((entry) => (
-      <div>{entry.name}</div>
-    ))
+    return (
+      <EntriesList
+        userMe={userMe}
+        entries={entries}
+      />
+    )
   }
 
   render () {
     return (
       <Card
         className={this.getRootClassNames()}
-        title={I18n.t('entries.title')}
+        title={this.getCardTitle()}
         handler={this.getNewEntryHandler('text')}
       >
         {this.renderPlaceholder()}

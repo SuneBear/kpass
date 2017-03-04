@@ -5,6 +5,7 @@ import { Field, propTypes as formPropTypes } from 'redux-form'
 import cx from 'classnames'
 
 import { Button, FieldText } from 'uis'
+import { createEmptyPromise } from 'utils'
 
 import './sign-in.view.styl'
 
@@ -28,10 +29,15 @@ export class SignIn extends Component {
       actions
     } = this.props
 
+    const formPromise = createEmptyPromise()
+
     actions.signInUser({
       username: values.username,
-      password: values.password
+      password: values.password,
+      formPromise
     })
+
+    return formPromise
   }
 
   renderSignInForm () {

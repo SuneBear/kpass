@@ -2,6 +2,7 @@
 
 .workspaceLayout
   $sidebarWidth = 286px
+  $baseSpacing = qu(5)
   $sidebarMinWidth = ($sidebarWidth * 0.6)
   $contentWidth = $layoutMinWidth - $sidebarWidth
 
@@ -9,6 +10,7 @@
 
   .workspaceHeaderView
     position: fixed
+    z-index: $zIndexHeader
     top: 0
     width: 100%
 
@@ -16,19 +18,36 @@
     display: flex
     align-items: flex-start
     min-width: $layoutMinWidth
-    padding: qu(5)
-    padding-top: $headerHeight + qu(5)
+    padding: $baseSpacing
+    padding-top: $headerHeight + $baseSpacing
     margin: 0 auto
-    margin-bottom: qu(5)
 
     .workspaceSidebar
       width: 25%
       max-width: $sidebarWidth
       min-width: $sidebarMinWidth
-      margin-right: qu(5)
+      margin-right: $baseSpacing
       transition: all 368ms
 
     .workspaceContent
       position: relative
       width: 100%
       min-width: $contentWidth
+
+    .workspaceType
+      [class*="switch-card-transition"]
+        position: absolute
+        width: 100%
+
+      > .cardView,
+      .workspaceCardLayer > .cardView
+        display: flex
+        flex-direction: column
+        max-height: "calc(100vh - %s)" % ($headerHeight + $baseSpacing * 2)
+
+        > .cardHeader
+          flex: 0 0 auto
+
+        > .cardBody
+          flex: 1
+          overflow: auto

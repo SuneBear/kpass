@@ -1,7 +1,6 @@
 import { I18n } from 'react-redux-i18n'
 import { combineEpics } from 'redux-observable'
 import { push } from 'react-router-redux'
-import { stopSubmit } from 'redux-form'
 import { normalize } from 'normalizr'
 import { Observable } from 'rxjs/Observable'
 
@@ -39,7 +38,7 @@ const signUpUserEpic = (action$) => {
   return action$
     .ofType(`${signUpUserAction}`)
     .switchMap((action) => {
-      const { username, password } = action.payload
+      const { username, password, formPromise } = action.payload
 
       const body = {
         id: username,
@@ -52,9 +51,10 @@ const signUpUserEpic = (action$) => {
           `${signUpUserAbortAction}`
         ))
         .concatMap((response) => {
+          formPromise.resolve()
+
           return Observable.of(
             signUpUserSuccessAction(),
-            stopSubmit('signUpForm'),
             signInUserAction({
               username,
               password: sha256(password)
@@ -62,6 +62,8 @@ const signUpUserEpic = (action$) => {
           )
         })
         .catch((errorMessage) => {
+          formPromise.reject(errorMessage)
+
           switch (errorMessage.error.status) {
             case 409:
               toast.error({
@@ -75,8 +77,7 @@ const signUpUserEpic = (action$) => {
           }
 
           return Observable.of(
-            signUpUserFailureAction(errorMessage),
-            stopSubmit('signUpForm', errorMessage)
+            signUpUserFailureAction(errorMessage)
           )
         })
     })
@@ -86,7 +87,7 @@ const signInUserEpic = (action$) => {
   return action$
     .ofType(`${signInUserAction}`)
     .switchMap((action) => {
-      const { username, password } = action.payload
+      const { username, password, formPromise } = action.payload
 
       const body = {
         username,
@@ -100,13 +101,14 @@ const signInUserEpic = (action$) => {
           `${signInUserAbortAction}`
         ))
         .concatMap((response) => {
+          formPromise.resolve()
+
           const token = response.access_token
           request.setToken(token)
           cookie('kp_username', username)
 
           return Observable.of(
             signInUserSuccessAction(),
-            stopSubmit('signInForm'),
             updateUserAction({
               body: response.user
             }),
@@ -117,12 +119,14 @@ const signInUserEpic = (action$) => {
           )
         })
         .catch((errorMessage) => {
+          formPromise.reject(errorMessage)
+
           toast.error({
             message: I18n.t('account.signInFailed')
           })
+
           return Observable.of(
-            signInUserFailureAction(errorMessage),
-            stopSubmit('signInForm', errorMessage)
+            signInUserFailureAction(errorMessage)
           )
         })
     })

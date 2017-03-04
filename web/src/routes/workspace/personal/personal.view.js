@@ -10,25 +10,42 @@ export class Personal extends Component {
     actions: PropTypes.object
   }
 
-  componentWillUpdate (nextProps) {
-    const { privateTeamId } = nextProps
+  componentDidMount () {
+    const { privateTeamId, actions } = this.props
 
-    this.props.actions.setCurrentTeam({
+    if (!privateTeamId) {
+      return
+    }
+
+    actions.mountCurrentTeam({
       teamId: privateTeamId
     })
   }
 
-  componentDidMount () {
-    const { privateTeamId } = this.props
+  componentWillReceiveProps (nextProps) {
+    const { privateTeamId, actions } = this.props
 
-    this.props.actions.setCurrentTeam({
-      teamId: privateTeamId
+    if (
+      !nextProps.privateTeamId ||
+      nextProps.privateTeamId === privateTeamId
+    ) {
+      return
+    }
+
+    actions.mountCurrentTeam({
+      teamId: nextProps.privateTeamId
     })
+  }
+
+  componentWillUnmount () {
+    const { actions } = this.props
+
+    actions.unmountCurrentTeam()
   }
 
   render () {
     return (
-      <div className={'personalView'}>
+      <div className={'workspaceType personalView'}>
         {this.props.children}
       </div>
     )

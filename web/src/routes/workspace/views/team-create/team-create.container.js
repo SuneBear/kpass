@@ -1,5 +1,5 @@
-import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 import { reduxForm } from 'redux-form'
 
 import { createTeamAction } from 'modules'

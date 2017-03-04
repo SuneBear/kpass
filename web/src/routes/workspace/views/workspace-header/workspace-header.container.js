@@ -1,6 +1,6 @@
-import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { push } from 'react-router-redux'
+import { bindActionCreators } from 'redux'
 
 import { userMeSelector, teamsSelector, signOutUserAction } from 'modules'
 import { currentTeamSelector } from '../../modules'

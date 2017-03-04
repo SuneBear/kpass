@@ -4,6 +4,7 @@ import { Field, propTypes as formPropTypes } from 'redux-form'
 import cx from 'classnames'
 
 import { Button, FieldText } from 'uis'
+import { createEmptyPromise } from 'utils'
 
 import './team-create.view.styl'
 
@@ -27,10 +28,15 @@ export class TeamCreate extends Component {
       actions
     } = this.props
 
+    const formPromise = createEmptyPromise()
+
     // @TODO: Implementation
     actions.createTeam({
-      teamName: values.teamName
+      teamName: values.teamName,
+      formPromise
     })
+
+    return formPromise
   }
 
   componentDidMount () {

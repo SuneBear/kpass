@@ -1,7 +1,7 @@
-import { injectReducer } from 'modules'
+import { injectReducer, injectEpic } from 'modules'
 import { requireAuth, isPublicTeam } from 'utils'
 import { WorkspaceLayout } from './layout'
-import { workspaceReducer } from './modules'
+import { workspaceReducer, workspaceEpic } from './modules'
 import { Personal } from './personal'
 import { Team } from './team'
 import { Entries, Members, TeamSettings } from './views'
@@ -22,7 +22,9 @@ export const getWorkspaceBashPath = (team) => {
 }
 
 export const initWorkspaceLayout = (store) => {
+  // Add reducer & epic async
   injectReducer(store, { key: 'workspace', reducer: workspaceReducer })
+  injectEpic(workspaceEpic)
   return requireAuth(WorkspaceLayout)
 }
 

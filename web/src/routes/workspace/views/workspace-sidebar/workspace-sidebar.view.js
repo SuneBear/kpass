@@ -13,7 +13,7 @@ export class WorkspaceSidebar extends Component {
   static propTypes = {
     className: PropTypes.string,
     basePath: PropTypes.string,
-    permissions: PropTypes.object
+    userPermissions: PropTypes.object
   }
 
   getRootClassnames () {
@@ -46,9 +46,9 @@ export class WorkspaceSidebar extends Component {
   }
 
   renderTeamSettingsNav () {
-    const { basePath, permissions } = this.props
+    const { basePath, userPermissions } = this.props
 
-    if (!permissions.updateTeamSetting) {
+    if (!userPermissions.updateTeamSetting) {
       return null
     }
 
@@ -65,9 +65,9 @@ export class WorkspaceSidebar extends Component {
   }
 
   renderTeamNav () {
-    const { basePath, permissions } = this.props
+    const { basePath, userPermissions } = this.props
 
-    if (!permissions.readTeamMember) {
+    if (!userPermissions.readTeamMember) {
       return null
     }
 

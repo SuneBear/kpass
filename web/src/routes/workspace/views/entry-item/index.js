@@ -1,1 +1,1 @@
-// @TODO: Title, meta, extra
+export * from './entry-item.container'

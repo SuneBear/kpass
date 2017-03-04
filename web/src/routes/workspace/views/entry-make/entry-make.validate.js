@@ -7,6 +7,6 @@ export const validateEntryName = (...args) => {
 
 export const entryMakeValidate = (values, props) => {
   return {
-    entryName: validateEntryName(values.entryName)
+    name: validateEntryName(values.name)
   }
 }

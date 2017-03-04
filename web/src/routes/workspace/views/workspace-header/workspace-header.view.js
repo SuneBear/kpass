@@ -47,7 +47,7 @@ export class WorkspaceHeader extends Component {
     return (
       <Modal
         ref={this.saveTeamCreateModalRef}
-        title={I18n.t('team.newTeam')}
+        title={I18n.t('team.new')}
         size={'small'}
       >
         <TeamCreate />
@@ -107,7 +107,7 @@ export class WorkspaceHeader extends Component {
     const extraList = [
       {
         className: 'workspaceSwitcherItem',
-        title: I18n.t('team.newTeam'),
+        title: I18n.t('team.new'),
         iconName: 'plus',
         onClick: this.handleNewTeamClick
       }
