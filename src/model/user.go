@@ -39,6 +39,7 @@ func (m *User) CheckID(id string) error {
 
 // CheckLogin ...
 func (m *User) CheckLogin(id, pass string) (user *schema.User, err error) {
+	verified := false
 	err = m.db.DB.Update(func(tx *buntdb.Tx) error {
 		userKey := schema.UserKey(id)
 		value, e := tx.Get(userKey)
@@ -55,16 +56,19 @@ func (m *User) CheckLogin(id, pass string) (user *schema.User, err error) {
 		if !auth.VerifyPass(id, pass, user.Pass) {
 			user.Attempt++
 			tx.Set(userKey, user.String(), nil)
-			tx.Commit()
-			return &gear.Error{Code: 400, Msg: "user id or password error"}
+			return nil
 		}
 		if user.Attempt > 0 {
 			user.Attempt = 0
 			tx.Set(userKey, user.String(), nil)
 		}
+		verified = true
 		return nil
 	})
 
+	if !verified && err == nil {
+		err = &gear.Error{Code: 400, Msg: "user id or password error"}
+	}
 	if err != nil {
 		return nil, dbError(err)
 	}
