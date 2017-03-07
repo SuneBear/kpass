@@ -1,0 +1,55 @@
+@require '../../../../styles/ref'
+
+.entryDetail
+  $bgColor = $gray97
+  $borderColor = $gray90
+
+  &View
+    null
+
+  &Header
+    padding-top: qu(1)
+
+    // Override Item
+    .entryItemHero
+      transform: scale(1.2)
+      margin-right: 14px
+
+    .entryItemTitle
+      margin-bottom: qu(2)
+      line-height: 22px
+      font-size: 18px
+      text-overflow()
+
+    .entryItemMoreHandler .icon
+      font-size: 17px
+
+    .entryItemMeta
+      .entryItemMetaItem
+        & + .entryItemMetaItem
+          margin-left: qu(3)
+
+    .entryItemHandlerset
+      margin-right: qu(8)
+
+  &Divider
+    padding-top: qu(4)
+    margin: 0 qu(-4)
+    margin-top: qu(4)
+    border-top: 1px solid $borderColor
+
+  &Content
+    .buttonNormal
+      border-color: $borderColor
+      background: $white
+
+      &:hover
+        border-color: $brand
+
+  // External
+  &Modal
+    .modal-close
+      top: 18px
+
+    .modal-content
+      background: $bgColor
