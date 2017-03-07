@@ -20,7 +20,8 @@ export class Dropdown extends Component {
     nested: PropTypes.bool,
     offset: PropTypes.array,
     onOpen: PropTypes.func,
-    onHide: PropTypes.func
+    onHide: PropTypes.func,
+    onClick: PropTypes.func
   }
 
   static defaultProps = {

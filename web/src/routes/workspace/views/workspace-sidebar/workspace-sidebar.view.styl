@@ -22,17 +22,24 @@
         display: flex
         align-items: center
         color: $black
-        padding: qu(3) qu(5)
+        padding: qu(2) qu(5)
+        padding-right: qu(8)
         cursor: pointer
-        overflow: hidden
         transition: background-color 218ms
+
+        span
+          display: inline-block
+          text-overflow()
+
+        & + .navItem
+          margin-top: qu(1)
 
         &:after
           content: ' '
           display: block
           position: absolute
           top: 50%
-          right: 20px
+          right: qu(6)
           width: 5px
           height: 5px
           margin-top: -2.5px
@@ -56,6 +63,7 @@
       .icon
         position: relative
         top: -1px
+        flex: 0 0 auto
         margin-left: 3px
         margin-right: 9px
         font-size: 16px

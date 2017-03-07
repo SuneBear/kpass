@@ -99,16 +99,16 @@ export class WorkspaceHeader extends Component {
     const dataList = teams.map((team) => ({
       className: 'workspaceSwitcherItem',
       value: team.id,
-      title: this.getTeamName(team),
       iconName: isPublicTeam(team) ? 'building' : 'user',
+      title: this.getTeamName(team),
       onClick: this.handleSwitchWorkspace
     }))
 
     const extraList = [
       {
         className: 'workspaceSwitcherItem',
-        title: I18n.t('team.new'),
         iconName: 'plus',
+        title: I18n.t('team.new'),
         onClick: this.handleNewTeamClick
       }
     ]

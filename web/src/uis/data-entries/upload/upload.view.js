@@ -7,7 +7,7 @@ import { Upload as AntUpload } from 'antd'
 import config from 'config'
 import { request } from 'utils'
 
-const UPLOAD_HOST = `${config.FILE_HOST}/upload/`
+const UPLOAD_HOST = `${config.FILE_HOST}/upload`
 
 // @TODO: Custom request client & handle error
 export class Upload extends Component {
@@ -43,7 +43,7 @@ export class Upload extends Component {
     return (
       <AntUpload
         className={this.getRootClassNames()}
-        action={`${UPLOAD_HOST}${url}`}
+        action={`${UPLOAD_HOST}/${url}`}
         headers={this.getHeaders()}
         {...props}
       />

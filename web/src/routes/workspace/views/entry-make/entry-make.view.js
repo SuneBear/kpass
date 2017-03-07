@@ -6,7 +6,7 @@ import cx from 'classnames'
 import { Button, FieldText, FieldSelect } from 'uis'
 import { createEmptyPromise } from 'utils'
 
-import { getEntryCategoryOptions } from '../../shared'
+import { getEntryCategories } from '../../shared'
 
 import './entry-make.view.styl'
 
@@ -15,14 +15,14 @@ export class EntryMake extends Component {
   static propTypes = {
     className: PropTypes.string,
     team: PropTypes.object,
-    entry: PropTypes.object,
-    currentAction: PropTypes.oneOf(['create', 'update']),
+    entryId: PropTypes.string,
+    action: PropTypes.oneOf(['create', 'update']),
     actions: PropTypes.object,
     ...formPropTypes
   }
 
   static defaultProps = {
-    currentAction: 'create'
+    action: 'create'
   }
 
   getRootClassnames () {
@@ -35,23 +35,24 @@ export class EntryMake extends Component {
   handleSubmit = (values) => {
     const {
       team,
-      currentAction,
+      entryId,
+      action,
       actions
     } = this.props
 
+    const isCreate = action === 'create'
     const formPromise = createEmptyPromise()
 
-    if (currentAction === 'create') {
+    if (isCreate) {
       actions.createEntry({
         teamId: team.id,
         body: values,
         formPromise
       })
     } else {
-      // @TODO: Implementation
       actions.updateEntry({
-        teamId: team.id,
         body: values,
+        entryId,
         formPromise
       })
     }
@@ -61,6 +62,9 @@ export class EntryMake extends Component {
 
   renderEntryMakeForm () {
     const { handleSubmit, pristine, valid, submitting } = this.props
+    const { action } = this.props
+
+    const isCreate = action === 'create'
 
     return (
       <form onSubmit={handleSubmit(this.handleSubmit)}>
@@ -73,7 +77,7 @@ export class EntryMake extends Component {
           name={'category'}
           component={FieldSelect}
           label={I18n.t('entry.entryCategory')}
-          options={getEntryCategoryOptions()}
+          options={getEntryCategories()}
         />
         <Button
           block
@@ -82,7 +86,7 @@ export class EntryMake extends Component {
           disabled={pristine || !valid}
           loading={submitting}
         >
-          <Translate value={'action.create'} />
+          <Translate value={isCreate ? 'action.create' : 'action.edit'} />
         </Button>
       </form>
     )

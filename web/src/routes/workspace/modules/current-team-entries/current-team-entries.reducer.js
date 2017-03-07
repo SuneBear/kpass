@@ -8,6 +8,10 @@ export const createCurrentTeamEntryAction = createAction('CREATE_CURRENT_TEAM_EN
 export const createCurrentTeamEntrySuccessAction = createAction('CREATE_CURRENT_TEAM_ENTRY_SUCCESS')
 export const createCurrentTeamEntryFailureAction = createAction('CREATE_CURRENT_TEAM_ENTRY_FAILURE')
 
+export const updateCurrentTeamEntryAction = createAction('UPDATE_CURRENT_TEAM_ENTRY')
+export const updateCurrentTeamEntrySuccessAction = createAction('UPDATE_CURRENT_TEAM_ENTRY_SUCCESS')
+export const updateCurrentTeamEntryFailureAction = createAction('UPDATE_CURRENT_TEAM_ENTRY_FAILURE')
+
 export const readCurrentTeamEntriesAction = createAction('READ_CURRENT_TEAM_ENTRIES')
 export const readCurrentTeamEntriesSuccessAction = createAction('READ_CURRENT_TEAM_ENTRIES_SUCCESS')
 export const readCurrentTeamEntriesFailureAction = createAction('READ_CURRENT_TEAM_ENTRIES_FAILURE')
@@ -77,9 +81,9 @@ export const currentTeamEntriesReducer = handleActions({
       return state
     }
 
-    const entryIdIndex = state.indexOf(entryId)
+    const entryIdIndex = state.entryIds.indexOf(entryId)
 
-    if (!entryIdIndex) {
+    if (entryIdIndex === -1) {
       return state
     }
 

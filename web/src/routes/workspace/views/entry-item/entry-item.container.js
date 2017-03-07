@@ -10,7 +10,7 @@ const mapStateToProps = (state) => ({})
 
 const mapDispatchToProps = (dispatch) => ({
   actions: bindActionCreators({
-    deleteCurrentTeamEntry: deleteCurrentTeamEntryAction
+    deleteEntry: deleteCurrentTeamEntryAction
   }, dispatch)
 })
 
