@@ -1,0 +1,83 @@
+@require '../../../styles/ref'
+
+.tooltip
+  $tooltipBg = rgba(0, 0, 0, 0.8)
+
+  position: absolute
+  z-index: $zIndexTooltip
+  display: block
+  font-size: 12px
+  line-height: 1.5
+
+  &-hidden
+    display: none
+
+  &-arrow
+    position: absolute
+    width: 0
+    height: 0
+    border-color: transparent
+    border-style: solid
+
+  &-inner
+    max-width: 250px
+    min-height: 30px
+    padding: 6px 12px
+    color: $white
+    text-align: left
+    text-decoration: none
+    background-color: $tooltipBg
+    border-radius: $radius
+    box-shadow: 0 2px 2px rgba(56, 56, 56, 0.25)
+
+  &-placement-top,
+  &-placement-topLeft,
+  &-placement-topRight
+    padding: 5px 0 8px 0
+
+    .tooltip-arrow
+      bottom: 3px
+      border-width: 5px 5px 0
+      border-top-color: $tooltipBg
+
+      left: 50%
+      margin-left: -5px
+
+  &-placement-right,
+  &-placement-rightTop,
+  &-placement-rightBottom
+    padding: 0 5px 0 8px
+
+    .tooltip-arrow
+      left: 3px
+      border-width: 5px 5px 5px 0
+      border-right-color: $tooltipBg
+
+      right: 50%
+      margin-top: -5px
+
+  &-placement-bottom,
+  &-placement-bottomLeft,
+  &-placement-bottomRight
+    padding: 8px 0 5px 0
+
+    .tooltip-arrow
+      top: 3px
+      border-width: 0 5px 5px
+      border-bottom-color: $tooltipBg
+
+      left: 50%
+      margin-left: -5px
+
+  &-placement-left,
+  &-placement-leftTop,
+  &-placement-leftBottom
+    padding: 0 8px 0 5px
+
+    .tooltip-arrow
+      right: 3px
+      border-width: 5px 0 5px 5px
+      border-left-color: $tooltipBg
+
+      top: 50%
+      margin-top: -5px
