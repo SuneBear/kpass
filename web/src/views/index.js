@@ -1,4 +1,6 @@
 export * from './avatar'
+export * from './badge'
 export * from './card'
+export * from './datestamp'
 export * from './logo'
 export * from './placeholder'
