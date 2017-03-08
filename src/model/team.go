@@ -97,7 +97,7 @@ func (m *Team) AddMember(ownerID, userID string, TeamID util.OID) (
 }
 
 // RemoveMember ...
-func (m *Team) RemoveMember(ownerID, userID string, TeamID util.OID) error {
+func (m *Team) RemoveMember(userID, memberID string, TeamID util.OID) error {
 	err := m.db.DB.Update(func(tx *buntdb.Tx) error {
 		value, e := tx.Get(schema.TeamKey(TeamID))
 		if e != nil {
@@ -110,16 +110,18 @@ func (m *Team) RemoveMember(ownerID, userID string, TeamID util.OID) error {
 		if team.IsDeleted {
 			return &gear.Error{Code: 404, Msg: "team not found"}
 		}
-		if team.UserID != ownerID {
+		if team.UserID == userID && userID == memberID {
+			return &gear.Error{Code: 403, Msg: "can't remove team owner"}
+		}
+		if team.UserID != userID && userID != memberID {
 			return &gear.Error{Code: 403, Msg: "not team owner"}
 		}
-		if team.Visibility == "private" {
-			return &gear.Error{Code: 403, Msg: "can't change member in private team"}
-		}
-		if !team.RemoveMember(userID) {
+		if !team.RemoveMember(memberID) {
 			return &gear.Error{Code: 400, Msg: "invalid team member to remove"}
 		}
-		_, _, e = tx.Set(schema.TeamKey(TeamID), team.String(), nil)
+		if _, _, e = tx.Set(schema.TeamKey(TeamID), team.String(), nil); e == nil {
+			_, e = tx.Delete(schema.TeamPassKey(TeamID, memberID))
+		}
 		return e
 	})
 	return dbError(err)

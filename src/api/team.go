@@ -159,7 +159,8 @@ func (a *Team) Update(ctx *gear.Context) (err error) {
 //
 // @Title RemoveMember
 // @Summary remove a team member
-// @Description only the team owner can remove the team member
+// @Description the team owner can remove other team member
+// @Description team member can remove self
 // @Param Authorization header string true "access_token"
 // @Param teamID path string true "team ID"
 // @Param userID path string true "team member ID"
@@ -172,13 +173,13 @@ func (a *Team) RemoveMember(ctx *gear.Context) (err error) {
 	if err != nil {
 		return ctx.ErrorStatus(400)
 	}
-	userID := ctx.Param("userID")
-	if userID == "" {
+	memberID := ctx.Param("userID")
+	if memberID == "" {
 		return ctx.ErrorStatus(400)
 	}
 
-	ownerID, _ := auth.UserIDFromCtx(ctx)
-	if err = a.models.Team.RemoveMember(ownerID, userID, TeamID); err != nil {
+	userID, _ := auth.UserIDFromCtx(ctx)
+	if err = a.models.Team.RemoveMember(userID, memberID, TeamID); err != nil {
 		return ctx.Error(err)
 	}
 	return ctx.End(204)
