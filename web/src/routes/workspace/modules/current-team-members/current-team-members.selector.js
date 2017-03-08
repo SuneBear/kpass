@@ -3,27 +3,22 @@ import { createSelector } from 'reselect'
 import { currentTeamSelector } from '../current-team'
 
 export const currentTeamMembersSelector = createSelector(
+  (state) => state.member.entities,
   (state) => currentTeamSelector(state),
-  (currentTeam) => {
-    if (!currentTeam) {
+  (entities, currentTeam) => {
+    const memberIds = currentTeam.members
+
+    if (!memberIds) {
+      return null
+    }
+
+    if (memberIds.length === 0) {
       return []
     }
 
-    const mockData = [
-      {
-        id: 'SuneBear',
-        avatarUrl: 'https://avatars.io/twitter/hisunebear'
-      },
-      {
-        id: 'Kumamon',
-        avatarUrl: 'https://avatars.io/twitter/55_kumamon_eng'
-      },
-      {
-        id: 'Kumakichi',
-        avatarUrl: 'https://avatars.io/twitter/Kumakichi81_bot'
-      }
-    ]
-
-    return mockData
+    return memberIds
+      .map((memberId) => {
+        return entities[memberId]
+      })
   }
 )

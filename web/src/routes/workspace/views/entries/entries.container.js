@@ -3,7 +3,6 @@ import { bindActionCreators } from 'redux'
 
 import { userMeSelector } from 'modules'
 import {
-  readCurrentTeamEntriesAction,
   currentUserPermissionsSelector,
   currentTeamSelector,
   currentTeamSortedEntriesSelector
@@ -19,7 +18,6 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   actions: bindActionCreators({
-    readCurrentTeamEntries: readCurrentTeamEntriesAction
   }, dispatch)
 })
 

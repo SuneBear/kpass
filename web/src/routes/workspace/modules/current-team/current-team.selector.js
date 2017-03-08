@@ -1,11 +1,13 @@
 import { createSelector } from 'reselect'
 
+import { isPublicTeam } from 'utils'
+
 export const privateTeamIdSelector = createSelector(
   (state) => state.team.entities,
   (entities) => {
     const entitiesKeys = Object.keys(entities)
     const privateTeamId = entitiesKeys.find(
-      teamId => entities[teamId].visibility === 'private'
+      teamId => !isPublicTeam(entities[teamId])
     )
 
     return privateTeamId

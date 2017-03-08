@@ -1,4 +1,9 @@
 import { schema } from 'normalizr'
 
-export const teamSchema = new schema.Entity('teams')
+import { memberSchema } from '../member'
+
+export const teamSchema = new schema.Entity('teams', {
+  members: [ memberSchema ]
+})
+
 export const teamsSchema = new schema.Array(teamSchema)

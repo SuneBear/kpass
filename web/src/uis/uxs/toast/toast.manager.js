@@ -37,7 +37,10 @@ const showNotice = (options) => {
     duration: DEFAULF_DURATION,
     content: <ToastContent {...options} />
   }
-  options = Object.assign({}, defaultOptions, options)
+  options = {
+    ...defaultOptions,
+    ...options
+  }
   toastManager.notice(options)
   setTimeout(() => moveNotice(), 0)
 }
@@ -65,7 +68,10 @@ const api = {
 
 const noticeStatus = ['success', 'info', 'warning', 'error']
 noticeStatus.map((type) => {
-  api[type] = (args) => api.show(Object.assign({}, args, { type }))
+  api[type] = (args) => api.show({
+    ...args,
+    type
+  })
 })
 
 // Export

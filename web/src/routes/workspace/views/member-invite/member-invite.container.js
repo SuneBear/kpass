@@ -5,7 +5,7 @@ import { reduxForm } from 'redux-form'
 import {
   currentTeamSelector,
   currentTeamMembersSelector,
-  updateTeamMembersAction
+  createCurrentTeamMemberAction
 } from '../../modules'
 
 import { MemberInvite as MemberInviteView } from './member-invite.view'
@@ -18,7 +18,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   actions: bindActionCreators({
-    updateTeamMembers: updateTeamMembersAction
+    createTeamMember: createCurrentTeamMemberAction
   }, dispatch)
 })
 

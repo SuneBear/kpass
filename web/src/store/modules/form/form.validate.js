@@ -19,3 +19,6 @@ export const minLength = min => value =>
 
 export const maxLength = max => value =>
   value && value.length > max ? `Must be ${max} characters or less` : undefined
+
+export const retype = (retypeValue, value) =>
+  retypeValue !== value ? 'Incorrect retyped value' : undefined

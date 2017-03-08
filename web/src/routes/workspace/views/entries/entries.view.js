@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react'
 import { I18n, Translate } from 'react-redux-i18n'
 import cx from 'classnames'
 
-import { Button, Modal } from 'uis'
+import { Button, Loading, Modal } from 'uis'
 import { Card, Placeholder } from 'views'
 import { EntriesList } from './entries-list'
 import { EntryMake } from '../entry-make'
@@ -16,23 +16,7 @@ export class Entries extends Component {
     userMe: PropTypes.object,
     team: PropTypes.object,
     entries: PropTypes.array,
-    userPermissions: PropTypes.object,
-    actions: PropTypes.object
-  }
-
-  componentWillReceiveProps (nextProps) {
-    const { team, actions } = this.props
-
-    if (
-      !nextProps.team.id ||
-      nextProps.team.id === team.id
-    ) {
-      return
-    }
-
-    actions.readCurrentTeamEntries({
-      teamId: nextProps.team.id
-    })
+    userPermissions: PropTypes.object
   }
 
   getRootClassNames () {
@@ -118,10 +102,22 @@ export class Entries extends Component {
     )
   }
 
-  renderPlaceholder () {
+  renderLoading () {
     const { entries } = this.props
 
     if (entries) {
+      return null
+    }
+
+    return (
+      <Loading />
+    )
+  }
+
+  renderPlaceholder () {
+    const { entries } = this.props
+
+    if (!entries || entries.length !== 0) {
       return null
     }
 
@@ -138,7 +134,7 @@ export class Entries extends Component {
   renderEntries () {
     const { userMe, entries } = this.props
 
-    if (!entries) {
+    if (!entries || !entries.length) {
       return null
     }
 
@@ -157,6 +153,7 @@ export class Entries extends Component {
         title={this.getCardTitle()}
         handler={this.getNewEntryHandler('text')}
       >
+        {this.renderLoading()}
         {this.renderPlaceholder()}
         {this.renderEntries()}
 

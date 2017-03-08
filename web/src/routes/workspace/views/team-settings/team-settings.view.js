@@ -31,14 +31,21 @@ export class TeamSettings extends Component {
     this.teamRenameModalRef.open()
   }
 
+  handleTeamRenameSubmitSuccess = () => {
+    this.teamRenameModalRef.close()
+  }
+
   handleFreezeToggleChange = (checked) => {
     const {
+      team,
       actions
     } = this.props
 
-    // @TODO: Implementation
-    actions.updateCurrentTeam({
-      isFrozen: checked
+    actions.updateTeam({
+      teamId: team.id,
+      body: {
+        isFrozen: checked
+      }
     })
   }
 
@@ -54,6 +61,7 @@ export class TeamSettings extends Component {
         <TeamRename
           team={team}
           initialValues={team}
+          onSubmitSuccess={this.handleTeamRenameSubmitSuccess}
         />
       </Modal>
     )

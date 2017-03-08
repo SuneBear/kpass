@@ -2,7 +2,8 @@ import React, { Component, PropTypes } from 'react'
 import { I18n, Translate } from 'react-redux-i18n'
 import cx from 'classnames'
 
-import { Button, Modal } from 'uis'
+import { isMe } from 'utils'
+import { Button, Loading, Modal } from 'uis'
 import { Card } from 'views'
 import { MembersList } from './members-list'
 import { MemberInvite } from '../member-invite'
@@ -36,6 +37,10 @@ export class Members extends Component {
       teamMembers
     } = this.props
 
+    if (!teamMembers) {
+      return 0
+    }
+
     return teamMembers.length
   }
 
@@ -65,30 +70,22 @@ export class Members extends Component {
     )
   }
 
-  handleLeaveTeam = () => {
-    const { team, userMe } = this.props
-    const { leaveTeam } = this.props.actions
+  handleRemoveMember = ({ member }) => {
+    const { userMe, team, actions } = this.props
 
-    // @TODO: Implementation
-    leaveTeam({
+    actions.removeMember({
       teamId: team.id,
-      memberId: userMe.id
-    })
-  }
-
-  handleRemoveMember = (memberId) => {
-    const { team } = this.props
-    const { removeTeamMember } = this.props.actions
-
-    // @TODO: Implementation
-    removeTeamMember({
-      teamId: team.id,
-      memberId
+      memberId: member.id,
+      isMe: isMe(member, userMe)
     })
   }
 
   handleAddMemberClick = () => {
     this.memberInviteModalRef.open()
+  }
+
+  handleMemberInviteSubmitSuccess = () => {
+    this.memberInviteModalRef.close()
   }
 
   renderMemberInviteModal () {
@@ -98,12 +95,14 @@ export class Members extends Component {
         title={I18n.t('teamMembers.invite')}
         size={'small'}
       >
-        <MemberInvite />
+        <MemberInvite
+          onSubmitSuccess={this.handleMemberInviteSubmitSuccess}
+        />
       </Modal>
     )
   }
 
-  render () {
+  renderMemberList () {
     const {
       userMe,
       team,
@@ -112,21 +111,40 @@ export class Members extends Component {
     } = this.props
 
     return (
+      <MembersList
+        userMe={userMe}
+        team={team}
+        members={teamMembers}
+        userPermissions={userPermissions}
+        onRemoveMember={this.handleRemoveMember}
+      />
+    )
+  }
+
+  renderLoading () {
+    const { teamMembers } = this.props
+
+    if (teamMembers) {
+      return null
+    }
+
+    return (
+      <Loading />
+    )
+  }
+
+  render () {
+    return (
       <Card
         withoutPadding
         className={this.getRootClassNames()}
         title={this.getCardTitle()}
         handler={this.getAddMemberHandler()}
       >
+        {this.renderLoading()}
+        {this.renderMemberList()}
+
         {this.renderMemberInviteModal()}
-        <MembersList
-          userMe={userMe}
-          team={team}
-          members={teamMembers}
-          userPermissions={userPermissions}
-          onLeaveTeam={this.handleLeaveTeam}
-          onRemoveMember={this.handleRemoveMember}
-        />
       </Card>
     )
   }

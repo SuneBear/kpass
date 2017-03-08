@@ -14,7 +14,6 @@ export class MembersList extends Component {
     team: PropTypes.object,
     members: PropTypes.array,
     userPermissions: PropTypes.object,
-    onLeaveTeam: PropTypes.func,
     onRemoveMember: PropTypes.func
   }
 
@@ -52,7 +51,6 @@ export class MembersList extends Component {
       userMe,
       team,
       userPermissions,
-      onLeaveTeam,
       onRemoveMember
     } = this.props
 
@@ -63,7 +61,6 @@ export class MembersList extends Component {
         isOwner={isOwner(team, member)}
         isMe={isMe(member, userMe)}
         userPermissions={userPermissions}
-        onLeaveTeam={onLeaveTeam}
         onRemoveMember={onRemoveMember}
        />
     )
@@ -75,6 +72,10 @@ export class MembersList extends Component {
       team,
       members
     } = this.props
+
+    if (!members) {
+      return null
+    }
 
     const sortedMembers = this.sortMembers(
       team.userId,

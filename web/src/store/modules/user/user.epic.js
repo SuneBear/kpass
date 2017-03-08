@@ -6,6 +6,7 @@ import { Observable } from 'rxjs/Observable'
 
 import { toast } from 'uis'
 import { request, sha256, cookie } from 'utils'
+import { setMemberEntitiesAction } from '../member'
 import { userSchema } from './user.schema'
 import {
   signUpUserAction,
@@ -51,18 +52,18 @@ const signUpUserEpic = (action$) => {
           `${signUpUserAbortAction}`
         ))
         .concatMap((response) => {
-          formPromise.resolve()
+          formPromise && formPromise.resolve()
 
           return Observable.of(
             signUpUserSuccessAction(),
             signInUserAction({
               username,
-              password: sha256(password)
+              password
             })
           )
         })
         .catch((errorMessage) => {
-          formPromise.reject(errorMessage)
+          formPromise && formPromise.reject(errorMessage)
 
           switch (errorMessage.error.status) {
             case 409:
@@ -101,7 +102,7 @@ const signInUserEpic = (action$) => {
           `${signInUserAbortAction}`
         ))
         .concatMap((response) => {
-          formPromise.resolve()
+          formPromise && formPromise.resolve()
 
           const token = response.access_token
           request.setToken(token)
@@ -119,7 +120,7 @@ const signInUserEpic = (action$) => {
           )
         })
         .catch((errorMessage) => {
-          formPromise.reject(errorMessage)
+          formPromise && formPromise.reject(errorMessage)
 
           toast.error({
             message: I18n.t('account.signInFailed')
@@ -188,7 +189,10 @@ const updateUserEpic = (action$) => {
         updateUserSuccessAction(),
         setUserEntitiesAction({
           entities: normalizedBody.entities.users
-        })
+        }),
+        setMemberEntitiesAction({
+          entities: normalizedBody.entities.users
+        }),
       )
     })
     .catch((errorMessage) => {

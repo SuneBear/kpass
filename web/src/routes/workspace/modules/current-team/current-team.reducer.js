@@ -4,6 +4,10 @@ const initialState = {
   teamId: null
 }
 
+export const updateCurrentTeamAction = createAction('UPDATE_CURRENT_TEAM')
+export const updateCurrentTeamSuccessAction = createAction('UPDATE_CURRENT_TEAM_SUCCESS')
+export const updateCurrentTeamFailureAction = createAction('UPDATE_CURRENT_TEAM_FAILURE')
+
 export const mountCurrentTeamAction = createAction('MOUNT_CURRENT_TEAM')
 export const unmountCurrentTeamAction = createAction('UNMOUNT_CURRENT_TEAM')
 export const setCurrentTeamAction = createAction('SET_CURRENT_TEAM')
@@ -17,7 +21,7 @@ export const currentTeamReducer = handleActions({
 
     const { teamId } = action.payload
 
-    if (typeof teamId === undefined) {
+    if (typeof teamId === 'undefined') {
       return state
     }
 
