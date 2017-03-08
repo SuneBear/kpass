@@ -1,47 +1,44 @@
-export const getEntryCategories = () => ([
-  {
-    name: 'Login',
-    color: '#F58E3D'
-  },
+import { I18n } from 'react-redux-i18n'
 
-  {
-    name: 'Network',
-    color: '#797EC9'
-  },
+export const getEntryCategories = () => {
+  const baseCategories = [
+    {
+      value: 'Login',
+      color: '#F58E3D'
+    },
 
-  {
-    name: 'Software License',
-    color: '#75C940'
-  },
+    {
+      value: 'Network',
+      color: '#797EC9'
+    },
 
-  {
-    name: 'Secure Note',
-    color: '#FFE738'
-  },
+    {
+      value: 'Software License',
+      color: '#75C940'
+    },
 
-  {
-    name: 'Server',
-    color: '#FF4F3E'
-  }
-])
+    {
+      value: 'Secure Note',
+      color: '#FFE738'
+    },
 
-export const getEntryCategoryNames = () => {
-  return getEntryCategories().map(
-    category => category.name
-  )
+    {
+      value: 'Server',
+      color: '#FF4F3E'
+    }
+  ]
+
+  // I18n
+  const enhancedCategories = baseCategories.map((category) => {
+    category.title = I18n.t(`entryCategory.${category.value}`)
+    return category
+  })
+
+  return enhancedCategories
 }
 
-export const getEntryCategoryOptions = () => {
-  return getEntryCategories().map(
-    category => ({
-      value: category.name,
-      color: category.color
-    })
-  )
-}
-
-export const getEntryCategoryByName = (name) => {
+export const getEntryCategoryByValue = (value) => {
   return getEntryCategories().find(
-    category => category.name === name
+    category => category.value === value
   )
 }

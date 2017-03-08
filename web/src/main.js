@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { I18n } from 'react-redux-i18n'
 import { Observable } from 'rxjs/Observable'
+import moment from 'moment'
 
 import { toast } from './uis'
 import { request, subscribeHTTPError, cookie } from './utils'
@@ -23,6 +24,10 @@ const MOUNT_NODE = document.getElementById('root')
 
 let render = () => {
   const routes = require('./routes/index').default(store)
+  const state = store.getState()
+
+  // Moment
+  moment.locale(state.i18n.locale)
 
   ReactDOM.render(
     <App store={store} routes={routes} />,

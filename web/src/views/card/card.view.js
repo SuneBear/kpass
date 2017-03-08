@@ -10,7 +10,8 @@ export class Card extends Component {
     children: PropTypes.any,
     title: PropTypes.string,
     withoutPadding: PropTypes.bool,
-    handler: PropTypes.element
+    handler: PropTypes.element,
+    onClick: PropTypes.func
   }
 
   getRootClassnames () {
@@ -68,8 +69,13 @@ export class Card extends Component {
   }
 
   render () {
+    const { onClick } = this.props
+
     return (
-      <div className={this.getRootClassnames()}>
+      <div
+        className={this.getRootClassnames()}
+        onClick={onClick}
+      >
         {this.renderCardHeader()}
         <div className={'cardBody'}>
           {this.props.children}

@@ -18,6 +18,7 @@ export * from './uxs/modal'
 export * from './uxs/popup'
 export * from './uxs/position'
 export * from './uxs/toast'
+export * from './uxs/tooltip'
 
 // Specials
 export * from './specials/menu-selector'

@@ -1,2 +1,74 @@
-.entryItemView
-  null
+@require '../../../../styles/ref'
+
+.entryItem
+  &View
+    display: flex
+
+  &Hero
+    display: inline-flex
+    align-items: center
+    justify-content: center
+    flex: 0 0 auto
+    margin-right: qu(3)
+
+    &.typeEntry
+      width: 20px
+      height: 20px
+      background-color: $gray93
+      border-radius: $radius
+
+      .icon
+        font-size: 9px
+        color: $gray65
+
+  &Content
+    display: inline-flex
+    flex-direction: column
+    flex: 1 1 0
+    min-width: 0
+
+  &Title
+    margin-bottom: qu(1)
+    padding-right: qu(2)
+    text-overflow()
+
+  &Meta
+    display: flex
+    align-items: center
+    font-size: 12px
+    color: $gray65
+
+    &Item
+      display: inline-flex
+      align-items: center
+
+      & + .entryItemMetaItem
+        margin-left: qu(2)
+
+      .icon
+        offset-icon()
+
+      .badgeView
+        margin-right: 1px
+
+    &Text
+      display: inline-block
+      max-width: 160px
+      margin-left: qu(1)
+      text-overflow()
+
+  &Handlerset
+    flex: 0 0 auto
+    color: $gray65
+
+    > *
+      display: inline-flex
+      align-items: center
+      cursor: pointer
+      transition: 218ms
+
+      &:hover
+        color: $brand
+
+  &Extra
+    null

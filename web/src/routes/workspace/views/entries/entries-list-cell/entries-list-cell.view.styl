@@ -1,4 +1,26 @@
 @require '../../../../../styles/ref'
 
+// Content Cell
 .entriesListCellView
-  null
+  padding: qu(3)
+  cursor: pointer
+  transition: background 218ms
+
+  &:hover
+    background: $gray97
+
+    .entryItemMoreHandler
+      opacity: 1
+
+  .entryItemMoreHandler
+    width: 22px
+    height: 22px
+    background-color: $white
+    border-radius: 50%
+    opacity: 0
+
+    .icon
+      margin-left: qu(1)
+
+    &:hover
+      background-color: alpha($brand, 4%)

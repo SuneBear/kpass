@@ -6,7 +6,7 @@ import {
   currentTeamSelector,
   currentEntrySelector,
   createCurrentTeamEntryAction,
-  updateCurrentEntryAction
+  updateCurrentTeamEntryAction
 } from '../../modules'
 
 import { EntryMake as EntryMakeView } from './entry-make.view'
@@ -20,7 +20,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
   actions: bindActionCreators({
     createEntry: createCurrentTeamEntryAction,
-    updateEntry: updateCurrentEntryAction
+    updateEntry: updateCurrentTeamEntryAction
   }, dispatch)
 })
 

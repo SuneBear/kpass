@@ -37,17 +37,18 @@
     .workspaceType
       [class*="switch-card-transition"]
         position: absolute
-        width: 100%
 
       > .cardView,
       .workspaceCardLayer > .cardView
+        $offset = $headerHeight + $baseSpacing * 2
         display: flex
         flex-direction: column
-        max-height: "calc(100vh - %s)" % ($headerHeight + $baseSpacing * 2)
+        width: 100%
+        max-height: "calc(100vh - %s)" % $offset
 
         > .cardHeader
           flex: 0 0 auto
 
         > .cardBody
-          flex: 1
+          flex: 1 auto
           overflow: auto

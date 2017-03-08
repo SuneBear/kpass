@@ -2,6 +2,10 @@
 
 export const enUS = {
   /* == Global == */
+  base: {
+    more: 'More'
+  },
+
   pageType: {
     secret: 'Secret',
     team: 'Team'
@@ -13,6 +17,7 @@ export const enUS = {
 
   action: {
     create: 'Create',
+    edit: 'Edit',
     save: 'Save'
   },
 
@@ -31,14 +36,14 @@ export const enUS = {
   account: {
     username: 'Username',
     password: 'Password',
-    unauthorized: 'Token experied, please sign in again',
+    unauthorized: 'Token experied, please sign in again.',
     signIn: 'Sign in',
     signInTip: 'Already have an account? Sign in',
-    signInFailed: 'Incorrect username or password',
+    signInFailed: 'Incorrect username or password.',
     signUp: 'Sign up',
     signUpTip: 'Dont\' have an account? Sign up',
-    signUpFailed: 'Failed to sign up',
-    signUpUserExisted: 'User already exists',
+    signUpFailed: 'Failed to sign up.',
+    signUpUserExisted: 'User already exists.',
     signOut: 'Sign Out',
     settings: 'Account Settings'
   },
@@ -46,8 +51,8 @@ export const enUS = {
   accountSettings: {
     publicProfile: 'Public profile',
     uploadAvatar: 'Upload new avatar',
-    uploadAvatarSucceed: 'Avatar has been updated',
-    uploadAvatarFailed: 'Failed to upload new avatar'
+    uploadAvatarSucceed: 'Avatar has been updated.',
+    uploadAvatarFailed: 'Failed to upload new avatar.'
   },
 
   entries: {
@@ -58,8 +63,22 @@ export const enUS = {
 
   entry: {
     new: 'New Entry',
+    edit: 'Edit Entry',
+    editSucceed: 'Entry edited successfully.',
+    delete: 'Delete Entry',
+    deleteSucceed: 'Entry deleted successfully.',
     entryName: 'Entry name',
-    entryCategory: 'Entry category'
+    entryCategory: 'Entry category',
+    category: 'Category',
+    updatedDate: 'Updated date'
+  },
+
+  entryCategory: {
+    'Login': 'Login',
+    'Network': 'Network',
+    'Software License': 'Software License',
+    'Secure Note': 'Secure Note',
+    'Server': 'Server'
   },
 
   team: {

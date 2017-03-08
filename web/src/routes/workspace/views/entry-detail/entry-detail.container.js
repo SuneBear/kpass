@@ -1,16 +1,12 @@
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
-import {
-  deleteCurrentTeamEntryAction
-} from '../../modules'
-import { EntryItem as EntryItemView } from './entry-item.view'
+import { EntryDetail as EntryDetailView } from './entry-detail.view'
 
 const mapStateToProps = (state) => ({})
 
 const mapDispatchToProps = (dispatch) => ({
   actions: bindActionCreators({
-    deleteEntry: deleteCurrentTeamEntryAction
   }, dispatch)
 })
 
@@ -21,4 +17,4 @@ const makeContainer = (component) => {
   )(component)
 }
 
-export const EntryItem = makeContainer(EntryItemView)
+export const EntryDetail = makeContainer(EntryDetailView)
