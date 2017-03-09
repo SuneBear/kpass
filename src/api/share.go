@@ -85,7 +85,7 @@ func (a *Share) Create(ctx *gear.Context) (err error) {
 		return ctx.Error(err)
 	}
 	userID, _ := auth.UserIDFromCtx(ctx)
-	if err = a.models.Team.CheckUser(entry.TeamID, userID); err != nil {
+	if err = a.models.Team.CheckMember(entry.TeamID, userID, true); err != nil {
 		return ctx.Error(err)
 	}
 

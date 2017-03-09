@@ -197,11 +197,15 @@ func (c *File) UploadFile(ctx *gear.Context) (err error) {
 	if err != nil {
 		return ctx.Error(err)
 	}
+	userID, _ := auth.UserIDFromCtx(ctx)
+	if err = c.models.Team.CheckMember(entry.TeamID, userID, true); err != nil {
+		return ctx.Error(err)
+	}
+
 	key, err := auth.KeyFromCtx(ctx)
 	if err != nil {
 		return ctx.Error(err)
 	}
-	userID, _ := auth.UserIDFromCtx(ctx)
 	if key, err = c.models.Team.GetKey(entry.TeamID, userID, key); err != nil {
 		return ctx.Error(err)
 	}

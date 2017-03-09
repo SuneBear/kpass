@@ -1,0 +1,118 @@
+{
+    "memo": "",
+    "projects": [
+        {
+            "name": "github.com/SermoDigital/jose",
+            "branch": "master",
+            "revision": "2bd9b81ac51d6d6134fcd4fd846bd2e7347a15f9",
+            "packages": [
+                "jwt",
+                "crypto",
+                "jws"
+            ]
+        },
+        {
+            "name": "github.com/go-http-utils/cookie",
+            "branch": "master",
+            "revision": "569c39288c81d4c3c98a8481f99141198462b12a",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/go-http-utils/negotiator",
+            "branch": "master",
+            "revision": "20eb27fc4a7731954c72be5e6c7ee7992b669af9",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/sdming/gosnow",
+            "branch": "master",
+            "revision": "3a05c415e886bd8d06522975d2c3458eafe93f04",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/teambition/gear",
+            "branch": "master",
+            "revision": "2ec7059b1854022929fcd79f9ac50d555876873c",
+            "packages": [
+                ".",
+                "middleware/cors",
+                "middleware/favicon",
+                "middleware/secure",
+                "middleware/static",
+                "logging"
+            ]
+        },
+        {
+            "name": "github.com/teambition/gear-auth",
+            "branch": "master",
+            "revision": "2ccd376e5adbb3df01562491db4ddd63599d2e38",
+            "packages": [
+                ".",
+                "crypto",
+                "jwt"
+            ]
+        },
+        {
+            "name": "github.com/teambition/trie-mux",
+            "branch": "master",
+            "revision": "73eb3431dce0d20e67791ddba312c1d3362e9698",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/tidwall/btree",
+            "branch": "master",
+            "revision": "9876f1454cf0993a53d74c27196993e345f50dd1",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/tidwall/buntdb",
+            "branch": "master",
+            "revision": "74dc10171b7549022c818bd212a9ddea151db02e",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/tidwall/gjson",
+            "branch": "master",
+            "revision": "e3f249f4fdf33c278edeb770426a6f83c954ae64",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/tidwall/grect",
+            "branch": "master",
+            "revision": "ba9a043346eba55344e40d66a5e74cfda3a9d293",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/tidwall/match",
+            "branch": "master",
+            "revision": "173748da739a410c5b0b813b956f89ff94730b4c",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/tidwall/rtree",
+            "branch": "master",
+            "revision": "d4a8a3d30d5729f85edfba1745241f3a621d0359",
+            "packages": [
+                "."
+            ]
+        }
+    ]
+}

@@ -66,7 +66,7 @@ func (a *Entry) Create(ctx *gear.Context) (err error) {
 		return ctx.Error(err)
 	}
 
-	entry, err := a.models.Entry.Create(userID, &schema.Entry{
+	entry, err := a.entryBll.Create(userID, &schema.Entry{
 		TeamID:   TeamID,
 		Name:     body.Name,
 		Category: body.Category,
@@ -122,6 +122,7 @@ func (t *tplEntryUpdate) Validate() error {
 // @Param entryID path string true "entry ID"
 // @Param body body tplEntryUpdate true "entry body"
 // @Success 200 schema.EntrySum
+// @Success 204
 // @Failure 400 string
 // @Failure 401 string
 // @Router PUT /api/entries/{entryID}
@@ -137,9 +138,12 @@ func (a *Entry) Update(ctx *gear.Context) (err error) {
 		return ctx.Error(err)
 	}
 
-	entrySum, err := a.models.Entry.Update(userID, EntryID, *body)
+	entrySum, err := a.entryBll.Update(userID, EntryID, *body)
 	if err != nil {
 		return ctx.Error(err)
+	}
+	if entrySum == nil {
+		return ctx.End(204)
 	}
 	return ctx.JSON(200, entrySum)
 }

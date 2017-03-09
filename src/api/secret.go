@@ -171,7 +171,7 @@ func (a *Secret) Delete(ctx *gear.Context) error {
 		return ctx.Error(err)
 	}
 
-	if err := a.models.Secret.Delete(EntryID, SecretID, userID); err != nil {
+	if err := a.secretBll.Delete(EntryID, SecretID, userID); err != nil {
 		return ctx.Error(err)
 	}
 	return ctx.End(204)

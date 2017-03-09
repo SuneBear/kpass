@@ -204,8 +204,8 @@ func (m *Team) FindByMemberID(memberID string) (teams []*schema.TeamResult, err 
 	return
 }
 
-// CheckUser check user' read right
-func (m *Team) CheckUser(TeamID util.OID, userID string) error {
+// CheckMember check member' read right
+func (m *Team) CheckMember(TeamID util.OID, userID string, write bool) error {
 	err := m.db.DB.View(func(tx *buntdb.Tx) error {
 		value, e := tx.Get(schema.TeamKey(TeamID))
 		if e != nil {
@@ -220,6 +220,9 @@ func (m *Team) CheckUser(TeamID util.OID, userID string) error {
 		}
 		if team.Visibility == "private" && team.UserID != userID {
 			return &gear.Error{Code: 403, Msg: "private team"}
+		}
+		if write && team.IsFrozen {
+			return &gear.Error{Code: 403, Msg: "team frozen"}
 		}
 
 		return nil

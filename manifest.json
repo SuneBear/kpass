@@ -1,0 +1,22 @@
+{
+    "dependencies": {
+        "github.com/SermoDigital/jose": {
+            "branch": "master"
+        },
+        "github.com/sdming/gosnow": {
+            "branch": "master"
+        },
+        "github.com/teambition/gear": {
+            "branch": "master"
+        },
+        "github.com/teambition/gear-auth": {
+            "branch": "master"
+        },
+        "github.com/tidwall/buntdb": {
+            "branch": "master"
+        },
+        "github.com/tidwall/gjson": {
+            "branch": "master"
+        }
+    }
+}

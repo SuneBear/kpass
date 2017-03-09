@@ -23,43 +23,18 @@ func (m *Secret) Init(db *service.DB) *Secret {
 }
 
 // Create ...
-func (m *Secret) Create(EntryID util.OID, userID, key string, secret *schema.Secret) (
+func (m *Secret) Create(EntryID util.OID, userID, key string, entry *schema.Entry, secret *schema.Secret) (
 	secretResult *schema.SecretResult, err error) {
 	SecretID := util.NewOID()
 	secret.Created = util.Time(time.Now())
 	secret.Updated = secret.Created
-
+	secretResult = secret.Result(SecretID)
 	err = m.db.DB.Update(func(tx *buntdb.Tx) error {
-		entryKey := schema.EntryKey(EntryID)
-		value, e := tx.Get(entryKey)
-		if e != nil {
-			return e
-		}
-		entry, e := schema.EntryFrom(value)
-		if e != nil || entry.IsDeleted {
-			return &gear.Error{Code: 404, Msg: "entry not found"}
-		}
-
-		value, e = tx.Get(schema.TeamKey(entry.TeamID))
-		if e != nil {
-			return e
-		}
-		team, e := schema.TeamFrom(value)
-		if e != nil || team.IsDeleted {
-			return &gear.Error{Code: 404, Msg: "team not found"}
-		}
-		if !team.HasMember(userID) {
-			return &gear.Error{Code: 403, Msg: "not team member"}
-		}
-		if team.IsFrozen {
-			return &gear.Error{Code: 403, Msg: "team is frozen"}
-		}
-
-		secretResult = secret.Result(SecretID)
 		entry.AddSecret(SecretID.String())
-		if value, e = auth.EncryptText(key, secret.String()); e == nil {
+		value, e := auth.EncryptText(key, secret.String())
+		if e == nil {
 			if _, _, e = tx.Set(schema.SecretKey(SecretID), value, nil); e == nil {
-				_, _, e = tx.Set(entryKey, entry.String(), nil)
+				_, _, e = tx.Set(schema.EntryKey(EntryID), entry.String(), nil)
 			}
 		}
 		return e
@@ -75,35 +50,8 @@ func (m *Secret) Create(EntryID util.OID, userID, key string, secret *schema.Sec
 func (m *Secret) Update(EntryID, SecretID util.OID, userID, key string, changes map[string]interface{}) (
 	secretResult *schema.SecretResult, err error) {
 	err = m.db.DB.Update(func(tx *buntdb.Tx) error {
-		// transaction: one or more user(team members) may update the secret.
-		value, e := tx.Get(schema.EntryKey(EntryID))
+		value, e := tx.Get(schema.SecretKey(SecretID))
 		if e != nil {
-			return e
-		}
-		entry, e := schema.EntryFrom(value)
-		if e != nil || entry.IsDeleted {
-			return &gear.Error{Code: 404, Msg: "entry not found"}
-		}
-		if !entry.HasSecret(SecretID.String()) {
-			return &gear.Error{Code: 403, Msg: "secret not found in the entry"}
-		}
-
-		value, e = tx.Get(schema.TeamKey(entry.TeamID))
-		if e != nil {
-			return e
-		}
-		team, e := schema.TeamFrom(value)
-		if e != nil || team.IsDeleted {
-			return &gear.Error{Code: 404, Msg: "team not found"}
-		}
-		if !team.HasMember(userID) {
-			return &gear.Error{Code: 403, Msg: "not team member"}
-		}
-		if team.IsFrozen {
-			return &gear.Error{Code: 403, Msg: "team is frozen"}
-		}
-
-		if value, e = tx.Get(schema.SecretKey(SecretID)); e != nil {
 			return e
 		}
 		if value, e = auth.DecryptText(key, value); e != nil {
@@ -158,36 +106,10 @@ func (m *Secret) Update(EntryID, SecretID util.OID, userID, key string, changes 
 }
 
 // Delete ...
-func (m *Secret) Delete(EntryID, SecretID util.OID, userID string) error {
+func (m *Secret) Delete(EntryID, SecretID util.OID, userID string, entry *schema.Entry) error {
 	err := m.db.DB.Update(func(tx *buntdb.Tx) error {
-		entryKey := schema.EntryKey(EntryID)
-		value, e := tx.Get(entryKey)
-		if e != nil {
-			return e
-		}
-		entry, e := schema.EntryFrom(value)
-		if e != nil || entry.IsDeleted {
-			return &gear.Error{Code: 404, Msg: "entry not found"}
-		}
-		if !entry.RemoveSecret(SecretID.String()) {
-			return &gear.Error{Code: 404, Msg: "secret not found in the entry"}
-		}
-
-		value, e = tx.Get(schema.TeamKey(entry.TeamID))
-		if e != nil {
-			return e
-		}
-		team, e := schema.TeamFrom(value)
-		if e != nil || team.IsDeleted {
-			return &gear.Error{Code: 404, Msg: "team not found"}
-		}
-		if !team.HasMember(userID) {
-			return &gear.Error{Code: 403, Msg: "not team member"}
-		}
-		if team.IsFrozen {
-			return &gear.Error{Code: 403, Msg: "team is frozen"}
-		}
-		if _, _, e = tx.Set(entryKey, entry.String(), nil); e == nil {
+		_, _, e := tx.Set(schema.EntryKey(EntryID), entry.String(), nil)
+		if e == nil {
 			_, e = tx.Delete(schema.SecretKey(SecretID))
 		}
 		return e
@@ -195,26 +117,6 @@ func (m *Secret) Delete(EntryID, SecretID util.OID, userID string) error {
 
 	return dbError(err)
 }
-
-// Find ...
-// func (m *Secret) Find(key string, SecretID util.OID) (secret *schema.Secret, err error) {
-// 	err = m.db.DB.View(func(tx *buntdb.Tx) error {
-// 		res, e := tx.Get(schema.SecretKey(SecretID))
-// 		if e != nil {
-// 			return e
-// 		}
-// 		res, e = auth.DecryptText(key, res)
-// 		if e != nil {
-// 			return e
-// 		}
-// 		secret, e = schema.SecretFrom(res)
-// 		return e
-// 	})
-// 	if err != nil {
-// 		return nil, dbError(err)
-// 	}
-// 	return
-// }
 
 // FindSecrets ...
 func (m *Secret) FindSecrets(key string, ids ...string) (secrets []*schema.SecretResult, err error) {
