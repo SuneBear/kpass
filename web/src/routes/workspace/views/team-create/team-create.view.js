@@ -32,7 +32,9 @@ export class TeamCreate extends Component {
 
     // @TODO: Implementation
     actions.createTeam({
-      teamName: values.teamName,
+      body: {
+        name: values.teamName
+      },
       formPromise
     })
 

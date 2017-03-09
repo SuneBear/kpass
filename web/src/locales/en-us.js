@@ -36,6 +36,7 @@ export const enUS = {
   account: {
     username: 'Username',
     password: 'Password',
+    passwordRetype: 'Retype password',
     unauthorized: 'Token experied, please sign in again.',
     signIn: 'Sign in',
     signInTip: 'Already have an account? Sign in',
@@ -84,14 +85,19 @@ export const enUS = {
   team: {
     new: 'New Team',
     teamName: 'Team name',
-    leave: 'Leave the team',
-    leaveAndDisband: 'Leave & Disband the team'
+    createSucceed: 'Team created successfully.'
   },
 
   teamMembers: {
     title: 'Members',
     remove: 'Remove from team',
+    removeSucceed: 'Member removed successfully.',
+    leave: 'Leave the team',
+    leaveSucceed: 'Team left successfully.',
+    leaveAndDisband: 'Leave & Disband the team',
     invite: 'Invite to team',
+    inviteRepeated: 'The user is already a member of the team.',
+    inviteFailed: 'Invalid username.',
     inviteSubmit: 'Invite'
   },
 
@@ -100,7 +106,8 @@ export const enUS = {
     rename: 'Rename team',
     renameDescription: 'Think of an ingenious name for the team that let members know what they can find.',
     freeze: 'Freeze team',
-    freezeDescription: 'When the team has been frozen, all non-owners get in read-only mode that can\'t modify any entries.'
+    freezeDescription: 'When the team has been frozen, all non-owners get in read-only mode that can\'t modify any entries.',
+    updateSucceed: 'Team updated successfully.'
   },
 
   zPlaceholder: 'Hello World'

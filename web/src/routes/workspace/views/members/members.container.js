@@ -6,8 +6,7 @@ import {
   currentTeamSelector,
   currentTeamMembersSelector,
   currentUserPermissionsSelector,
-  leaveTeamAction,
-  removeTeamMemberAction
+  deleteCurrentTeamMemberAction
 } from '../../modules'
 
 import { Members as MembersView } from './members.view'
@@ -21,8 +20,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   actions: bindActionCreators({
-    leaveTeam: leaveTeamAction,
-    removeTeamMember: removeTeamMemberAction
+    removeMember: deleteCurrentTeamMemberAction
   }, dispatch)
 })
 

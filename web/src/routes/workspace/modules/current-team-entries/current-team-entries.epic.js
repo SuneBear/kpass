@@ -5,7 +5,11 @@ import { Observable } from 'rxjs/Observable'
 
 import { toast } from 'uis'
 import { request } from 'utils'
-import { entrySchema, entriesSchema, setEntryEntitiesAction } from 'modules'
+import {
+  entrySchema,
+  entriesSchema,
+  setEntryEntitiesAction
+} from 'modules'
 import { unmountCurrentTeamAction } from '../index'
 import {
   createCurrentTeamEntryAction,

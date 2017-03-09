@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react'
 import { I18n, Translate } from 'react-redux-i18n'
 import cx from 'classnames'
 
+import { getFileUrl } from 'utils'
 import { Button } from 'uis'
 import { Avatar } from 'views'
 
@@ -15,7 +16,6 @@ export class MembersListCell extends Component {
     isMe: PropTypes.bool,
     isOwner: PropTypes.bool,
     userPermissions: PropTypes.object,
-    onLeaveTeam: PropTypes.func,
     onRemoveMember: PropTypes.func
   }
 
@@ -26,17 +26,11 @@ export class MembersListCell extends Component {
     )
   }
 
-  handleLeaveTeam = () => {
-    const { onLeaveTeam } = this.props
-
-    onLeaveTeam()
-  }
-
   handleRemoveMember = () => {
     const { onRemoveMember, member } = this.props
 
     onRemoveMember({
-      memberId: member.id
+      member
     })
   }
 
@@ -45,7 +39,7 @@ export class MembersListCell extends Component {
 
     return (
       <div className={'userInfoSection'}>
-        <Avatar url={member.avatarUrl} />
+        <Avatar url={getFileUrl(member.avatar)} />
         <span className={'userName'}>{member.id}</span>
       </div>
     )
@@ -69,22 +63,24 @@ export class MembersListCell extends Component {
     const { isOwner, isMe, userPermissions } = this.props
 
     let handler = null
-    if (isMe) {
+    if (isMe && !isOwner) { // @ALT: isMe
       const handlerText = isOwner
-        ? I18n.t('team.leaveAndDisband')
-        : I18n.t('team.leave')
+        ? I18n.t('teamMembers.leaveAndDisband')
+        : I18n.t('teamMembers.leave')
 
       handler = (
         <Button
           ghost
           type={'danger'}
           size={'small'}
-          onClick={this.handleLeaveTeam}
+          onClick={this.handleRemoveMember}
         >
           {handlerText}
         </Button>
       )
-    } else if (userPermissions.deleteTeamMember) {
+    }
+
+    if (!isMe && userPermissions.deleteTeamMember) {
       handler = (
         <Button
           ghost

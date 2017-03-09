@@ -1,6 +1,8 @@
 import { connect } from 'react-redux'
+import { push } from 'react-router-redux'
 import { bindActionCreators } from 'redux'
 
+import { teamsSelector } from 'modules'
 import {
   currentTeamSelector,
   mountCurrentTeamAction,
@@ -9,13 +11,15 @@ import {
 import { Team as TeamView } from './team.view'
 
 const mapStateToProps = (state) => ({
+  teams: teamsSelector(state),
   currentTeam: currentTeamSelector(state)
 })
 
 const mapDispatchToProps = (dispatch) => ({
   actions: bindActionCreators({
     mountCurrentTeam: mountCurrentTeamAction,
-    unmountCurrentTeam: unmountCurrentTeamAction
+    unmountCurrentTeam: unmountCurrentTeamAction,
+    push
   }, dispatch)
 })
 

@@ -57,6 +57,12 @@ export class SignUp extends Component {
           type={'password'}
           placeholder={I18n.t('account.password')}
         />
+        <Field
+          name='passwordRetype'
+          component={FieldText}
+          type={'password'}
+          placeholder={I18n.t('account.passwordRetype')}
+        />
         <Button
           className={'SignUpHandler'}
           type={'primary'}

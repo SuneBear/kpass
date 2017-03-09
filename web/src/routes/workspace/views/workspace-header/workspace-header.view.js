@@ -39,6 +39,10 @@ export class WorkspaceHeader extends Component {
     this.teamCreateModalRef.open()
   }
 
+  handleNewTeamSubmitSuccess = () => {
+    this.teamCreateModalRef.close()
+  }
+
   handleAccountSettingsClick = () => {
     this.accountSettingsModalRef.open()
   }
@@ -50,7 +54,9 @@ export class WorkspaceHeader extends Component {
         title={I18n.t('team.new')}
         size={'small'}
       >
-        <TeamCreate />
+        <TeamCreate
+          onSubmitSuccess={this.handleNewTeamSubmitSuccess}
+        />
       </Modal>
     )
   }

@@ -1,3 +1,5 @@
+import 'isomorphic-fetch'
+
 import 'rxjs/add/observable/dom/ajax'
 import 'rxjs/add/observable/of'
 import 'rxjs/add/observable/throw'

@@ -2,13 +2,13 @@ import { connect } from 'react-redux'
 import { push } from 'react-router-redux'
 import { bindActionCreators } from 'redux'
 
-import { userMeSelector, teamsSelector, signOutUserAction } from 'modules'
+import { userMeSelector, sortedTeamsSelector, signOutUserAction } from 'modules'
 import { currentTeamSelector } from '../../modules'
 import { WorkspaceHeader as WorkspaceHeaderView } from './workspace-header.view'
 
 const mapStateToProps = (state) => ({
   userMe: userMeSelector(state),
-  teams: teamsSelector(state),
+  teams: sortedTeamsSelector(state),
   currentTeam: currentTeamSelector(state)
 })
 

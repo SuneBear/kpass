@@ -27,14 +27,17 @@ export class MemberInvite extends Component {
 
   handleSubmit = (values) => {
     const {
+      team,
       actions
     } = this.props
 
     const formPromise = createEmptyPromise()
 
-    // @TODO: Implementation
-    actions.updateTeamMembers({
-      username: values.username,
+    actions.createTeamMember({
+      teamId: team.id,
+      body: {
+        userID: values.username
+      },
       formPromise
     })
 
