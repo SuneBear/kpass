@@ -14,8 +14,8 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   actions: bindActionCreators({
-    push: push,
-    signOutUser: signOutUserAction
+    signOutUser: signOutUserAction,
+    push
   }, dispatch)
 })
 

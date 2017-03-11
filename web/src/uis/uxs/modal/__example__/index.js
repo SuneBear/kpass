@@ -50,8 +50,8 @@ export class ModalExample extends Component {
     console.warn('modal opened')
   }
 
-  onHide () {
-    console.warn('modal hided')
+  onClose () {
+    console.warn('modal closed')
   }
 
   render () {
@@ -79,7 +79,7 @@ export class ModalExample extends Component {
               title={'Nested Modal'}
               size={'small'}
               onOpen={this.onOpen}
-              onHide={this.onHide}
+              onClose={this.onClose}
               footer={nestedModalFooter}
               ref={this.saveRefNested}
             >

@@ -4,8 +4,8 @@ import { push } from 'react-router-redux'
 import { normalize } from 'normalizr'
 import { Observable } from 'rxjs/Observable'
 
-import { toast } from 'uis'
 import { request, sha256, cookie } from 'utils'
+import { toast } from 'uis'
 import { setMemberEntitiesAction } from '../member'
 import { userSchema } from './user.schema'
 import {

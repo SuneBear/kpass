@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect'
 
-import { userMeSelector } from 'modules'
 import { getUserPermissions } from 'utils'
+import { userMeSelector } from 'modules'
 
 import { currentTeamSelector } from '../current-team'
 

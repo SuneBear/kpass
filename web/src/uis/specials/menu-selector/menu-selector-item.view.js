@@ -1,9 +1,9 @@
 import React, { Component, PropTypes } from 'react'
 import cx from 'classnames'
 
+import { capitalize } from 'utils'
 import { Icon } from 'uis'
 import { Avatar } from 'views'
-import { capitalize } from 'utils'
 
 import './menu-selector-item.view.styl'
 
@@ -20,6 +20,7 @@ export class MenuSelectorItem extends Component {
     description: PropTypes.string,
     avatarUrl: PropTypes.string,
     color: PropTypes.string,
+    error: PropTypes.string,
     iconName: PropTypes.string
   }
 
@@ -74,6 +75,18 @@ export class MenuSelectorItem extends Component {
 
     return (
       <Icon name={iconName} />
+    )
+  }
+
+  renderError () {
+    const { error } = this.props
+
+    if (!error) {
+      return null
+    }
+
+    return (
+      <span className={'errorMessage'}>{error}</span>
     )
   }
 
@@ -133,6 +146,7 @@ export class MenuSelectorItem extends Component {
         {this.renderColorLabel()}
         {this.renderIcon()}
         {this.renderMainInfo()}
+        {this.renderError()}
         {this.renderSelectedLabel()}
       </div>
     )

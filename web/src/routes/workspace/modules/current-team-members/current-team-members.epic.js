@@ -4,8 +4,8 @@ import { combineEpics } from 'redux-observable'
 import { normalize } from 'normalizr'
 import { Observable } from 'rxjs/Observable'
 
-import { toast } from 'uis'
 import { request } from 'utils'
+import { toast } from 'uis'
 import {
   memberSchema,
   setMemberEntitiesAction,

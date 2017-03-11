@@ -13,7 +13,9 @@ export class WorkspaceLayout extends Component {
   }
 
   componentWillMount () {
-    this.props.actions.readTeams()
+    const { actions } = this.props
+
+    actions.readTeams()
   }
 
   render () {

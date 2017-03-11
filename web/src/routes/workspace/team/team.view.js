@@ -6,9 +6,10 @@ import './team.view.styl'
 export class Team extends Component {
 
   static propTypes = {
-    params: PropTypes.object,
     children: PropTypes.element,
+    params: PropTypes.object,
     location: PropTypes.object,
+    basePath: PropTypes.string,
     teams: PropTypes.array,
     currentTeam: PropTypes.object,
     actions: PropTypes.object
@@ -78,10 +79,12 @@ export class Team extends Component {
   }
 
   render () {
-    const { children, location, currentTeam } = this.props
+    const { children, location, basePath, currentTeam } = this.props
 
     const key = currentTeam.id
     const childrenKey = location.pathname
+      .replace(basePath, '')
+      .split('/')[1]
 
     return (
       <div className={'workspaceType teamView'} key={key}>

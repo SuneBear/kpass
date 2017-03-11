@@ -3,8 +3,8 @@ import { normalize } from 'normalizr'
 import { Observable } from 'rxjs/Observable'
 import { I18n } from 'react-redux-i18n'
 
-import { toast } from 'uis'
 import { request } from 'utils'
+import { toast } from 'uis'
 import { teamSchema, setTeamEntitiesAction } from 'modules'
 import { readCurrentTeamEntriesAction } from '../../modules'
 import {

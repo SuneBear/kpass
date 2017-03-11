@@ -4,8 +4,8 @@ import { I18n } from 'react-redux-i18n'
 import { Observable } from 'rxjs/Observable'
 import moment from 'moment'
 
-import { toast } from './uis'
 import { request, subscribeHTTPError, cookie } from './utils'
+import { toast } from './uis'
 import { createStore, initialState } from './store'
 import { setUserMeIdAction, setUserEntitiesAction } from './store/modules'
 import App from './app'
@@ -102,6 +102,10 @@ subscribeHTTPError((res) => {
     case 401:
       return toast.error({
         message: I18n.t('account.unauthorized')
+      })
+    case 403:
+      return toast.error({
+        message: I18n.t('team.isFrozen')
       })
   }
 })

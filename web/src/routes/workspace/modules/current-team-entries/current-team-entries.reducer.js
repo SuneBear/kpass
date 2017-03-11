@@ -1,7 +1,8 @@
 import { createAction, handleActions } from 'redux-actions'
 
 const initialState = {
-  entryIds: null
+  entryIds: null,
+  filter: null
 }
 
 export const createCurrentTeamEntryAction = createAction('CREATE_CURRENT_TEAM_ENTRY')
@@ -19,6 +20,8 @@ export const readCurrentTeamEntriesFailureAction = createAction('READ_CURRENT_TE
 export const deleteCurrentTeamEntryAction = createAction('DELETE_CURRENT_TEAM_ENTRY')
 export const deleteCurrentTeamEntrySuccessAction = createAction('DELETE_CURRENT_TEAM_ENTRY_SUCCESS')
 export const deleteCurrentTeamEntryFailureAction = createAction('DELETE_CURRENT_TEAM_ENTRY_FAILURE')
+
+export const setCurrentTeamEntriesFilterAction = createAction('SET_CURRENT_TEAM_ENTRIES_FILTER')
 
 export const currentTeamEntriesReducer = handleActions({
 
@@ -93,6 +96,23 @@ export const currentTeamEntriesReducer = handleActions({
         ...state.entryIds.slice(0, entryIdIndex),
         ...state.entryIds.slice(entryIdIndex + 1)
       ]
+    }
+  },
+
+  [`${setCurrentTeamEntriesFilterAction}`]: (state, action) => {
+    if (!action.payload) {
+      return state
+    }
+
+    const { filter } = action.payload
+
+    if (!filter) {
+      return state
+    }
+
+    return {
+      ...state,
+      filter
     }
   }
 

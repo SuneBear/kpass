@@ -13,6 +13,7 @@ export class WorkspaceSidebar extends Component {
   static propTypes = {
     className: PropTypes.string,
     basePath: PropTypes.string,
+    routing: PropTypes.object,
     userPermissions: PropTypes.object
   }
 
@@ -24,7 +25,12 @@ export class WorkspaceSidebar extends Component {
   }
 
   renderSecretNav () {
-    const { basePath } = this.props
+    const { basePath, routing } = this.props
+
+    const classnames = cx(
+      'navItem',
+      { isActive: routing.pathname.indexOf(ENTRIES_PATH) >= 0 }
+    )
 
     return (
       <div className={'navGroup'}>
@@ -34,8 +40,7 @@ export class WorkspaceSidebar extends Component {
         <div className={'navGroupList'}>
           <Link
             to={`${basePath}/${ENTRIES_PATH}`}
-            className={'navItem'}
-            activeClassName={'isActive'}
+            className={classnames}
           >
             <Icon name={'lock'} />
             <Translate value={'entries.title'} />

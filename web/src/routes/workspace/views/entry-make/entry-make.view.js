@@ -3,8 +3,8 @@ import { I18n, Translate } from 'react-redux-i18n'
 import { Field, propTypes as formPropTypes } from 'redux-form'
 import cx from 'classnames'
 
-import { Button, FieldText, FieldSelect } from 'uis'
 import { createEmptyPromise } from 'utils'
+import { Button, FieldText, FieldSelect } from 'uis'
 
 import { getEntryCategories } from '../../shared'
 

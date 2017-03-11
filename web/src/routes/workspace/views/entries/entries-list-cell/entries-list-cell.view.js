@@ -12,9 +12,11 @@ export class EntriesListCell extends Component {
 
   static propTypes = {
     className: PropTypes.string,
+    willOpenEntry: PropTypes.object,
     entry: PropTypes.object,
     creatorPermissions: PropTypes.object,
-    onClick: PropTypes.func
+    onClick: PropTypes.func,
+    onModalClose: PropTypes.func
   }
 
   getRootClassnames () {
@@ -24,25 +26,32 @@ export class EntriesListCell extends Component {
     )
   }
 
+  shouldEntryDetailOpenModal () {
+    const { willOpenEntry, entry } = this.props
+    return willOpenEntry.id === entry.id
+  }
+
   saveEntryDetailModalRef = (ref) => {
     this.entryDetailModalRef = ref
   }
 
-  handleCellClick = (e) => {
-    const { onClick } = this.props
+  handleCellClick = () => {
+    const { entry, onClick } = this.props
 
     if (onClick) {
-      onClick(e)
+      onClick(entry)
     }
-
-    this.entryDetailModalRef.open()
   }
 
   renderEntryDetailModal () {
+    const { onModalClose } = this.props
+
     return (
       <Modal
         ref={this.saveEntryDetailModalRef}
+        opened={this.shouldEntryDetailOpenModal()}
         className={'entryDetailModal'}
+        onClose={onModalClose}
       >
         {this.renderEntryDetail()}
       </Modal>

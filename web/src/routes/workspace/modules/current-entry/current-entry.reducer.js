@@ -15,10 +15,6 @@ export const currentEntryReducer = handleActions({
 
     const { entryId } = action.payload
 
-    if (typeof entryId === undefined) {
-      return state
-    }
-
     return {
       ...state,
       entryId

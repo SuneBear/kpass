@@ -1,7 +1,11 @@
 import { createSelector } from 'reselect'
 
 import { currentTeamSelector } from '../current-team'
-import { getWorkspaceBashPath } from '../../index'
+import { currentTeamEntriesFilterSelector } from '../current-team-entries'
+import {
+  getWorkspaceBashPath,
+  ENTRIES_PATH
+} from '../../index'
 
 export const currentBasePathSelector = createSelector(
   (state) => currentTeamSelector(state),
@@ -11,5 +15,13 @@ export const currentBasePathSelector = createSelector(
     }
 
     return getWorkspaceBashPath(currentTeam)
+  }
+)
+
+export const currentEntriesBasePathSelector = createSelector(
+  (state) => currentBasePathSelector(state),
+  (state) => currentTeamEntriesFilterSelector(state),
+  (basePath, filter) => {
+    return `${basePath}/${ENTRIES_PATH}/${filter}`
   }
 )

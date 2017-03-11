@@ -14,10 +14,10 @@ export const isAuthedUserMe = (store) => {
   return isAuthedUser(userMe)
 }
 
-export const requireAuth = UserAuthWrapper({
+export const requireAuth = (Component) => UserAuthWrapper({
   authSelector: state => userMeSelector(state),
   predicate: isAuthedUser,
   redirectAction: replace,
   failureRedirectPath: ACCOUNT_BASE_PATH,
   wrapperDisplayName: 'UserIsAuthenticated'
-})
+})(Component)
