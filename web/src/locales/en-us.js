@@ -87,7 +87,9 @@ export const enUS = {
     teamName: 'Team name',
     isFrozen: 'No permission or team was frozen.',
     frozenLabel: 'Frozen',
-    createSucceed: 'Team created successfully.'
+    createSucceed: 'Team created successfully.',
+    joinSucceed: 'Team joined successfully.',
+    joinFailed: 'Invalid or expired invite link, please try another one.',
   },
 
   teamMembers: {
@@ -98,9 +100,15 @@ export const enUS = {
     leaveSucceed: 'Team left successfully.',
     leaveAndDisband: 'Leave & Disband the team',
     invite: 'Invite to team',
+    inviteGenerate: 'Generate invite link',
+    inviteGenerateSucceed: 'Invite link generated successfully.',
+    inviteLink: 'Invite link',
+    inviteLinkCopy: 'Copy invite link',
+    inviteLinkCopySucceed: 'Invite link copied successfully.',
+    inviteLinkDescription: 'Invite link which will be expired after %{validMinutes} minutes is only valid for this user: ',
     inviteRepeated: 'The user is already a member of the team.',
-    inviteFailed: 'Invalid username.',
-    inviteSubmit: 'Invite'
+    inviteFailed: 'Invalid username, please try another one.',
+    joining: 'Joining a workspace...'
   },
 
   teamSettings: {

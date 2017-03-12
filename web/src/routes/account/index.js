@@ -7,7 +7,7 @@ export const SIGN_IN_PATH = 'sign-in'
 export const SIGN_UP_PATH = 'sign-up'
 
 export const redirectToSignIn = (nextState, replace) => {
-  return replace(`${ACCOUNT_BASE_PATH}/${SIGN_IN_PATH}`)
+  return replace(`${ACCOUNT_BASE_PATH}/${SIGN_IN_PATH}${nextState.location.search}`)
 }
 
 export default (store) => ({
@@ -19,6 +19,7 @@ export default (store) => ({
       path : SIGN_IN_PATH,
       component: SignIn
     },
+
     {
       path : SIGN_UP_PATH,
       component: SignUp

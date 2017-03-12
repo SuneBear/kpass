@@ -6,6 +6,7 @@ import cx from 'classnames'
 
 import { createEmptyPromise } from 'utils'
 import { Button, FieldText } from 'uis'
+import { ACCOUNT_BASE_PATH, SIGN_IN_PATH } from '../index'
 
 import './sign-up.view.styl'
 
@@ -13,6 +14,7 @@ export class SignUp extends Component {
 
   static propTypes = {
     className: PropTypes.string,
+    location: PropTypes.object,
     actions: PropTypes.object,
     ...formPropTypes
   }
@@ -26,6 +28,7 @@ export class SignUp extends Component {
 
   handleSubmit = (values) => {
     const {
+      location,
       actions
     } = this.props
 
@@ -34,6 +37,7 @@ export class SignUp extends Component {
     actions.signUpUser({
       username: values.username,
       password: values.password,
+      location,
       formPromise
     })
 
@@ -78,12 +82,17 @@ export class SignUp extends Component {
   }
 
   render () {
+    const { location } = this.props
+
     return (
       <div className={this.getRootClassNames()}>
         <div className={'accountLayoutForm'}>
           {this.renderSignUpForm()}
         </div>
-        <Link className={'accountLayoutFooter'} to={'/account/sign-in'}>
+        <Link
+          className={'accountLayoutFooter'}
+          to={`${ACCOUNT_BASE_PATH}/${SIGN_IN_PATH}${location.search}`}
+        >
           <Translate value={'account.signInTip'} />
         </Link>
       </div>

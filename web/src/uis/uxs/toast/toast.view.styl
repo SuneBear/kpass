@@ -1,9 +1,10 @@
 @require '../../../styles/ref'
 
 // Variables
+$baseSpacing = qu(4)
 $noticeMinHeight = 52px
 $noticeMaxHeight = 100px
-$animationDuration = 468ms
+$animationDuration = 268ms
 
 // Toast
 .toast
@@ -22,11 +23,11 @@ $animationDuration = 468ms
 
   &.placementBottomLeft
     left: qu(8) !important
-    bottom: qu(4) !important
+    bottom: $baseSpacing !important
 
   &-notice
     position: relative
-    margin-bottom: qu(4)
+    margin-bottom: $baseSpacing
     border-radius: $radius
     overflow: hidden
     box-shadow: 0px 7px 21px 0px rgba(0, 0, 0, .1)
@@ -44,7 +45,7 @@ $animationDuration = 468ms
     height: 16px
     opacity: .7
     cursor: pointer
-    transition: opacity 218ms ease-in-out
+    transition: opacity 218ms
 
     &:hover
       opacity: 1
@@ -69,14 +70,15 @@ $animationDuration = 468ms
   &-fade-enter
     animation-name: noticeEnter
     animation-duration: $animationDuration
-    animation-timing-function: cubic-bezier(0, 1, 0.39, 1)
-    animation-play-state: paused
 
   &-fade-leave
     animation-name: noticeLeave
-    animation-duration: ($animationDuration - 100)
-    animation-timing-function: cubic-bezier(0.5, 0, 0.2, 1)
+    animation-duration: $animationDuration
+
+  &-fade-enter,
+  &-fade-leave
     animation-play-state: paused
+    animation-timing-function: cubic-bezier(0.02, 0.01, 0.47, 1)
 
   &-fade-enter-active,
   &-fade-leave-active
@@ -90,18 +92,18 @@ $animationDuration = 468ms
 
     100%
       max-height: $noticeMaxHeight
-      margin-bottom: qu(4)
+      margin-bottom: $baseSpacing
       opacity: 1
 
   @keyframes noticeLeave
     0%
       max-height: $noticeMaxHeight
-      margin-bottom: qu(4)
+      margin-bottom: $baseSpacing
       transform: translateY(0)
       opacity: 1
 
     100%
       max-height: 0
       margin-bottom: 0
-      transform: translateY(qu(10))
+      transform: translateY(80%)
       opacity: 0

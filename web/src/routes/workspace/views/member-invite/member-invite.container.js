@@ -1,10 +1,9 @@
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { reduxForm } from 'redux-form'
+import { reduxForm, formValueSelector } from 'redux-form'
 
 import {
   currentTeamSelector,
-  currentTeamMembersSelector,
   createCurrentTeamMemberAction
 } from '../../modules'
 
@@ -13,7 +12,7 @@ import { memberInviteValidate } from './member-invite.validate'
 
 const mapStateToProps = (state) => ({
   team: currentTeamSelector(state),
-  teamMembers: currentTeamMembersSelector(state)
+  username: formValueSelector('memberInviteForm')(state, 'username')
 })
 
 const mapDispatchToProps = (dispatch) => ({

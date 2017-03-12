@@ -93,10 +93,6 @@ export class Entries extends Component {
   handleEntryCellClick = (entry) => {
     const { entriesBashPath, actions } = this.props
 
-    actions.setCurrentEntry({
-      entryId: entry.id
-    })
-
     actions.push(getEntryPathById(
       entriesBashPath, entry.id
     ))
@@ -104,10 +100,6 @@ export class Entries extends Component {
 
   handleEntryModalClose = () => {
     const { entriesBashPath, actions } = this.props
-
-    actions.setCurrentEntry({
-      entryId: null
-    })
 
     actions.push(entriesBashPath)
   }

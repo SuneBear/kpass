@@ -18,6 +18,20 @@ export const serialize = (obj, prefix) => {
     .join('&')
 }
 
+export const unserialize = (serializedQuery) => {
+  const obj = {}
+
+  serializedQuery
+    .replace(/^\?/g, '')
+    .split('&')
+    .map((item) => {
+      const [ key, value ] = decodeURIComponent(item).split('=')
+      obj[key] = value
+    })
+
+  return obj
+}
+
 export const mixinDeep = (target, ...objects) => {
   for (let object of objects) {
     if (!isObject(object)) continue

@@ -55,7 +55,10 @@ export class RequestClient {
   }
 
   constructor (options) {
-    this.options = Object.assign(RequestClient.getDefaultOptions(), options)
+    this.options = {
+      ...RequestClient.getDefaultOptions(),
+      ...options
+    }
     const token = cookie('access_token')
     if (token) this.setToken(token)
   }
@@ -97,16 +100,16 @@ export class RequestClient {
         .catch((e) => {
           const headers = e.xhr.getAllResponseHeaders()
           const errorMessage = {
-            error: new Response(new Blob([JSON.stringify(e.xhr.response)]), {
+            error: new window.Response(new window.Blob([JSON.stringify(e.xhr.response)]), {
               status: e.xhr.status,
               statusText: e.xhr.statusText,
-              headers: headers.length ? new Headers(parseHeaders(headers)) : new Headers()
+              headers: headers.length ? new window.Headers(parseHeaders(headers)) : new window.Headers()
             }),
             method,
             url,
             body
           }
-          setTimeout(() => {
+          window.setTimeout(() => {
             httpError$.next(errorMessage)
           }, 10)
           return Observable.throw(errorMessage)

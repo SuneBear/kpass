@@ -16,6 +16,7 @@ export class FieldText extends Component {
     placeholder: PropTypes.string,
     autoFocus: PropTypes.bool,
     type: PropTypes.string,
+    onChange: PropTypes.func,
 
     // Redux from
     input: PropTypes.object,
@@ -40,7 +41,9 @@ export class FieldText extends Component {
   }
 
   focus () {
-    setTimeout(() => this.inputRef.focus(), 10)
+    window.setTimeout(() =>
+      this.inputRef.focus()
+    , 10)
   }
 
   renderLabel () {
@@ -70,6 +73,9 @@ export class FieldText extends Component {
   }
 
   handleChange = (e) => {
+    if (this.props.onChange) {
+      this.props.onChange(e)
+    }
     this.props.input.onChange(e)
   }
 

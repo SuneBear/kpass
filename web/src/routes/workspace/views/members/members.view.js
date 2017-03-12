@@ -21,6 +21,14 @@ export class Members extends Component {
     actions: PropTypes.object
   }
 
+  constructor (props) {
+    super(props)
+
+    this.state = {
+      inviteCode: null
+    }
+  }
+
   saveMemberInviteModalRef = (ref) => {
     this.memberInviteModalRef = ref
   }
@@ -74,6 +82,7 @@ export class Members extends Component {
     const { userMe, team, actions } = this.props
 
     actions.removeMember({
+      team,
       teamId: team.id,
       memberId: member.id,
       isMe: isMe(member, userMe)
@@ -84,8 +93,14 @@ export class Members extends Component {
     this.memberInviteModalRef.open()
   }
 
-  handleMemberInviteSubmitSuccess = () => {
-    this.memberInviteModalRef.close()
+  handleMemberInviteSubmitSuccess = (response) => {
+    this.state.inviteCode = response.code
+    this.setState(this.state)
+  }
+
+  handleUsernameChange = () => {
+    this.state.inviteCode = null
+    this.setState(this.state)
   }
 
   renderMemberInviteModal () {
@@ -94,8 +109,11 @@ export class Members extends Component {
         ref={this.saveMemberInviteModalRef}
         title={I18n.t('teamMembers.invite')}
         size={'small'}
+        onClose={this.handleUsernameChange}
       >
         <MemberInvite
+          inviteCode={this.state.inviteCode}
+          onUsernameChange={this.handleUsernameChange}
           onSubmitSuccess={this.handleMemberInviteSubmitSuccess}
         />
       </Modal>

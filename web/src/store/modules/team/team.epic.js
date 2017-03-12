@@ -14,6 +14,10 @@ import {
   createTeamSuccessAction,
   createTeamFailureAction,
 
+  joinTeamAction,
+  joinTeamSuccessAction,
+  joinTeamFailureAction,
+
   readTeamsAction,
   readTeamsSuccessAction,
   readTeamsFailureAction,
@@ -39,7 +43,6 @@ const createTeamEpic = (action$) => {
           const normalizedResponse = normalize(response, teamSchema)
 
           return Observable.of(
-            createTeamSuccessAction(),
             setMemberEntitiesAction({
               entities: normalizedResponse.entities.members
             }),
@@ -48,14 +51,57 @@ const createTeamEpic = (action$) => {
             }),
             push(getWorkspaceBashPath({
               id: normalizedResponse.result
-            }))
+            })),
+            createTeamSuccessAction()
           )
         })
         .catch((error) => {
           formPromise.reject(error)
 
           return Observable.of(
-            createTeamFailureAction(error)
+            createTeamFailureAction(error),
+          )
+        })
+    })
+}
+
+const joinTeamEpic = (action$) => {
+  return action$
+    .ofType(`${joinTeamAction}`)
+    .switchMap((action) => {
+      const { body } = action.payload
+
+      return request
+        .post('teams/join', body)
+        .concatMap((response) => {
+          toast.success({
+            message: I18n.t('team.joinSucceed')
+          })
+
+          const normalizedResponse = normalize(response, teamSchema)
+
+          console.log(normalizedResponse)
+
+          return Observable.of(
+            setMemberEntitiesAction({
+              entities: normalizedResponse.entities.members
+            }),
+            setTeamEntitiesAction({
+              entities: normalizedResponse.entities.teams
+            }),
+            push(getWorkspaceBashPath({
+              id: normalizedResponse.result
+            })),
+            joinTeamSuccessAction()
+          )
+        })
+        .catch((error) => {
+          toast.error({
+            message: I18n.t('team.joinFailed')
+          })
+
+          return Observable.of(
+            joinTeamFailureAction(error)
           )
         })
     })
@@ -90,5 +136,6 @@ const readTeamsEpic = (action$) => {
 
 export const teamEpic = combineEpics(
   createTeamEpic,
+  joinTeamEpic,
   readTeamsEpic
 )

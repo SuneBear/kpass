@@ -6,6 +6,7 @@ export * from './entry-item'
 export * from './entry-make'
 
 export * from './member-invite'
+export * from './member-join'
 export * from './members'
 
 export * from './team-create'

@@ -1,16 +1,11 @@
 import { I18n } from 'react-redux-i18n'
 import { push } from 'react-router-redux'
 import { combineEpics } from 'redux-observable'
-import { normalize } from 'normalizr'
 import { Observable } from 'rxjs/Observable'
 
 import { request } from 'utils'
 import { toast } from 'uis'
-import {
-  memberSchema,
-  setMemberEntitiesAction,
-  deleteTeamSuccessAction
-} from 'modules'
+import { deleteTeamSuccessAction, setTeamEntitiesAction } from 'modules'
 import { unmountCurrentTeamAction } from '../index'
 import {
   createCurrentTeamMemberAction,
@@ -34,14 +29,13 @@ const createCurrentTeamMemberEpic = (action$) => {
           `${unmountCurrentTeamAction}`
         ))
         .concatMap((response) => {
-          formPromise.resolve()
+          formPromise.resolve(response)
 
-          const normalizedResponse = normalize(response, memberSchema)
+          toast.success({
+            message: I18n.t('teamMembers.inviteGenerateSucceed')
+          })
 
           return Observable.of(
-            setMemberEntitiesAction({
-              entities: normalizedResponse.entities.members
-            }),
             createCurrentTeamMemberSuccessAction()
           )
         })
@@ -71,7 +65,7 @@ const deleteCurrentTeamMemberEpic = (action$) => {
   return action$
     .ofType(`${deleteCurrentTeamMemberAction}`)
     .switchMap((action) => {
-      const { teamId, memberId, isMe } = action.payload
+      const { team, teamId, memberId, isMe } = action.payload
 
       return request
         .delete(`teams/${teamId}/members/${memberId}`)
@@ -85,6 +79,7 @@ const deleteCurrentTeamMemberEpic = (action$) => {
             toast.success({
               message: I18n.t('teamMembers.leaveSucceed')
             })
+
             successActions.push(
               deleteTeamSuccessAction({
                 teamId
@@ -95,6 +90,24 @@ const deleteCurrentTeamMemberEpic = (action$) => {
             toast.success({
               message: I18n.t('teamMembers.removeSucceed')
             })
+
+            // @Hack response
+            const parsedTeamEntities = {
+              [`${team.id}`]: {
+                ...team,
+                members: [
+                  ...team.members.filter(
+                    currentMemberId => currentMemberId !== memberId
+                  )
+                ]
+              }
+            }
+
+            successActions.push(
+              setTeamEntitiesAction({
+                entities: parsedTeamEntities
+              })
+            )
           }
 
           return Observable.of(

@@ -18,7 +18,7 @@ export class Loading extends Component {
     if (this.props.hideAnimated) {
       const duration = 418
       indicator.classList.add('hideAnimated')
-      setTimeout(() => callback(), duration)
+      window.setTimeout(() => callback(), duration)
     } else {
       callback()
     }
