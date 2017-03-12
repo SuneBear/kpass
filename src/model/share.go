@@ -27,7 +27,7 @@ func (m *Share) Init(db *service.DB) *Share {
 func (m *Share) Create(EntryID util.OID, key, pass string, expire time.Duration, share *schema.Share) (
 	shareResult *schema.ShareResult, err error) {
 	ShareID := util.NewOID()
-	token, err := auth.EncryptText(auth.SignPass(share.UserID, pass), key)
+	token, err := auth.EncryptStr(auth.SignPass(share.UserID, pass), key)
 	if err != nil {
 		return nil, dbError(err)
 	}

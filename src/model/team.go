@@ -233,7 +233,7 @@ func (m *Team) CheckMember(TeamID util.OID, userID string, write bool) error {
 
 // SavePass ...
 func (m *Team) SavePass(TeamID util.OID, userID, key, teamPass string) error {
-	value, err := auth.EncryptText(key, teamPass)
+	value, err := auth.EncryptStr(key, teamPass)
 	if err != nil {
 		return dbError(err)
 	}
@@ -250,7 +250,7 @@ func (m *Team) GetPass(TeamID util.OID, userID, key string) (string, error) {
 	err := m.db.DB.View(func(tx *buntdb.Tx) error {
 		val, e := tx.Get(schema.TeamPassKey(TeamID, userID))
 		if e == nil {
-			teamPass, e = auth.DecryptText(key, val)
+			teamPass, e = auth.DecryptStr(key, val)
 		}
 		return e
 	})
@@ -267,7 +267,7 @@ func (m *Team) GetKey(TeamID util.OID, userID, key string) (string, error) {
 		teamPass := ""
 		val, e := tx.Get(schema.TeamPassKey(TeamID, userID))
 		if e == nil {
-			teamPass, e = auth.DecryptText(key, val)
+			teamPass, e = auth.DecryptStr(key, val)
 		}
 		if e == nil {
 			if val, e = tx.Get(schema.TeamKey(TeamID)); e == nil {

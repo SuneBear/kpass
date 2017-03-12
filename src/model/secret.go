@@ -31,7 +31,7 @@ func (m *Secret) Create(EntryID util.OID, userID, key string, entry *schema.Entr
 	secretResult = secret.Result(SecretID)
 	err = m.db.DB.Update(func(tx *buntdb.Tx) error {
 		entry.AddSecret(SecretID.String())
-		value, e := auth.EncryptText(key, secret.String())
+		value, e := auth.EncryptStr(key, secret.String())
 		if e == nil {
 			if _, _, e = tx.Set(schema.SecretKey(SecretID), value, nil); e == nil {
 				_, _, e = tx.Set(schema.EntryKey(EntryID), entry.String(), nil)
@@ -54,7 +54,7 @@ func (m *Secret) Update(EntryID, SecretID util.OID, userID, key string, changes 
 		if e != nil {
 			return e
 		}
-		if value, e = auth.DecryptText(key, value); e != nil {
+		if value, e = auth.DecryptStr(key, value); e != nil {
 			return e
 		}
 		secret, e := schema.SecretFrom(value)
@@ -90,7 +90,7 @@ func (m *Secret) Update(EntryID, SecretID util.OID, userID, key string, changes 
 
 		if changed {
 			secret.Updated = util.Time(time.Now())
-			value, e = auth.EncryptText(key, secret.String())
+			value, e = auth.EncryptStr(key, secret.String())
 			if e != nil {
 				return e
 			}
@@ -131,7 +131,7 @@ func (m *Secret) FindSecrets(key string, ids ...string) (secrets []*schema.Secre
 			if e != nil {
 				return e
 			}
-			res, e = auth.DecryptText(key, res)
+			res, e = auth.DecryptStr(key, res)
 			if e != nil {
 				return e
 			}

@@ -55,7 +55,7 @@ open http://petstore.swagger.io/?url=http://127.0.0.1:3000/swagger.json
 ```js
 const globalHMACFn = (data) => HMAC(SHA256, dbSalt)(data)
 const globalAESKeyFn = (a, b) => base64Encode(globalHMACFn(globalHMACFn(a) + globalHMACFn(b)))
-const globalPBKDF2Fn = (data, iv) => PBKDF2(dbSalt, 1025, 32, HMAC(SHA256, iv))(data)
+const globalPBKDF2Fn = (data, iv) => PBKDF2(dbSalt, 12480, 64, HMAC(SHA512, iv))(data)
 const globalEncryptFn = (key, data) => {
   let cipherData = AES-CTR(globalHMACFn(key), IV(16), data)
   let sum = HMAC(SHA1, cipherData)(data)

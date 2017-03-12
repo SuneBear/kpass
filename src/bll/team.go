@@ -61,7 +61,7 @@ func (b *Team) Invite(ownerID, key, userID string, TeamID util.OID) (string, err
 	if err != nil {
 		return "", err
 	}
-	teamPass, err = auth.EncryptText(auth.AESKey(owner.Pass, user.Pass), teamPass)
+	teamPass, err = auth.EncryptStr(auth.AESKey(owner.Pass, user.Pass), teamPass)
 	if err != nil {
 		return "", err
 	}
@@ -94,7 +94,7 @@ func (b *Team) Join(userID, key, token string) (*schema.TeamResult, error) {
 	if err != nil {
 		return nil, err
 	}
-	teamPass, err = auth.DecryptText(auth.AESKey(owner.Pass, user.Pass), teamPass)
+	teamPass, err = auth.DecryptStr(auth.AESKey(owner.Pass, user.Pass), teamPass)
 	if err != nil {
 		return nil, err
 	}
