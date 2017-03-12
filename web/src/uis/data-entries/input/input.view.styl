@@ -1,5 +1,7 @@
 @require '../../../styles/ref'
 
+@require '../field-label/field-label.view'
+
 .input
   height: qu(10)
   min-width: qu(19)
@@ -22,3 +24,54 @@
 
   &:focus
     border-color: $gray65
+
+  // Label
+  &-label
+    @extend .fieldLabel
+
+  // Group
+  &-group
+    position: relative
+    display: table
+    border-collapse: separate
+    border-spacing: 0
+    width: 100%
+
+    &-addon
+      display: table-cell
+      position: relative
+      width: 1px
+      white-space: nowrap
+      vertical-align: middle
+      font-size: 12px
+      font-weight: 400
+      line-height: 1
+      text-align: center
+      border: 1px solid $gray85
+      border-radius: $radius
+      overflow: hidden
+
+      > *
+        padding: qu(3)
+        cursor: pointer
+        transition: all 318ms
+
+        &:hover
+          background-color: $gray97
+
+      &:first-child
+        border-right: 0
+        border-bottom-right-radius: 0
+        border-top-right-radius: 0
+
+      &:last-child
+        border-left: 0
+        border-bottom-left-radius: 0
+        border-top-left-radius: 0
+
+    .input
+      display: table-cell
+      float: left
+      width: 100%
+      border-bottom-right-radius: 0
+      border-top-right-radius: 0

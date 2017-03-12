@@ -48,6 +48,7 @@ export class EntriesListCell extends Component {
 
     return (
       <Modal
+        isAfterClose
         ref={this.saveEntryDetailModalRef}
         opened={this.shouldEntryDetailOpenModal()}
         className={'entryDetailModal'}

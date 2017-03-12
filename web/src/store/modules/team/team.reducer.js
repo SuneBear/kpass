@@ -12,6 +12,10 @@ export const createTeamAction = createAction('CREATE_TEAM')
 export const createTeamSuccessAction = createAction('CREATE_TEAM_SUCCESS')
 export const createTeamFailureAction = createAction('CREATE_TEAM_FAILURE')
 
+export const joinTeamAction = createAction('JOIN_TEAM')
+export const joinTeamSuccessAction = createAction('JOIN_TEAM_SUCCESS')
+export const joinTeamFailureAction = createAction('JOIN_TEAM_FAILURE')
+
 export const readTeamsAction = createAction('READ_TEAMS')
 export const readTeamsSuccessAction = createAction('READ_TEAMS_SUCCESS')
 export const readTeamsFailureAction = createAction('READ_TEAMS_FAILURE')

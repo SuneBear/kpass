@@ -7,6 +7,8 @@ import { NOOP } from 'utils/constants'
 
 import './modal.view.styl'
 
+const TRANSITION_DURATION = 268
+
 export class Modal extends Component {
 
   static propTypes = {
@@ -18,6 +20,7 @@ export class Modal extends Component {
     className: PropTypes.string,
     prefixCls: PropTypes.string,
     transitionCls: PropTypes.string,
+    isAfterClose: PropTypes.bool,
     opened: PropTypes.bool,
     centered: PropTypes.bool,
     onOpen: PropTypes.func,
@@ -37,6 +40,7 @@ export class Modal extends Component {
     prefixCls: 'modal',
     transitionCls: 'slide',
     size: 'normal',
+    isAfterClose: false,
     opened: false,
     centered: false,
     onOpen: NOOP,
@@ -97,7 +101,13 @@ export class Modal extends Component {
   }
 
   close = () => {
-    this.props.onClose()
+    const { isAfterClose, onClose } = this.props
+    const closeDelay = isAfterClose ? TRANSITION_DURATION : 0
+
+    // @Hack: Simulate transitionEnd
+    window.setTimeout(() => {
+      onClose()
+    }, closeDelay)
 
     this.state.visible = false
     this.setState(this.state)

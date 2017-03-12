@@ -4,7 +4,7 @@ import { WorkspaceLayout } from './layout'
 import { workspaceReducer, workspaceEpic } from './modules'
 import { Personal } from './personal'
 import { Team } from './team'
-import { Entries, Members, TeamSettings } from './views'
+import { Entries, Members, MemberJoin, TeamSettings } from './views'
 
 export const WORKSPACE_BASE_PATH = '/workspace'
 export const PERSONAL_PATH = 'personal'
@@ -13,6 +13,7 @@ export const ENTRIES_PATH = 'entries'
 export const ENTRIES_FILTER_DEFAULT_PATH = 'unfiltered'
 export const ENTRY_PATH = 'entry'
 export const MEMBERS_PATH = 'members'
+export const JOIN_PATH = 'join'
 export const SETTINGS_PATH = 'settings'
 
 export const getWorkspaceBashPath = (team) => {
@@ -25,6 +26,10 @@ export const getWorkspaceBashPath = (team) => {
 
 export const getEntryPathById = (basePath, entryId) => {
   return `${basePath}/${ENTRY_PATH}/${entryId}`
+}
+
+export const getInvitePathByCode = (code) => {
+  return `${WORKSPACE_BASE_PATH}/${JOIN_PATH}/${code}`
 }
 
 export const initWorkspaceLayout = (store) => {
@@ -75,6 +80,13 @@ export default (store) => ({
   indexRoute : { onEnter: redirectToPersonal },
   component : initWorkspaceLayout(store),
   childRoutes : [
+    // External
+    {
+      path : `${JOIN_PATH}/:inviteCode`,
+      component : MemberJoin
+    },
+
+    // Personal
     {
       path : PERSONAL_PATH,
       indexRoute : { onEnter: redirectToPersonalEntries },
@@ -84,6 +96,7 @@ export default (store) => ({
       ]
     },
 
+    // Team
     {
       path : `${TEAM_PATH}/:teamId`,
       component : Team,

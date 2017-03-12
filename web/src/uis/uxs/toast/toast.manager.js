@@ -9,6 +9,7 @@ import './toast.view.styl'
 
 // Constants
 const DEFAULF_DURATION = 5
+const ANIMATION_DURATION = 268
 const MAX_NOTICES = 5
 const PLACEMENT = 'bottomLeft'
 
@@ -23,11 +24,11 @@ const toastManager = Notification.newInstance({
 const moveNotice = () => {
   const notices = toastManager.component.state.notices
   if (notices.length > MAX_NOTICES) {
-    setTimeout(() => {
+    window.setTimeout(() => {
       const oldestNoticeIndex = notices.length - MAX_NOTICES - 1
       const oldestNoticeKey = notices[oldestNoticeIndex].key
       toastManager.removeNotice(oldestNoticeKey)
-    }, 168)
+    }, ANIMATION_DURATION)
   }
 }
 
@@ -42,7 +43,7 @@ const showNotice = (options) => {
     ...options
   }
   toastManager.notice(options)
-  setTimeout(() => moveNotice(), 0)
+  window.setTimeout(() => moveNotice(), 0)
 }
 
 // API

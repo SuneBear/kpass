@@ -1,2 +1,21 @@
-.memberInviteView
-  null
+@require '../../../../styles/ref'
+
+.memberInvite
+  &View
+    null
+
+  &Link
+    null
+
+    &Divider
+      margin: qu(4) 0 10px
+      padding: 0
+      border-top: 1px solid $gray93
+
+    &Description
+      margin-top: qu(2)
+      overflow: scroll
+
+      > .username
+        display: inline-block
+        font-weight: bold

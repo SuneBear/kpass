@@ -4,7 +4,7 @@ import { push } from 'react-router-redux'
 import { normalize } from 'normalizr'
 import { Observable } from 'rxjs/Observable'
 
-import { request, sha256, cookie } from 'utils'
+import { request, sha256, cookie, unserialize } from 'utils'
 import { toast } from 'uis'
 import { setMemberEntitiesAction } from '../member'
 import { userSchema } from './user.schema'
@@ -39,7 +39,7 @@ const signUpUserEpic = (action$) => {
   return action$
     .ofType(`${signUpUserAction}`)
     .switchMap((action) => {
-      const { username, password, formPromise } = action.payload
+      const { username, password, location, formPromise } = action.payload
 
       const body = {
         id: username,
@@ -58,7 +58,8 @@ const signUpUserEpic = (action$) => {
             signUpUserSuccessAction(),
             signInUserAction({
               username,
-              password
+              password,
+              location
             })
           )
         })
@@ -88,13 +89,15 @@ const signInUserEpic = (action$) => {
   return action$
     .ofType(`${signInUserAction}`)
     .switchMap((action) => {
-      const { username, password, formPromise } = action.payload
+      const { username, password, location, formPromise } = action.payload
 
       const body = {
         username,
         password: sha256(password),
         grant_type: 'password'
       }
+
+      const redirectUrl = unserialize(location.search).redirect || '/'
 
       return request
         .post('login', body)
@@ -116,7 +119,7 @@ const signInUserEpic = (action$) => {
             setUserMeIdAction({
               userMeId: response.user.id
             }),
-            push('/')
+            push(redirectUrl)
           )
         })
         .catch((errorMessage) => {
