@@ -2,8 +2,8 @@ import React, { Component, PropTypes } from 'react'
 import { I18n, Translate } from 'react-redux-i18n'
 import cx from 'classnames'
 
-import { Button, Input, Upload, toast } from 'uis'
 import { getFileUrl } from 'utils'
+import { Button, Input, Upload, toast } from 'uis'
 import { Avatar } from 'views'
 
 import './account-settings.view.styl'

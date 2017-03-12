@@ -4,6 +4,7 @@ import { bindActionCreators } from 'redux'
 
 import { teamsSelector } from 'modules'
 import {
+  currentBasePathSelector,
   currentTeamSelector,
   mountCurrentTeamAction,
   unmountCurrentTeamAction
@@ -11,6 +12,7 @@ import {
 import { Team as TeamView } from './team.view'
 
 const mapStateToProps = (state) => ({
+  basePath: currentBasePathSelector(state),
   teams: teamsSelector(state),
   currentTeam: currentTeamSelector(state)
 })

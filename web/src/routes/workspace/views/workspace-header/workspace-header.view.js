@@ -1,8 +1,8 @@
 import React, { Component, PropTypes } from 'react'
 import { I18n } from 'react-redux-i18n'
 
-import { Icon, Dropdown, Modal, MenuSelector } from 'uis'
 import { isPublicTeam, getFileUrl } from 'utils'
+import { Icon, Dropdown, Modal, MenuSelector } from 'uis'
 import { Avatar, Logo } from 'views'
 import { TeamCreate } from '../team-create'
 import { AccountSettings } from '../account-settings'
@@ -105,8 +105,9 @@ export class WorkspaceHeader extends Component {
     const dataList = teams.map((team) => ({
       className: 'workspaceSwitcherItem',
       value: team.id,
-      iconName: isPublicTeam(team) ? 'building' : 'user',
       title: this.getTeamName(team),
+      iconName: isPublicTeam(team) ? 'building' : 'user',
+      error: team.isFrozen ? I18n.t('team.frozenLabel') : null,
       onClick: this.handleSwitchWorkspace
     }))
 

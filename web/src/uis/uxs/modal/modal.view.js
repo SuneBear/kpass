@@ -21,7 +21,7 @@ export class Modal extends Component {
     opened: PropTypes.bool,
     centered: PropTypes.bool,
     onOpen: PropTypes.func,
-    onHide: PropTypes.func,
+    onClose: PropTypes.func,
     mask: PropTypes.object,
     footer: PropTypes.oneOfType([
       PropTypes.element,
@@ -40,7 +40,7 @@ export class Modal extends Component {
     opened: false,
     centered: false,
     onOpen: NOOP,
-    onHide: NOOP,
+    onClose: NOOP,
     mask: {
       transitionCls: 'fade',
       visible: true,
@@ -54,7 +54,26 @@ export class Modal extends Component {
     super(props)
 
     this.state = {
-      visible: props.opened
+      visible: null
+    }
+  }
+
+  // @TODO: Distinguish `props.opened` and `state.visible`
+  componentWillReceiveProps (nextProps, nextState) {
+    if (nextProps.opened === this.props.opened) {
+      return
+    }
+
+    if (nextProps.opened) {
+      this.open()
+    } else {
+      this.close()
+    }
+  }
+
+  componentDidMount () {
+    if (this.props.opened) {
+      this.open()
     }
   }
 
@@ -71,29 +90,17 @@ export class Modal extends Component {
   }
 
   open = () => {
+    this.props.onOpen()
+
     this.state.visible = true
     this.setState(this.state)
   }
 
   close = () => {
+    this.props.onClose()
+
     this.state.visible = false
     this.setState(this.state)
-  }
-
-  componentWillUpdate (_, nextState) {
-    const { onOpen, onHide } = this.props
-
-    if (nextState.visible) {
-      onOpen()
-    } else {
-      onHide()
-    }
-  }
-
-  componentDidMount () {
-    if (this.state.visible) {
-      this.props.onOpen()
-    }
   }
 
   optionalProps () {
@@ -176,12 +183,12 @@ export class Modal extends Component {
       <Dialog
         visible={this.state.visible}
         closable={false}
-        onClose={this.close}
         style={style}
         className={this.getRootClassNames()}
         title={title}
         zIndex={zIndex}
         footer={footer}
+        onClose={this.close}
         {...this.optionalProps()}
       >
         {this.renderClose()}

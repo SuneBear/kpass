@@ -6,17 +6,43 @@ import { Button, Loading, Modal } from 'uis'
 import { Card, Placeholder } from 'views'
 import { EntriesList } from './entries-list'
 import { EntryMake } from '../entry-make'
+import { getEntryPathById } from '../../index'
 
 import './entries.view.styl'
 
 export class Entries extends Component {
 
   static propTypes = {
+    params: PropTypes.object,
     className: PropTypes.string,
     userMe: PropTypes.object,
     team: PropTypes.object,
+    currentEntry: PropTypes.object,
     entries: PropTypes.array,
-    userPermissions: PropTypes.object
+    entriesFilter: PropTypes.string,
+    entriesBashPath: PropTypes.string,
+    userPermissions: PropTypes.object,
+    actions: PropTypes.object
+  }
+
+  componentWillReceiveProps (nextProps) {
+    const { currentEntry, entriesFilter, actions } = this.props
+
+    if (entriesFilter !== nextProps.params.filterName) {
+      actions.setCurrentFilter({
+        filter: nextProps.params.filterName
+      })
+    }
+
+    if (
+      nextProps.params.entryId === currentEntry.id
+    ) {
+      return
+    }
+
+    actions.setCurrentEntry({
+      entryId: nextProps.params.entryId
+    })
   }
 
   getRootClassNames () {
@@ -62,6 +88,28 @@ export class Entries extends Component {
 
   handleNewEntrySubmitSuccess = () => {
     this.newEntryModalRef.close()
+  }
+
+  handleEntryCellClick = (entry) => {
+    const { entriesBashPath, actions } = this.props
+
+    actions.setCurrentEntry({
+      entryId: entry.id
+    })
+
+    actions.push(getEntryPathById(
+      entriesBashPath, entry.id
+    ))
+  }
+
+  handleEntryModalClose = () => {
+    const { entriesBashPath, actions } = this.props
+
+    actions.setCurrentEntry({
+      entryId: null
+    })
+
+    actions.push(entriesBashPath)
   }
 
   getNewEntryHandler (type, isGhost) {
@@ -132,7 +180,12 @@ export class Entries extends Component {
   }
 
   renderEntries () {
-    const { userMe, entries } = this.props
+    const {
+      userMe,
+      team,
+      currentEntry,
+      entries
+    } = this.props
 
     if (!entries || !entries.length) {
       return null
@@ -141,7 +194,11 @@ export class Entries extends Component {
     return (
       <EntriesList
         userMe={userMe}
+        team={team}
+        willOpenEntry={currentEntry}
         entries={entries}
+        onCellClick={this.handleEntryCellClick}
+        onCellModalClose={this.handleEntryModalClose}
       />
     )
   }

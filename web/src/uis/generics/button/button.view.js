@@ -61,6 +61,7 @@ export class Button extends Component {
     } = this.props
 
     if (loading || disabled) {
+      e.preventDefault()
       return null
     }
 

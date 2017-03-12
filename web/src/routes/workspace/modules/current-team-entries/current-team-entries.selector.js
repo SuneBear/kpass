@@ -40,3 +40,10 @@ export const currentTeamSortedEntriesSelector = createSelector(
       })
   }
 )
+
+export const currentTeamEntriesFilterSelector = createSelector(
+  (state) => state.workspace.currentTeamEntries.filter,
+  (filter) => {
+    return filter
+  }
+)

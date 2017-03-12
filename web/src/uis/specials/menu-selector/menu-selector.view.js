@@ -27,6 +27,7 @@ export class MenuSelector extends Component {
         description: PropTypes.string,
         avatarUrl: PropTypes.string,
         color: PropTypes.string,
+        error: PropTypes.string,
         iconName: PropTypes.string,
         onClick: PropTypes.func
       })

@@ -85,6 +85,8 @@ export const enUS = {
   team: {
     new: 'New Team',
     teamName: 'Team name',
+    isFrozen: 'No permission or team was frozen.',
+    frozenLabel: 'Frozen',
     createSucceed: 'Team created successfully.'
   },
 

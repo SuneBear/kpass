@@ -3,8 +3,8 @@ import { I18n } from 'react-redux-i18n'
 import { normalize } from 'normalizr'
 import { Observable } from 'rxjs/Observable'
 
-import { toast } from 'uis'
 import { request } from 'utils'
+import { toast } from 'uis'
 import {
   entrySchema,
   entriesSchema,
