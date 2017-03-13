@@ -41,6 +41,9 @@ export class EntriesListCell extends Component {
     if (onClick) {
       onClick(entry)
     }
+
+    // @Hack: Avoid delay
+    this.entryDetailModalRef.open()
   }
 
   renderEntryDetailModal () {

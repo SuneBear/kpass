@@ -14,16 +14,21 @@ export const getEntryCategories = () => {
 
     {
       value: 'Software License',
-      color: '#75C940'
+      color: '#3DA8F5'
     },
 
     {
       value: 'Secure Note',
-      color: '#FFE738'
+      color: '#75C940'
     },
 
     {
       value: 'Server',
+      color: '#FFE738'
+    },
+
+    {
+      value: 'Wallet',
       color: '#FF4F3E'
     }
   ]

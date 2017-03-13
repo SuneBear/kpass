@@ -1,8 +1,12 @@
 import React, { Component, PropTypes } from 'react'
+import { Translate } from 'react-redux-i18n'
 import cx from 'classnames'
 
-import { Button } from 'uis'
+import { Button, Loading, Modal } from 'uis'
+import { Card } from 'views'
 import { EntryItem } from '../entry-item'
+import { Secrets } from '../secrets'
+import { SecretMake } from '../secret-make'
 
 import './entry-detail.view.styl'
 
@@ -15,6 +19,14 @@ export class EntryDetail extends Component {
     actions: PropTypes.object
   }
 
+  componentWillMount () {
+    const { entry, actions } = this.props
+
+    actions.readEntry({
+      entryId: entry.id
+    })
+  }
+
   getRootClassnames () {
     return cx(
       'entryDetailView',
@@ -22,17 +34,93 @@ export class EntryDetail extends Component {
     )
   }
 
-  renderEntryItem () {
+  saveAddSecretModalRef = (ref) => {
+    this.addSecretModalRef = ref
+  }
+
+  handleAddSecretClick = () => {
+    this.addSecretModalRef.open()
+  }
+
+  handleAddSecretSubmitSuccess = () => {
+    this.addSecretModalRef.close()
+  }
+
+  renderEntryHeader () {
     const {
       entry,
       creatorPermissions
     } = this.props
 
     return (
-      <EntryItem
-        entry={entry}
-        creatorPermissions={creatorPermissions}
-      />
+      <div className={'entryDetailHeader'}>
+        <EntryItem
+          entry={entry}
+          creatorPermissions={creatorPermissions}
+        />
+      </div>
+    )
+  }
+
+  renderAddSecretHandler () {
+    const { creatorPermissions } = this.props
+
+    if (!creatorPermissions.createSecret) {
+      return null
+    }
+
+    return (
+      <div className={'entryDetailContentSection'}>
+        <Button
+          block
+          icon={'plus-sign'}
+          type={'normal'}
+          onClick={this.handleAddSecretClick}
+        >
+          <Translate value={'secret.new'} />
+        </Button>
+      </div>
+    )
+  }
+
+  renderAddSecretModal () {
+    return (
+      <Modal
+        ref={this.saveAddSecretModalRef}
+        className={'secretMakeModal'}
+      >
+        <SecretMake
+          onSubmitSuccess={this.handleAddSecretSubmitSuccess}
+        />
+      </Modal>
+    )
+  }
+
+  renderLoading () {
+    const { entry } = this.props
+
+    if (entry.secrets) {
+      return null
+    }
+
+    return (
+      <Card className={'entryDetailContentSection'}>
+        <Loading />
+      </Card>
+    )
+  }
+
+  renderSecrets () {
+    const { entry } = this.props
+
+    if (!entry.secrets) {
+      return null
+    }
+
+    return (
+      <div className={'entryDetailContentSection'}>
+        <Secrets />
+      </div>
     )
   }
 
@@ -41,13 +129,15 @@ export class EntryDetail extends Component {
       <div
         className={this.getRootClassnames()}
       >
-        <div className={'entryDetailHeader'}>
-          {this.renderEntryItem()}
-        </div>
+        {this.renderEntryHeader()}
         <div className={'entryDetailDivider'} />
         <div className={'entryDetailContent'}>
-          <Button block type={'normal'}>@TODO: Secret</Button>
+          {this.renderAddSecretHandler()}
+          {this.renderLoading()}
+          {this.renderSecrets()}
         </div>
+
+        {this.renderAddSecretModal()}
       </div>
     )
   }

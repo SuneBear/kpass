@@ -1,5 +1,7 @@
 import { createSelector } from 'reselect'
 
+import { ENTRIES_FILTER_DEFAULT_PATH } from '../../index'
+
 export const currentTeamEntriesSelector = createSelector(
   (state) => state.entry.entities,
   (state) => state.workspace.currentTeamEntries.entryIds,
@@ -44,6 +46,6 @@ export const currentTeamSortedEntriesSelector = createSelector(
 export const currentTeamEntriesFilterSelector = createSelector(
   (state) => state.workspace.currentTeamEntries.filter,
   (filter) => {
-    return filter
+    return filter || ENTRIES_FILTER_DEFAULT_PATH
   }
 )

@@ -4,6 +4,8 @@ export * from './entries'
 export * from './entry-detail'
 export * from './entry-item'
 export * from './entry-make'
+export * from './secrets'
+export * from './secret-make'
 
 export * from './member-invite'
 export * from './member-join'

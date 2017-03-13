@@ -2,6 +2,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { reduxForm } from 'redux-form'
 
+import { cookie } from 'utils/cookie'
 import { signInUserAction } from 'modules'
 import { SignIn as SignInView } from './sign-in.view'
 import { signInValidate } from './sign-in.validate'
@@ -22,7 +23,10 @@ const createContainer = (component) => {
 
   return reduxForm({
     form: 'signInForm',
-    validate: signInValidate
+    validate: signInValidate,
+    initialValues: {
+      username: cookie('kp_username')
+    }
   })(connectedComponent)
 }
 

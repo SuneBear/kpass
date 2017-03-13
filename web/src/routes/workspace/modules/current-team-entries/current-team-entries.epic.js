@@ -43,6 +43,10 @@ const createCurrentTeamEntryEpic = (action$) => {
         .concatMap((response) => {
           formPromise.resolve()
 
+          toast.success({
+            message: I18n.t('entry.createSucceed')
+          })
+
           const normalizedResponse = normalize(response, entrySchema)
 
           return Observable.of(

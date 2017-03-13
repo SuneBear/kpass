@@ -14,8 +14,12 @@ export class FieldText extends Component {
     name: PropTypes.string,
     defaultValue: PropTypes.string,
     placeholder: PropTypes.string,
+    autosize: PropTypes.object,
     autoFocus: PropTypes.bool,
+    prefix: PropTypes.element,
     type: PropTypes.string,
+    onFocus: PropTypes.func,
+    onBlur: PropTypes.func,
     onChange: PropTypes.func,
 
     // Redux from
@@ -65,10 +69,16 @@ export class FieldText extends Component {
   }
 
   handleFocus = (e) => {
+    if (this.props.onFocus) {
+      this.props.onFocus(e)
+    }
     this.props.input.onFocus(e)
   }
 
   handleBlur = (e) => {
+    if (this.props.onBlur) {
+      this.props.onBlur(e)
+    }
     this.props.input.onBlur(e)
   }
 
@@ -85,7 +95,9 @@ export class FieldText extends Component {
       name,
       placeholder,
       defaultValue,
+      autosize,
       autoFocus,
+      prefix,
       type
     } = this.props
 
@@ -100,7 +112,9 @@ export class FieldText extends Component {
           defaultValue={input.value}
           name={name}
           placeholder={placeholder}
+          autosize={autosize}
           autoFocus={autoFocus}
+          prefix={prefix}
           type={type}
           onFocus={this.handleFocus}
           onBlur={this.handleBlur}

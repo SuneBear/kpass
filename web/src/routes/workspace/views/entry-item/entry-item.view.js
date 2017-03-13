@@ -132,7 +132,7 @@ export class EntryItem extends Component {
         content={this.getMoreMenu()}
       >
         <Tooltip
-          title={I18n.t('base.more')}
+          title={I18n.t('entry.menu')}
           onClick={(e) => e.stopPropagation()}
         >
           <div className={'entryItemMoreHandler'}>

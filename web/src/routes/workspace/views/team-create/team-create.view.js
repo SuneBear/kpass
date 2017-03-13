@@ -41,10 +41,11 @@ export class TeamCreate extends Component {
     return formPromise
   }
 
-  componentDidMount () {
-    this.refs.teamNameInput
-      .getRenderedComponent().focus()
-  }
+  // @Hack: Auto focus
+  // componentDidMount () {
+  //   this.refs.teamNameInput
+  //     .getRenderedComponent().focus()
+  // }
 
   renderMemberInviteForm () {
     const { handleSubmit, pristine, valid, submitting } = this.props
