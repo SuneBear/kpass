@@ -15,7 +15,7 @@ import {
   deleteCurrentTeamMemberAction,
   deleteCurrentTeamMemberSuccessAction,
   deleteCurrentTeamMemberFailureAction
-} from './current-team-members.reducer'
+} from './current-team-members.action'
 
 const createCurrentTeamMemberEpic = (action$) => {
   return action$
@@ -91,7 +91,7 @@ const deleteCurrentTeamMemberEpic = (action$) => {
               message: I18n.t('teamMembers.removeSucceed')
             })
 
-            // @Hack response
+            // @Hack: Mock response
             const parsedTeamEntities = {
               [`${team.id}`]: {
                 ...team,

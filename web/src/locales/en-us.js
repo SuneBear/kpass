@@ -16,6 +16,7 @@ export const enUS = {
   },
 
   action: {
+    add: 'Add',
     create: 'Create',
     edit: 'Edit',
     save: 'Save'
@@ -63,7 +64,9 @@ export const enUS = {
   },
 
   entry: {
+    menu: 'Entry Menu',
     new: 'New Entry',
+    createSucceed: 'Entry created successfully',
     edit: 'Edit Entry',
     editSucceed: 'Entry edited successfully.',
     delete: 'Delete Entry',
@@ -79,7 +82,35 @@ export const enUS = {
     'Network': 'Network',
     'Software License': 'Software License',
     'Secure Note': 'Secure Note',
-    'Server': 'Server'
+    'Server': 'Server',
+    'Wallet': 'Wallet'
+  },
+
+  secrets: {
+    placeholderTitle: 'Obliviate yourself when entry and secret meet.'
+  },
+
+  secret: {
+    menu: 'Secret Menu',
+    new: 'Add a secret',
+    newTitle: 'Add a secret to "%{entryName}"',
+    createSucceed: 'Secret added successfully',
+    edit: 'Edit Secret',
+    editTitle: 'Edit secret "%{secretName}"',
+    editSucceed: 'Secret edited successfully.',
+    delete: 'Delete Secret',
+    deleteSucceed: 'Secret deleted successfully.',
+    secretName: 'Name',
+    secretNamePlaceholder: 'Name, username, email, etc identity',
+    secretPassword: 'Key',
+    secretPasswordCopy: 'Copy password',
+    secretPasswordCopySucceed: 'Password copied successfully',
+    secretPasswordPlaceholder: 'Key / Password',
+    secretUrl: 'URL',
+    secretUrlGoTo: 'Open link in new tab',
+    secretUrlPlaceholder: 'URL / IP',
+    secretNote: 'Note',
+    secretNotePlaceholder: 'Note, support markdown syntax'
   },
 
   team: {

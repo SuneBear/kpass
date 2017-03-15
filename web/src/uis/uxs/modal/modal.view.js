@@ -84,30 +84,47 @@ export class Modal extends Component {
   getRootClassNames () {
     const {
       className,
-      size
+      size,
+      title
     } = this.props
 
     return cx(
       className,
-      [`size-${size}`]
+      [`size-${size}`],
+      { 'without-header': !title }
     )
+  }
+
+  setTimer () {
+    const { isAfterClose, onClose } = this.props
+    const closeDelay = isAfterClose ? TRANSITION_DURATION : 0
+
+    // @Hack: Simulate transitionEnd
+    if (!this.onCloseTimer) {
+      this.onCloseTimer = window.setTimeout(() => {
+        onClose()
+      }, closeDelay)
+    }
+  }
+
+  resetTimer () {
+    if (this.onCloseTimer) {
+      clearTimeout(this.onCloseTimer)
+      this.onCloseTimer = null
+    }
   }
 
   open = () => {
     this.props.onOpen()
+
+    this.resetTimer()
 
     this.state.visible = true
     this.setState(this.state)
   }
 
   close = () => {
-    const { isAfterClose, onClose } = this.props
-    const closeDelay = isAfterClose ? TRANSITION_DURATION : 0
-
-    // @Hack: Simulate transitionEnd
-    window.setTimeout(() => {
-      onClose()
-    }, closeDelay)
+    this.setTimer()
 
     this.state.visible = false
     this.setState(this.state)
@@ -201,8 +218,8 @@ export class Modal extends Component {
         onClose={this.close}
         {...this.optionalProps()}
       >
-        {this.renderClose()}
         <div className={'scrollable-viewport'}>
+          {this.renderClose()}
           {this.props.children}
         </div>
       </Dialog>

@@ -3,6 +3,9 @@ export * from './generics/button'
 export * from './generics/icon'
 export * from './generics/loading'
 
+// Layout
+export * from './layout/grid'
+
 // Data Entries
 export * from './data-entries/input'
 export * from './data-entries/select'

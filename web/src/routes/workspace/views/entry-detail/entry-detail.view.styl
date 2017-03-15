@@ -1,6 +1,7 @@
 @require '../../../../styles/ref'
 
 .entryDetail
+  $baseSpacing = qu(4)
   $bgColor = $gray97
   $borderColor = $gray90
 
@@ -12,7 +13,7 @@
 
     // Override Item
     .entryItemHero
-      transform: scale(1.2)
+      transform: scale(1.1)
       margin-right: 14px
 
     .entryItemTitle
@@ -25,20 +26,24 @@
       font-size: 17px
 
     .entryItemMeta
-      .entryItemMetaItem
-        & + .entryItemMetaItem
+      &Item
+        & + &
           margin-left: qu(3)
 
     .entryItemHandlerset
       margin-right: qu(8)
 
   &Divider
-    padding-top: qu(4)
-    margin: 0 qu(-4)
-    margin-top: qu(4)
-    border-top: 1px solid $borderColor
+    divider($baseSpacing)
+    margin-left: -($baseSpacing)
+    margin-right: -($baseSpacing)
+    border-color: $borderColor
 
   &Content
+    .cardView
+      border: 1px solid $borderColor
+      box-shadow: none
+
     .buttonNormal
       border-color: $borderColor
       background: $white
@@ -46,10 +51,17 @@
       &:hover
         border-color: $brand
 
+    &Section
+      & + &
+        margin-top: $baseSpacing
+
+      .loadingWrap
+        height: 133px
+
   // External
   &Modal
     .modal-close
-      top: 18px
+      margin-top: 1px
 
     .modal-content
       background: $bgColor

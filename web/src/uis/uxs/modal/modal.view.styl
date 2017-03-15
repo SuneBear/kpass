@@ -62,8 +62,8 @@
     flex: 1
 
     .scrollable-viewport
-      padding: qu(4)
       flex: 1
+      padding: qu(4)
       overflow: auto
       thin-scroll()
 
@@ -86,6 +86,14 @@
     min-height: qu(12) + 1
     padding: qu(2) qu(4)
     border-top: 1px solid $gray90
+
+  // Without header
+  &.without-header
+    .modal-close
+      top: 17px
+
+    .scrollable-viewport
+      position: relative
 
   // Animation
   &-slide-enter,

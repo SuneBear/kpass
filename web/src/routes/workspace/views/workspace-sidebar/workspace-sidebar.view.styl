@@ -5,9 +5,6 @@
   .navGroup
     padding-top: qu(5)
 
-    & + .nav-group
-      margin-top: qu(4)
-
     .navGroupTitle
       margin-left: qu(5)
       margin-bottom: qu(4)
@@ -27,12 +24,12 @@
         cursor: pointer
         transition: background-color 218ms
 
+        & + .navItem
+          margin-top: qu(1)
+
         span
           display: inline-block
           text-overflow()
-
-        & + .navItem
-          margin-top: qu(1)
 
         &:after
           content: ' '

@@ -86,20 +86,35 @@ export const getUserPermissions = (user, team) => {
 
 export const getCreatorPermissions = (memberId, userMe, team) => {
   const $alwaysTrue = true
+
   const $isCreator = $alwaysTrue // @REPLACE: isCreator(memberId, userMe)
   const $isOwner = isOwner(team, userMe)
   const $isFrozenTeam = isFrozenTeam(team)
   const $isNonFrozenTeamAndCreator = !$isFrozenTeam && $isCreator
 
+  const getFinalPermission = (key) => {
+    const conditions = [
+      $isNonFrozenTeamAndCreator,
+      $isOwner
+    ]
+    return conditions.some((cond) => cond)
+  }
+
   const permissionKeys = [
     // Entry
     'updateEntry',
-    'deleteEntry'
+    'deleteEntry',
+
+    // Secret
+    'createSecret',
+    'updateSecret',
+    'deleteSecret'
   ]
 
+  // Get Permissions
   const permissions = {}
   permissionKeys.map((key) => {
-    const permission = $isNonFrozenTeamAndCreator || $isOwner
+    const permission = getFinalPermission(key)
     permissions[key] = permission
   })
 

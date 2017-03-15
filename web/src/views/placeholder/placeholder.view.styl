@@ -1,6 +1,8 @@
 @require '../../styles/ref'
 
-.placeholder
+$namespace = '.placeholder'
+
+{$namespace}
   &View
     padding: qu(10) qu(5)
     text-align: center
@@ -10,18 +12,39 @@
     > *
       text-overflow()
 
+    // Size
+    &.sizeSmall
+      padding: qu(8) qu(5)
+
+      {$namespace}Image
+        min-width: 52px
+        max-width: 100px
+        margin-bottom: qu(2)
+
+      {$namespace}Icon
+        margin-bottom: qu(1)
+        font-size: 40px
+
+      {$namespace}Title
+        font-size: 14px
+
   &Image
     min-width: 80px
     max-width: 120px
     margin: 0 auto
     margin-bottom: qu(4)
 
+  &Icon
+    line-height: 1
+    margin-bottom: qu(2)
+    font-size: 60px
+    color: $gray65
+
   &Title
     font-size: 18px
-    margin-bottom: qu(3)
 
   &Description
-    null
+    margin-top: qu(3)
 
   &Handler
     margin-top: qu(4)

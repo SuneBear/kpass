@@ -3,17 +3,18 @@
 @require '../field-label/field-label.view'
 
 .input
-  height: qu(10)
+  height: $inputHeight
   min-width: qu(19)
   padding: 10px qu(3)
   font-size: 14px
   color: inherit
   vertical-align: top
-  background-color: transparent
+  background-color: $white
   border: 1px solid $gray85
   border-radius: qu(1)
   outline: 0
   transition: border 318ms
+  resize: none
 
   &[disabled]
     background-color: $gray97
@@ -37,6 +38,7 @@
     border-spacing: 0
     width: 100%
 
+    // Addon
     &-addon
       display: table-cell
       position: relative
@@ -75,3 +77,30 @@
       width: 100%
       border-bottom-right-radius: 0
       border-top-right-radius: 0
+
+  // Prefix & suffix
+  &-preSuffix-wrapper
+    position: relative
+    display: inline-block
+    width: 100%
+
+    input
+      padding-left: qu(9)
+
+  &-prefix,
+  &-suffix
+    position: absolute
+    z-index: 3
+    top: 50%
+    line-height: 0
+    transform: translateY(-50%)
+
+    .icon
+      color: $gray65
+      offset-icon(1)
+
+  &-prefix
+    left: qu(3)
+
+  &-suffix
+    right: qu(3)

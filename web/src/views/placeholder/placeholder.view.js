@@ -1,6 +1,9 @@
 import React, { Component, PropTypes } from 'react'
 import cx from 'classnames'
 
+import { capitalize } from 'utils'
+import { Icon } from 'uis'
+
 import './placeholder.view.styl'
 
 const PLACEHOLDER_IMAGES = {
@@ -17,15 +20,22 @@ export class Placeholder extends Component {
 
   static propTypes = {
     className: PropTypes.string,
+    size: PropTypes.oneOf(['small', 'normal']),
+    iconName: PropTypes.string,
     imageName: PropTypes.string,
     title: PropTypes.string,
     description: PropTypes.string,
     handler: PropTypes.element
   }
 
+  static defaultProps = {
+    size: 'normal'
+  }
+
   getRootClassnames () {
     return cx(
       'placeholderView',
+      [`size${capitalize(this.props.size)}`],
       this.props.className
     )
   }
@@ -45,6 +55,18 @@ export class Placeholder extends Component {
 
     return (
       <img className={'placeholderImage'} src={imageUrl} />
+    )
+  }
+
+  renderIcon () {
+    const { iconName } = this.props
+
+    if (!iconName) {
+      return null
+    }
+
+    return (
+      <Icon className={'placeholderIcon'} name={iconName} />
     )
   }
 
@@ -94,6 +116,7 @@ export class Placeholder extends Component {
     return (
       <div className={this.getRootClassnames()}>
         {this.renderImage()}
+        {this.renderIcon()}
         {this.renderTitle()}
         {this.renderDescription()}
         {this.renderHandler()}

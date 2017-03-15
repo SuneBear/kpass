@@ -20,7 +20,8 @@ export class Datestamp extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    let cond = this.props.date.toJSON() !== nextProps.date.toJSON()
+    const cond = this.props.date.toJSON() !== nextProps.date.toJSON()
+
     if (cond) {
       this.setState({
         date: this.format(nextProps.date)
@@ -48,13 +49,13 @@ export class Datestamp extends Component {
   }
 
   format (t) {
-    let now = moment()
-    let date = moment(t)
+    const now = moment()
+    const date = moment(t)
 
     if (date.year() !== now.year()) {
       return date.format('L')
     } else {
-      let diff = now.diff(date, 'hour', true)
+      const diff = now.diff(date, 'hour', true)
       if (diff < 1) {
         return date.fromNow()
       } else {

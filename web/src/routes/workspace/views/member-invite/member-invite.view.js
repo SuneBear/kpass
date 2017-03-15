@@ -25,11 +25,6 @@ export class MemberInvite extends Component {
     ...formPropTypes
   }
 
-  componentDidMount () {
-    this.refs.usernameInput
-      .getRenderedComponent().focus()
-  }
-
   getRootClassnames () {
     return cx(
       'memberInviteView',
