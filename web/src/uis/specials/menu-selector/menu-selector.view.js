@@ -47,6 +47,7 @@ export class MenuSelector extends Component {
 
   constructor (props) {
     super(props)
+
     this.refPopup = Object.create(null)
   }
 

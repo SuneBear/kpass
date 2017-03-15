@@ -7,6 +7,7 @@ import { Observable } from 'rxjs/Observable'
 import { request, sha256, cookie, unserialize } from 'utils'
 import { toast } from 'uis'
 import { setMemberEntitiesAction } from '../member'
+import { resetTeamEntitiesAction } from '../team'
 import { userSchema } from './user.schema'
 import {
   signUpUserAction,
@@ -143,6 +144,7 @@ const signOutUserEpic = (action$) => {
       cookie('kp_username', null)
       return Observable.of(
         signOutUserSuccessAction(),
+        resetTeamEntitiesAction(),
         setUserMeIdAction({
           userMeId: 'Who\'s Your Daddy?'
         }),

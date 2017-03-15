@@ -4,7 +4,7 @@ import CopyToClipboard from 'react-copy-to-clipboard'
 import cx from 'classnames'
 import { pick } from 'lodash'
 
-import { isUrl } from 'utils'
+import { isUrl, asteriskify } from 'utils'
 import { Icon, Dropdown, MenuSelector, Modal, Tooltip, toast } from 'uis'
 import { Card, Readable } from 'views'
 import { SecretMake } from '../../secret-make'
@@ -19,6 +19,14 @@ export class SecretsListCell extends Component {
     secret: PropTypes.object,
     creatorPermissions: PropTypes.object,
     actions: PropTypes.object
+  }
+
+  constructor (props) {
+    super(props)
+
+    this.state = {
+      showPassword: false
+    }
   }
 
   getRootClassnames () {
@@ -38,6 +46,11 @@ export class SecretsListCell extends Component {
 
   handleEditSecretSubmitSuccess = () => {
     this.editSecretModalRef.close()
+  }
+
+  handleToggleShowPassword = () => {
+    this.state.showPassword = !this.state.showPassword
+    this.setState(this.state)
   }
 
   handleDeleteSecret = () => {
@@ -151,9 +164,15 @@ export class SecretsListCell extends Component {
 
   renderDetailInfoPassword () {
     const { secret } = this.props
+    const { showPassword } = this.state
+    let formattedPassword = secret.password
 
     if (!secret.password) {
       return null
+    }
+
+    if (!showPassword) {
+      formattedPassword = asteriskify(formattedPassword)
     }
 
     const handleCopy = () => {
@@ -162,16 +181,36 @@ export class SecretsListCell extends Component {
       })
     }
 
+    const ValueClassName = cx(
+      'secretDetailInfosItemValue',
+      { isConcealed: !showPassword }
+    )
+
+    const togglePasswordClassName = cx(
+      { isActive: showPassword }
+    )
+
     return (
       <div className={'secretDetailInfosItem'}>
         <div className={'secretDetailInfosItemLabel'}>
           <Icon name={'lock'} />
           <Translate value={'secret.secretPassword'} />
         </div>
-        <div className={'secretDetailInfosItemValue'}>
-          {secret.password}
+        <div className={ValueClassName}>
+          {formattedPassword}
         </div>
         <div className={'secretDetailInfosItemHandler'}>
+          <Tooltip title={I18n.t(showPassword
+            ? 'secret.secretPasswordHide'
+            : 'secret.secretPasswordShow')}
+          >
+            <Icon
+              name={'eye'}
+              className={togglePasswordClassName}
+              Component={'a'}
+              onClick={this.handleToggleShowPassword}
+            />
+          </Tooltip>
           <Tooltip title={I18n.t('secret.secretPasswordCopy')}>
             <CopyToClipboard text={secret.password} onCopy={handleCopy}>
               <Icon name={'copy'} Component={'a'} />

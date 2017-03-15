@@ -17,8 +17,7 @@ export class FieldSelect extends Component {
     options: PropTypes.array,
 
     // Redux from
-    input: PropTypes.object,
-    meta: PropTypes.object
+    input: PropTypes.object
   }
 
   getRootClassNames () {
@@ -44,14 +43,6 @@ export class FieldSelect extends Component {
         text={label}
       />
     )
-  }
-
-  handleFocus = (e) => {
-    this.props.input.onFocus(e)
-  }
-
-  handleBlur = (e) => {
-    this.props.input.onBlur(e)
   }
 
   handleChange = (e) => {

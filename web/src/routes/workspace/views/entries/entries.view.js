@@ -26,9 +26,12 @@ export class Entries extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    const { currentEntry, entriesFilter, actions } = this.props
+    const { params, currentEntry, entriesFilter, actions } = this.props
 
-    if (entriesFilter !== nextProps.params.filterName) {
+    if (
+      !params.filterName ||
+      entriesFilter !== nextProps.params.filterName
+    ) {
       actions.setCurrentFilter({
         filter: nextProps.params.filterName
       })

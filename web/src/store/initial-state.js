@@ -16,9 +16,9 @@ const getInitialLocale = () => {
  * State Tree
  * @types: API, View (UI), Form, Context
  */
-export const initialState = {
+export const getInitialState = () => ({
   i18n: {
     locale: getInitialLocale(),
     translations: dictionaries
   }
-}
+})

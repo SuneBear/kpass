@@ -8,19 +8,7 @@ import './dropdown.view.styl'
 export class Dropdown extends Component {
 
   static propTypes = {
-    style: PropTypes.object,
-    className: PropTypes.string,
-    prefixCls: PropTypes.string,
-    transitionCls: PropTypes.string,
-    action: PropTypes.oneOf(['click', 'hover', 'focus']),
-    placement: PropTypes.string,
-    opened: PropTypes.bool,
-    mountIn: PropTypes.func,
-    content: PropTypes.element,
-    nested: PropTypes.bool,
-    offset: PropTypes.array,
-    onOpen: PropTypes.func,
-    onHide: PropTypes.func,
+    ...Popup.propTypes,
     onClick: PropTypes.func
   }
 
@@ -32,8 +20,15 @@ export class Dropdown extends Component {
 
   constructor (props) {
     super(props)
+
     this.refPopup = Object.create(null)
     this.content = this.getContent(this.props.content)
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.content !== this.props.content) {
+      this.content = this.getContent(nextProps.content)
+    }
   }
 
   savePopup = (el) => {
@@ -77,12 +72,6 @@ export class Dropdown extends Component {
       className: this.getContentClassnames(content),
       onClick: this.handleClick
     })
-  }
-
-  componentWillReceiveProps (nextProps) {
-    if (nextProps.content !== this.props.content) {
-      this.content = this.getContent(nextProps.content)
-    }
   }
 
   render () {

@@ -13,7 +13,6 @@ export class Button extends Component {
       PropTypes.element,
       PropTypes.string
     ]),
-    onClick: PropTypes.func,
     icon: PropTypes.string,
     type: PropTypes.oneOf(['primary', 'text', 'danger', 'normal']),
     htmlType: PropTypes.oneOf(['submit', 'button', 'reset']),
@@ -21,7 +20,8 @@ export class Button extends Component {
     block: PropTypes.bool,
     loading: PropTypes.bool,
     disabled: PropTypes.bool,
-    ghost: PropTypes.bool
+    ghost: PropTypes.bool,
+    onClick: PropTypes.func
   }
 
   static defaultProps = {
