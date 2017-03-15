@@ -1,6 +1,7 @@
 package src
 
 import (
+	"regexp"
 	"strings"
 	"time"
 
@@ -15,7 +16,7 @@ import (
 )
 
 // Version is app version
-const Version = "0.5.1"
+const Version = "v1.0.0-alpha.1"
 
 // New returns a app instance
 func New(dbPath string, env string) *gear.App {
@@ -56,12 +57,14 @@ func New(dbPath string, env string) *gear.App {
 	app.Use(favicon.NewWithIco(faviconBin))
 
 	staticMiddleware := static.New(staticOpts)
+
+	var routerPrefix = regexp.MustCompile(`^/(api|download|upload)/`)
 	app.Use(func(ctx *gear.Context) (err error) {
 		switch {
-		case ctx.Path == "/":
-			return ctx.HTML(200, indexBody)
 		case ctx.Path == "/logo.png" || ctx.Path == "/humans.txt" || ctx.Path == "/robots.txt" || strings.HasPrefix(ctx.Path, "/static/"):
 			return staticMiddleware(ctx)
+		case ctx.Path == "/" || !routerPrefix.MatchString(ctx.Path):
+			return ctx.HTML(200, indexBody)
 		}
 		return nil
 	})

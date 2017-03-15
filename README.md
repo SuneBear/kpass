@@ -9,19 +9,22 @@ KPass is a web application to manage password safe.
 ## Build
 
 ```sh
-go get -t github.com/seccom/kpass
+go get -u github.com/seccom/kpass
 go get -u github.com/jteeuwen/go-bindata/...
 cd $GOPATH/src/github.com/seccom/kpass
+cd web
+yarn install
+cd -
 make build
 ```
+
 It will build three executable files for OSX, windows and linux version in "./dist" directory.
 
 ### Run in OSX
 
 ```sh
-cd ./dist
-./kpass --help
-./kpass
+./dist/kpass --help
+./dist/kpass
 ```
 
 It will run with default options, create a `kpass.kdb` file and open a browser.

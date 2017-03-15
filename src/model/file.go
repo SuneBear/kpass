@@ -3,6 +3,7 @@ package model
 import (
 	"io"
 	"io/ioutil"
+	"net/url"
 	"time"
 
 	"github.com/seccom/kpass/src/auth"
@@ -45,7 +46,7 @@ func (m *File) Create(userID, key, name string, r io.Reader) (
 
 	file := &schema.File{UserID: userID, Name: name, Size: size, Created: util.Time(time.Now())}
 	file.Updated = file.Created
-	fileResult = file.Result(FileID, signed)
+	fileResult = file.Result(FileID, url.QueryEscape(signed))
 	err = m.db.DB.Update(func(tx *buntdb.Tx) error {
 		_, _, e := tx.Set(schema.FileKey(FileID), file.String(), nil)
 		if e == nil {
@@ -128,7 +129,7 @@ func (m *File) FindFiles(EntryID util.OID, key string, ids ...string) (
 			if err != nil {
 				return err
 			}
-			fileResult := file.Result(ID, signed)
+			fileResult := file.Result(ID, url.QueryEscape(signed))
 			fileResult.SetDownloadURL("entry", entryID)
 			files = append(files, fileResult)
 		}
