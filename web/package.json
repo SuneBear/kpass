@@ -106,6 +106,7 @@
     "redux-title": "^0.0.3",
     "reselect": "^2.5.4",
     "rxjs": "5.0.2",
+    "styled-components": "^1.4.4",
     "tb-colors": "^0.2.0",
     "tb-icons": "^0.2.40"
   },
