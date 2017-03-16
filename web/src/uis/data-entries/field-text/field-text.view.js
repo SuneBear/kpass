@@ -105,6 +105,11 @@ export class FieldText extends Component {
       input.value = defaultValue
     }
 
+    const specialOptions = {}
+    if (prefix) {
+      specialOptions.prefix = prefix
+    }
+
     return (
       <div className='inputWrap'>
         <Input
@@ -114,11 +119,11 @@ export class FieldText extends Component {
           placeholder={placeholder}
           autosize={autosize}
           autoFocus={autoFocus}
-          prefix={prefix}
           type={type}
           onFocus={this.handleFocus}
           onBlur={this.handleBlur}
           onChange={this.handleChange}
+          {...specialOptions}
         />
       </div>
     )

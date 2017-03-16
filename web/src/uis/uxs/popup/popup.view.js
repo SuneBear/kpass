@@ -40,6 +40,7 @@ export class Popup extends Component {
 
   constructor (props) {
     super(props)
+
     this.state = {
       visible: this.props.opened
     }

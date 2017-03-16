@@ -26,6 +26,8 @@ export const deleteTeamFailureAction = createAction('DELETE_TEAM_FAILURE')
 
 export const setTeamEntitiesAction = createAction('SET_TEAM_ENTITIES')
 
+export const resetTeamEntitiesAction = createAction('CLEAR_TEAM_ENTITIES')
+
 export const teamReducer = handleActions({
 
   [`${deleteTeamSuccessAction}`]: (state, action) => {
@@ -81,6 +83,12 @@ export const teamReducer = handleActions({
     return {
       ...state,
       entities: nextStateEntities
+    }
+  },
+
+  [`${resetTeamEntitiesAction}`]: (state, action) => {
+    return {
+      ...initialState
     }
   }
 

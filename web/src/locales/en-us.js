@@ -103,6 +103,8 @@ export const enUS = {
     secretName: 'Name',
     secretNamePlaceholder: 'Name, username, email, etc identity',
     secretPassword: 'Key',
+    secretPasswordShow: 'Show password',
+    secretPasswordHide: 'Hide password',
     secretPasswordCopy: 'Copy password',
     secretPasswordCopySucceed: 'Password copied successfully',
     secretPasswordPlaceholder: 'Key / Password',

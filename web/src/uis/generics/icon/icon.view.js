@@ -7,7 +7,8 @@ export class Icon extends Component {
   static propTypes = {
     name: PropTypes.string.isRequired,
     className: PropTypes.string,
-    Component: PropTypes.oneOfType([PropTypes.string, PropTypes.func])
+    Component: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+    onClick: PropTypes.func
   }
 
   static defaultProps = {

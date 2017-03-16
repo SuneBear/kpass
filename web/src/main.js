@@ -6,7 +6,7 @@ import moment from 'moment'
 
 import { request, subscribeHTTPError, cookie } from './utils'
 import { toast } from './uis'
-import { createStore, initialState } from './store'
+import { createStore, getInitialState } from './store'
 import { setUserMeIdAction, setUserEntitiesAction } from './store/modules'
 import App from './app'
 
@@ -15,7 +15,7 @@ import './styles/main.styl'
 // ========================================================
 // Store Instantiation
 // ========================================================
-const store = createStore(initialState)
+const store = createStore(getInitialState())
 
 // ========================================================
 // Render Setup
