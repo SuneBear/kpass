@@ -13,9 +13,11 @@ import (
 )
 
 var (
-	address = flag.String("addr", "127.0.0.1:8088", `Auth service address to listen on.`)
-	dbPath  = flag.String("dbpath", "./kpass.kdb", `KPass database pass.`)
-	devMode = flag.Bool("dev", false, "Development mode, will use memory database as default.")
+	address  = flag.String("addr", "127.0.0.1:8088", `Auth service address to listen on.`)
+	dbPath   = flag.String("dbpath", "./kpass.kdb", `KPass database pass.`)
+	devMode  = flag.Bool("dev", false, "Development mode, will use memory database as default.")
+	certFile = flag.String("certFile", "", `certFile path, used to create TLS service, support HTTP/2.`)
+	keyFile  = flag.String("keyFile", "", `keyFile path, used to create TLS service, support HTTP/2.`)
 )
 
 func main() {
@@ -34,14 +36,18 @@ func main() {
 
 	env := os.Getenv("APP_ENV")
 	app := src.New(*dbPath, env)
-	srv := app.Start(*address)
+
 	go func() {
-		host := "http://" + srv.Addr().String()
+		host := "http://" + app.Server.Addr
 		logger.Info("Start KPass: " + host)
 		time.Sleep(time.Second)
 		startBrowser(host)
 	}()
-	logger.Fatal(srv.Wait())
+	if *certFile != "" && *keyFile != "" {
+		logger.Fatal(app.ListenTLS(*address, *certFile, *keyFile))
+	} else {
+		logger.Fatal(app.Listen(*address))
+	}
 }
 
 // startBrowser tries to open the URL in a browser

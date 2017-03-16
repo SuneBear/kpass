@@ -7,6 +7,7 @@ import (
 	"time"
 
 	josejwt "github.com/SermoDigital/jose/jwt"
+	"github.com/seccom/kpass/src/logger"
 	"github.com/seccom/kpass/src/util"
 	"github.com/teambition/crypto-go"
 	"github.com/teambition/gear"
@@ -128,7 +129,14 @@ func UserIDFromCtx(ctx *gear.Context) (userID string, err error) {
 
 // FromCtx ...
 func FromCtx(ctx *gear.Context) (josejwt.Claims, error) {
-	return std.FromCtx(ctx)
+	userID := ""
+	c, err := std.FromCtx(ctx)
+	if err == nil {
+		userID = c.Get("id").(string)
+	}
+	log := logger.FromCtx(ctx)
+	log["User"] = userID // add user id to log
+	return c, err
 }
 
 // SignedFileKey ...

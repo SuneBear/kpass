@@ -5,6 +5,6 @@ export const getFileUrl = (baseUrl) => {
     return null
   }
   const downloadHost = `${config.FILE_HOST}`
-  const fileUrl = `${downloadHost}/${baseUrl}`
+  const fileUrl = `${downloadHost}${baseUrl}`
   return fileUrl
 }

@@ -6,6 +6,14 @@ KPass is a web application to manage password safe.
 [![Coverage Status](http://img.shields.io/coveralls/seccom/kpass.svg?style=flat-square)](https://coveralls.io/r/seccom/kpass)
 [![License](http://img.shields.io/badge/license-mit-blue.svg?style=flat-square)](https://raw.githubusercontent.com/seccom/kpass/master/LICENSE)
 
+## Feature
+
+1. Support multi-users
+1. Support multi-teams
+1. Support HTTPS and HTTP/2
+1. Support secret files(TODO)
+1. Share secret to other user(TODO)
+
 ## Build
 
 ```sh
@@ -56,15 +64,15 @@ open http://petstore.swagger.io/?url=http://127.0.0.1:3000/swagger.json
 ## Security Design
 
 ```js
-const globalHMACFn = (data) => HMAC(SHA256, dbSalt)(data)
-const globalAESKeyFn = (a, b) => base64Encode(globalHMACFn(globalHMACFn(a) + globalHMACFn(b)))
-const globalPBKDF2Fn = (data, iv) => PBKDF2(dbSalt, 12480, 64, HMAC(SHA512, iv))(data)
-const globalEncryptFn = (key, data) => {
-  let cipherData = AES-CTR(globalHMACFn(key), IV(16), data)
-  let sum = HMAC(SHA1, cipherData)(data)
+globalHMACFn = (a, b) => HMAC(SHA256, a)(b)
+globalAESKeyFn = (a, b) => base64Encode(globalHMACFn(a + b))
+globalPBKDF2Fn = (data, iv) => PBKDF2(dbSalt, 12480, 64, HMAC(SHA512, iv))(data)
+globalEncryptFn = (key, data) => {
+  cipherData = AESCTR(globalHMACFn(key), IV(16), data)
+  sum = HMAC(SHA1, cipherData)(data)
   return cipherData + sum
 }
-const globalDecryptFn = reverse(globalEncryptFn)
+globalDecryptFn = reverse(globalEncryptFn)
 ```
 
 ### User password
@@ -72,11 +80,11 @@ const globalDecryptFn = reverse(globalEncryptFn)
 It is used to verify user.
 
 ```js
-let UserPass = SHA256("someUserPassword")
-let data = globalHmac(UserID) + UserPass
-let iv = IV(8)
-let data = globalPBKDF2Fn(data, iv)
-let UserCheckPass = base64Encode(data + iv)
+UserPass = SHA256("someUserPassword")
+data = globalHmac(UserID) + UserPass
+iv = IV(8)
+data = globalPBKDF2Fn(data, iv)
+UserCheckPass = base64Encode(data + iv)
 // Save UserCheckPass to user Model
 ```
 
@@ -85,7 +93,7 @@ let UserCheckPass = base64Encode(data + iv)
 It is used to encrypt and decrypt user's data.
 
 ```js
-let UserAESKey = globalAESKeyFn(UserPass, UserCheckPass)
+UserAESKey = globalAESKeyFn(UserPass, UserCheckPass)
 ```
 
 ### Team password
@@ -93,11 +101,11 @@ let UserAESKey = globalAESKeyFn(UserPass, UserCheckPass)
 It is used to generate TeamKey.
 
 ```js
-let TeamPass = SHA256(RandPass(20))
-let data = globalHmac(TeamID) + TeamPass
-let iv = IV(8)
-let data = globalPBKDF2Fn(data, iv)
-let TeamCheckPass = base64Encode(data + iv)
+TeamPass = SHA256(RandPass(20))
+data = globalHmac(TeamID) + TeamPass
+iv = IV(8)
+data = globalPBKDF2Fn(data, iv)
+TeamCheckPass = base64Encode(data + iv)
 // Save TeamCheckPass to team Model
 ```
 
@@ -106,7 +114,7 @@ let TeamCheckPass = base64Encode(data + iv)
 It is used to encrypt and decrypt secret messages and files in team' entris.
 
 ```js
-let TeamAESKey = globalAESKeyFn(TeamPass, TeamCheckPass)
+TeamAESKey = globalAESKeyFn(TeamPass, TeamCheckPass)
 ```
 
 ### Team password for member
@@ -116,32 +124,32 @@ All team members should able to get TeamAESKey to encrypt and decrypt.
 **When user login and create a team:**
 
 ```js
-let CipherTeamPass = globalEncryptFn(UserAESKey, TeamPass)
+CipherTeamPass = globalEncryptFn(UserAESKey, TeamPass)
 // Save CipherTeamPass to database with TeamID and UserID
 ```
 
 **When user login and read or write team's data:**
 
 ```js
-let UserAESKey = globalAESKeyFn(UserPass, UserCheckPass)
-let TeamPass = globalDecryptFn(UserAESKey, CipherTeamPass)
-let TeamAESKey = globalAESKeyFn(TeamPass, TeamCheckPass)
-let cipherData = globalEncryptFn(TeamAESKey, data)
-let data = globalDecryptFn(TeamAESKey, cipherData)
+UserAESKey = globalAESKeyFn(UserPass, UserCheckPass)
+TeamPass = globalDecryptFn(UserAESKey, CipherTeamPass)
+TeamAESKey = globalAESKeyFn(TeamPass, TeamCheckPass)
+cipherData = globalEncryptFn(TeamAESKey, data)
+data = globalDecryptFn(TeamAESKey, cipherData)
 ```
 
 **When user A login and invite another user B to the team:**
 
 ```js
-let UserAESKey_A = globalAESKeyFn(UserPass_A, UserCheckPass_A)
-let TeamPass = globalDecryptFn(UserAESKey_A, CipherTeamPass)
-let AESKey = globalAESKeyFn(UserCheckPass_A, UserCheckPass_B)
-let InviteCode = globalEncryptFn(AESKey, TeamPass)
+UserAESKey_A = globalAESKeyFn(UserPass_A, UserCheckPass_A)
+TeamPass = globalDecryptFn(UserAESKey_A, CipherTeamPass)
+AESKey = globalAESKeyFn(UserCheckPass_A, UserCheckPass_B)
+InviteCode = globalEncryptFn(AESKey, TeamPass)
 // user A send InviteCode to user B, user B logined
-let UserAESKey_B = globalAESKeyFn(UserPass_B, UserCheckPass_B)
-let AESKey = globalAESKeyFn(UserCheckPass_A, UserCheckPass_B)
-let TeamPass = globalDecryptFn(AESKey, InviteCode)
+UserAESKey_B = globalAESKeyFn(UserPass_B, UserCheckPass_B)
+AESKey = globalAESKeyFn(UserCheckPass_A, UserCheckPass_B)
+TeamPass = globalDecryptFn(AESKey, InviteCode)
 // Check TeamPass with TeamCheckPass
-let CipherTeamPass = globalEncryptFn(UserAESKey_B, TeamPass)
+CipherTeamPass = globalEncryptFn(UserAESKey_B, TeamPass)
 // Save CipherTeamPass to database with TeamID and UserID_B
 ```

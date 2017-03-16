@@ -41,6 +41,11 @@ func Init() {
 	})
 }
 
+// FromCtx ...
+func FromCtx(ctx *gear.Context) logging.Log {
+	return std.FromCtx(ctx)
+}
+
 // Info ...
 func Info(v interface{}) {
 	std.Info(v)
