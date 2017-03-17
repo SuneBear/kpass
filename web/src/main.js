@@ -97,7 +97,26 @@ if (username) {
 
 // @SideEffect: Handle HTTP Error
 subscribeHTTPError((res) => {
+  const url = res.url
   const status = res.error.status
+
+  const ignoredUrls = [
+    // Account
+    'user',
+    'login',
+    'join'
+  ]
+
+  const isIgnoredUrl = (url) => {
+    return ignoredUrls.some((ignoredUrl) => {
+      return url.indexOf(ignoredUrl) >= 0
+    })
+  }
+
+  if (isIgnoredUrl(url)) {
+    return
+  }
+
   switch (status) {
     case 401:
       return toast.error({
